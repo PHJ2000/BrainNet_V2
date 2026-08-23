@@ -1,0 +1,16 @@
+timestamp	name	cpu_percent	memory_usage	db_connections
+2026-08-20T17:20:55+09:00	bn-vs-fastapi-legacy	5.58%	61.3MiB / 1GiB	91
+2026-08-20T17:20:54+09:00	bn-vs-fastapi-legacy	90.36%	72.73MiB / 1GiB	91
+2026-08-20T17:20:56+09:00	bn-vs-fastapi-legacy	92.02%	72.93MiB / 1GiB	91
+2026-08-20T17:20:59+09:00	bn-vs-fastapi-legacy	91.60%	73.07MiB / 1GiB	91
+2026-08-20T17:21:01+09:00	bn-vs-fastapi-legacy	91.84%	73.02MiB / 1GiB	91
+2026-08-20T17:21:03+09:00	bn-vs-fastapi-legacy	91.61%	73.16MiB / 1GiB	91
+2026-08-20T17:21:05+09:00	bn-vs-fastapi-legacy	92.16%	73.05MiB / 1GiB	91
+2026-08-20T17:21:07+09:00	bn-vs-fastapi-legacy	92.16%	73.12MiB / 1GiB	91
+2026-08-20T17:21:09+09:00	bn-vs-fastapi-legacy	91.74%	73.2MiB / 1GiB	91
+2026-08-20T17:21:11+09:00	bn-vs-fastapi-legacy	91.83%	73.05MiB / 1GiB	91
+2026-08-20T17:21:13+09:00	bn-vs-fastapi-legacy	91.33%	73.26MiB / 1GiB	91
+2026-08-20T17:21:15+09:00	bn-vs-fastapi-legacy	90.93%	73.4MiB / 1GiB	91
+2026-08-20T17:21:17+09:00	bn-vs-fastapi-legacy	91.33%	73.12MiB / 1GiB	91
+2026-08-20T17:21:19+09:00	bn-vs-fastapi-legacy	91.37%	73.16MiB / 1GiB	91
+2026-08-20T17:21:22+09:00	bn-vs-fastapi-legacy	91.59%	73.17MiB / 1GiB	91

@@ -1,0 +1,10 @@
+# Contract mutation results
+
+| Implementation | Stage | Exit | Duration ms |
+|---|---|---:|---:|
+| python | original_build | 0 | 1319 |
+| python | original_runtime | 0 | 1419 |
+| python | mutated_build | 0 | 1265 |
+| python | mutated_runtime | 1 | 1650 |
+| java | original_build | 0 | 27180 |
+| java | mutated_build | 1 | 26587 |

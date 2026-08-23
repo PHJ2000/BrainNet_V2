@@ -1,0 +1,24 @@
+{
+  "kind": "sse",
+  "concurrency": 20,
+  "elapsed_seconds": 0.9,
+  "connections": 20,
+  "http_success": 20,
+  "complete": 20,
+  "success_rate": 1.0,
+  "first_event": {
+    "count": 20,
+    "p50_ms": 385.715,
+    "p95_ms": 399.632,
+    "p99_ms": 422.711,
+    "max_ms": 422.711
+  },
+  "full_stream": {
+    "count": 20,
+    "p50_ms": 857.618,
+    "p95_ms": 874.193,
+    "p99_ms": 892.303,
+    "max_ms": 892.303
+  },
+  "exceptions": {}
+}

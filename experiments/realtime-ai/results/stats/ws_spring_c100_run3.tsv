@@ -1,0 +1,3 @@
+timestamp	name	cpu_percent	memory_usage
+2026-08-20T18:59:20+09:00	bn-rt-spring	0.03%	626.6MiB / 1GiB
+2026-08-20T18:59:22+09:00	bn-rt-spring	41.42%	627MiB / 1GiB

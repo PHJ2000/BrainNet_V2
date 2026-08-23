@@ -1,0 +1,1 @@
+{"concurrency": 100, "duration_seconds": 10.144, "requests": 4343, "success": 4343, "rps": 428.128, "failure_rate": 0.0, "statuses": {"201": 4343}, "latency": {"p50_ms": 222.355, "p95_ms": 311.774, "p99_ms": 350.094, "max_ms": 390.283}}

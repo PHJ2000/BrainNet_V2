@@ -1,0 +1,50 @@
+services:
+  postgres:
+    image: postgres:15.13-alpine
+    environment: { POSTGRES_DB: ownership, POSTGRES_USER: benchmark, POSTGRES_PASSWORD: benchmark }
+    command: ["postgres", "-c", "max_connections=200"]
+    tmpfs: [/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U benchmark -d ownership"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+  provider:
+    build: ./provider
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/health')"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+  fastapi:
+    build: ./fastapi
+    environment:
+      DB_SCHEMA: fs
+      DATABASE_URL: postgresql+asyncpg://benchmark:benchmark@postgres:5432/ownership
+      PROVIDER_URL: http://provider:8080
+    depends_on: { postgres: { condition: service_healthy }, provider: { condition: service_healthy } }
+    ports: ["18201:8080"]
+    cpus: 2
+    mem_limit: 1g
+  spring:
+    build: ./spring
+    environment:
+      DB_SCHEMA: j
+      JDBC_URL: jdbc:postgresql://postgres:5432/ownership
+      DB_USER: benchmark
+      DB_PASSWORD: benchmark
+      PROVIDER_URL: http://provider:8080
+    depends_on: { postgres: { condition: service_healthy }, provider: { condition: service_healthy } }
+    ports: ["18202:8080"]
+    cpus: 2
+    mem_limit: 1g
+    command: ["java", "-Xms128m", "-Xmx512m", "-jar", "app.jar"]
+  proxy:
+    image: nginx:1.29-alpine
+    environment: { CORE_BACKEND: "${CORE_BACKEND:-spring}" }
+    volumes: ["./proxy/default.conf.template:/etc/nginx/templates/default.conf.template:ro"]
+    ports: ["18200:8080"]
+    depends_on: [fastapi, spring]
+  loadgen:
+    build: ./loadgen
+    profiles: ["tools"]

@@ -1,0 +1,4 @@
+timestamp	name	cpu_percent	memory_usage	db_connections
+2026-08-20T17:02:02+09:00	bn-vs-fastapi-safe	0.14%	53.75MiB / 1GiB	23
+2026-08-20T17:02:04+09:00	bn-vs-fastapi-safe	93.47%	54.43MiB / 1GiB	23
+2026-08-20T17:02:07+09:00	bn-vs-fastapi-safe	92.95%	54.91MiB / 1GiB	23

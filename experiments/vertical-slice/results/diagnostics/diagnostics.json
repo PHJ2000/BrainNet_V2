@@ -1,0 +1,122 @@
+[
+  {
+    "implementation": "fastapi-legacy",
+    "case": "validation",
+    "status": 422,
+    "code": "VALIDATION_ERROR",
+    "trace": "diag-fastapi-legacy-validation",
+    "response_contract": true,
+    "log_trace_found": true,
+    "rollback_ok": null
+  },
+  {
+    "implementation": "fastapi-legacy",
+    "case": "missing",
+    "status": 404,
+    "code": "NODE_NOT_FOUND",
+    "trace": "diag-fastapi-legacy-missing",
+    "response_contract": true,
+    "log_trace_found": true,
+    "rollback_ok": null
+  },
+  {
+    "implementation": "fastapi-legacy",
+    "case": "conflict",
+    "status": 200,
+    "code": null,
+    "trace": "diag-fastapi-legacy-conflict",
+    "response_contract": false,
+    "log_trace_found": true,
+    "rollback_ok": null
+  },
+  {
+    "implementation": "fastapi-legacy",
+    "case": "db",
+    "status": 500,
+    "code": "DB_ERROR",
+    "trace": "diag-fastapi-legacy-db",
+    "response_contract": true,
+    "log_trace_found": true,
+    "rollback_ok": true
+  },
+  {
+    "implementation": "fastapi-safe",
+    "case": "validation",
+    "status": 422,
+    "code": "VALIDATION_ERROR",
+    "trace": "diag-fastapi-safe-validation",
+    "response_contract": true,
+    "log_trace_found": true,
+    "rollback_ok": null
+  },
+  {
+    "implementation": "fastapi-safe",
+    "case": "missing",
+    "status": 404,
+    "code": "NODE_NOT_FOUND",
+    "trace": "diag-fastapi-safe-missing",
+    "response_contract": true,
+    "log_trace_found": true,
+    "rollback_ok": null
+  },
+  {
+    "implementation": "fastapi-safe",
+    "case": "conflict",
+    "status": 409,
+    "code": "VERSION_CONFLICT",
+    "trace": "diag-fastapi-safe-conflict",
+    "response_contract": true,
+    "log_trace_found": true,
+    "rollback_ok": null
+  },
+  {
+    "implementation": "fastapi-safe",
+    "case": "db",
+    "status": 500,
+    "code": "DB_ERROR",
+    "trace": "diag-fastapi-safe-db",
+    "response_contract": true,
+    "log_trace_found": true,
+    "rollback_ok": true
+  },
+  {
+    "implementation": "spring",
+    "case": "validation",
+    "status": 422,
+    "code": "VALIDATION_ERROR",
+    "trace": "diag-spring-validation",
+    "response_contract": true,
+    "log_trace_found": true,
+    "rollback_ok": null
+  },
+  {
+    "implementation": "spring",
+    "case": "missing",
+    "status": 404,
+    "code": "NODE_NOT_FOUND",
+    "trace": "diag-spring-missing",
+    "response_contract": true,
+    "log_trace_found": true,
+    "rollback_ok": null
+  },
+  {
+    "implementation": "spring",
+    "case": "conflict",
+    "status": 409,
+    "code": "VERSION_CONFLICT",
+    "trace": "diag-spring-conflict",
+    "response_contract": true,
+    "log_trace_found": true,
+    "rollback_ok": null
+  },
+  {
+    "implementation": "spring",
+    "case": "db",
+    "status": 500,
+    "code": "DB_ERROR",
+    "trace": "diag-spring-db",
+    "response_contract": true,
+    "log_trace_found": true,
+    "rollback_ok": true
+  }
+]

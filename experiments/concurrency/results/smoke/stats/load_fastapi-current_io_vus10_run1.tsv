@@ -1,0 +1,6 @@
+timestamp	name	cpu_percent	memory_usage
+2026-08-20T14:59:53+09:00	bn-fastapi-current	0.19%	34.42MiB / 1GiB
+2026-08-20T14:59:55+09:00	bn-fastapi-current	0.30%	34.42MiB / 1GiB
+2026-08-20T14:59:54+09:00	bn-fastapi-current	0.25%	34.43MiB / 1GiB
+2026-08-20T14:59:57+09:00	bn-fastapi-current	0.23%	34.42MiB / 1GiB
+2026-08-20T14:59:59+09:00	bn-fastapi-current	0.13%	34.41MiB / 1GiB

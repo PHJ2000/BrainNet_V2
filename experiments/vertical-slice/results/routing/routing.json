@@ -1,0 +1,16 @@
+{
+  "cutover_backend": {
+    "runtime": "spring",
+    "status": "ok",
+    "virtual_threads": true
+  },
+  "cutover_ms": 11168,
+  "rollback_backend": {
+    "status": "ok",
+    "runtime": "fastapi",
+    "mode": "legacy",
+    "pool_size_per_process": 30
+  },
+  "rollback_ms": 2753,
+  "passed": true
+}

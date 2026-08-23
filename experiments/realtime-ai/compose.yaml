@@ -1,0 +1,82 @@
+services:
+  provider:
+    build: ./provider
+    image: brainnet-adr3-provider:local
+    container_name: bn-rt-provider
+    ports: ["18200:8080"]
+    cpus: 2
+    mem_limit: 512m
+
+  fastapi-legacy:
+    build: ./fastapi
+    image: brainnet-adr3-fastapi:local
+    container_name: bn-rt-fastapi-legacy
+    environment:
+      APP_MODE: legacy
+      PROVIDER_URL: http://provider:8080
+      UPSTREAM_TIMEOUT_SECONDS: 1
+    depends_on: [provider]
+    ports: ["18201:8080"]
+    cpus: 2
+    mem_limit: 1g
+
+  fastapi-safe:
+    build: ./fastapi
+    image: brainnet-adr3-fastapi:local
+    container_name: bn-rt-fastapi-safe
+    environment:
+      APP_MODE: safe
+      PROVIDER_URL: http://provider:8080
+      UPSTREAM_TIMEOUT_SECONDS: 1
+    depends_on: [provider]
+    ports: ["18202:8080"]
+    cpus: 2
+    mem_limit: 1g
+
+  fastapi-scaled:
+    build: ./fastapi
+    image: brainnet-adr3-fastapi:local
+    container_name: bn-rt-fastapi-scaled
+    environment:
+      APP_MODE: safe
+      PROVIDER_URL: http://provider:8080
+      UPSTREAM_TIMEOUT_SECONDS: 1
+    command: ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8080", "--workers", "2", "--no-access-log"]
+    depends_on: [provider]
+    ports: ["18204:8080"]
+    cpus: 2
+    mem_limit: 1g
+
+  spring:
+    build: ./spring
+    image: brainnet-adr3-spring:local
+    container_name: bn-rt-spring
+    environment:
+      PROVIDER_URL: http://provider:8080
+      UPSTREAM_TIMEOUT_MS: 1000
+    command: ["java", "-Xms128m", "-Xmx512m", "-jar", "app.jar"]
+    depends_on: [provider]
+    ports: ["18203:8080"]
+    cpus: 2
+    mem_limit: 1g
+
+  proxy:
+    image: nginx:1.29-alpine
+    container_name: bn-rt-proxy
+    environment:
+      REALTIME_BACKEND: ${REALTIME_BACKEND:-spring}
+      NGINX_ENVSUBST_FILTER: REALTIME_BACKEND
+    volumes:
+      - ./proxy/default.conf.template:/etc/nginx/templates/default.conf.template:ro
+    ports: ["18210:8080"]
+    depends_on: [fastapi-safe, spring]
+
+  loadgen:
+    build: ./loadgen
+    image: brainnet-adr3-loadgen:local
+    profiles: ["tools"]
+    volumes:
+      - ./loadgen:/work:ro
+      - ./${RESULTS_DIR:-results}:/results
+    working_dir: /work
+    depends_on: [fastapi-legacy, fastapi-safe, spring]

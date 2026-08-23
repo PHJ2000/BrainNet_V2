@@ -1,0 +1,14 @@
+timestamp	name	cpu_percent	memory_usage	db_connections
+2026-08-20T17:59:25+09:00	bn-vs-spring	0.05%	231.8MiB / 1GiB	34
+2026-08-20T17:59:28+09:00	bn-vs-spring	214.55%	234.6MiB / 1GiB	34
+2026-08-20T17:59:30+09:00	bn-vs-spring	216.23%	234.4MiB / 1GiB	34
+2026-08-20T17:59:32+09:00	bn-vs-spring	225.13%	235.2MiB / 1GiB	34
+2026-08-20T17:59:35+09:00	bn-vs-spring	225.38%	236.4MiB / 1GiB	34
+2026-08-20T17:59:37+09:00	bn-vs-spring	227.81%	236.5MiB / 1GiB	34
+2026-08-20T17:59:39+09:00	bn-vs-spring	232.37%	237.4MiB / 1GiB	34
+2026-08-20T17:59:42+09:00	bn-vs-spring	221.41%	238.6MiB / 1GiB	34
+2026-08-20T17:59:44+09:00	bn-vs-spring	235.37%	239.3MiB / 1GiB	34
+2026-08-20T17:59:47+09:00	bn-vs-spring	231.88%	239.6MiB / 1GiB	34
+2026-08-20T17:59:50+09:00	bn-vs-spring	225.32%	240.6MiB / 1GiB	34
+2026-08-20T17:59:52+09:00	bn-vs-spring	226.40%	240.9MiB / 1GiB	34
+2026-08-20T17:59:55+09:00	bn-vs-spring	220.84%	242.4MiB / 1GiB	34

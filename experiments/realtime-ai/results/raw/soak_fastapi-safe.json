@@ -1,0 +1,24 @@
+{
+  "kind": "soak",
+  "duration_seconds": 902.39,
+  "counters": {
+    "ws_ok": 79852,
+    "ai_504": 1,
+    "ai_200": 21606,
+    "sse_ok": 6979,
+    "sse_exception_TimeoutError": 51,
+    "ai_exception_TimeoutError": 128,
+    "ai_502": 11,
+    "sse_failed": 1
+  },
+  "events": 108629,
+  "failures": 192,
+  "failure_rate": 0.001767,
+  "ai_latency": {
+    "count": 21746,
+    "p50_ms": 1388.679,
+    "p95_ms": 6134.018,
+    "p99_ms": 9438.023,
+    "max_ms": 10975.752
+  }
+}

@@ -1,0 +1,17 @@
+timestamp	name	cpu_percent	memory_usage
+2026-08-20T15:48:31+09:00	bn-fastapi-current	14.21%	33.8MiB / 1GiB
+2026-08-20T15:48:34+09:00	bn-fastapi-current	67.22%	45.27MiB / 1GiB
+2026-08-20T15:48:36+09:00	bn-fastapi-current	77.03%	44.59MiB / 1GiB
+2026-08-20T15:48:38+09:00	bn-fastapi-current	79.98%	45.38MiB / 1GiB
+2026-08-20T15:48:40+09:00	bn-fastapi-current	90.33%	44.64MiB / 1GiB
+2026-08-20T15:48:42+09:00	bn-fastapi-current	49.17%	44.84MiB / 1GiB
+2026-08-20T15:48:44+09:00	bn-fastapi-current	67.33%	44.61MiB / 1GiB
+2026-08-20T15:48:46+09:00	bn-fastapi-current	69.04%	45.38MiB / 1GiB
+2026-08-20T15:48:48+09:00	bn-fastapi-current	82.11%	44.84MiB / 1GiB
+2026-08-20T15:48:50+09:00	bn-fastapi-current	49.27%	44.63MiB / 1GiB
+2026-08-20T15:48:52+09:00	bn-fastapi-current	73.00%	44.64MiB / 1GiB
+2026-08-20T15:48:55+09:00	bn-fastapi-current	57.58%	44.52MiB / 1GiB
+2026-08-20T15:48:54+09:00	bn-fastapi-current	2.81%	44.52MiB / 1GiB
+2026-08-20T15:48:56+09:00	bn-fastapi-current	72.59%	45.01MiB / 1GiB
+2026-08-20T15:48:58+09:00	bn-fastapi-current	86.62%	45.37MiB / 1GiB
+2026-08-20T15:49:01+09:00	bn-fastapi-current	9.06%	43.86MiB / 1GiB

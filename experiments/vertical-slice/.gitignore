@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+spring/target/
+mutation/work/
+

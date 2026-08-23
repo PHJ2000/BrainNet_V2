@@ -1,0 +1,1 @@
+{"base_url": "http://proxy:8080", "contract": {"status": 201, "array_of_one": true, "content": "idea:brainstorm", "state": "GHOST", "project_id": 1, "parent_id": 1, "depth": 2, "order_index": 3, "pos_x": 10.5, "pos_y": 20.5, "tags": []}, "contract_pass": true, "pass": true, "websocket_fastapi_pass": true}

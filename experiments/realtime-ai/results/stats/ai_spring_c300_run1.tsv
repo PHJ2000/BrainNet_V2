@@ -1,0 +1,12 @@
+timestamp	name	cpu_percent	memory_usage
+2026-08-20T18:53:45+09:00	bn-rt-spring	0.10%	351.3MiB / 1GiB
+2026-08-20T18:53:47+09:00	bn-rt-spring	5.45%	352.1MiB / 1GiB
+2026-08-20T18:53:49+09:00	bn-rt-spring	122.15%	411.9MiB / 1GiB
+2026-08-20T18:53:51+09:00	bn-rt-spring	118.11%	429.3MiB / 1GiB
+2026-08-20T18:53:54+09:00	bn-rt-spring	42.30%	446.9MiB / 1GiB
+2026-08-20T18:53:53+09:00	bn-rt-spring	50.07%	463.5MiB / 1GiB
+2026-08-20T18:53:55+09:00	bn-rt-spring	42.98%	472.4MiB / 1GiB
+2026-08-20T18:53:57+09:00	bn-rt-spring	56.05%	490.4MiB / 1GiB
+2026-08-20T18:53:59+09:00	bn-rt-spring	65.11%	499.5MiB / 1GiB
+2026-08-20T18:54:01+09:00	bn-rt-spring	52.82%	534.9MiB / 1GiB
+2026-08-20T18:54:04+09:00	bn-rt-spring	76.71%	606.3MiB / 1GiB

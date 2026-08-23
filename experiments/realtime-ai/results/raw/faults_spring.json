@@ -1,0 +1,18 @@
+{
+  "kind": "faults",
+  "provider_503_status": 502,
+  "timeout_status": 504,
+  "recovery_status": 200,
+  "cancelled_stream_events": 1,
+  "provider_after_cancel": {
+    "active": 0,
+    "started": 4,
+    "completed": 2,
+    "cancelled": 1
+  },
+  "websocket_reconnect": true,
+  "server_after_disconnect": {
+    "websocket_connections": 0
+  },
+  "pass": true
+}

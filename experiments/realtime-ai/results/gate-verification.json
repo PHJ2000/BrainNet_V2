@@ -1,0 +1,24 @@
+{
+  "checks": {
+    "ai_spring_each_run_failure_below_1pct": true,
+    "ai_spring_p95_noninferior": true,
+    "sse_both_complete_99pct": true,
+    "sse_spring_first_event_noninferior": true,
+    "websocket_both_accuracy_99pct": true,
+    "websocket_spring_echo_noninferior": false,
+    "fault_probes": true,
+    "routing_and_rollback": true,
+    "soak_fastapi-safe_failure_below_1pct": true,
+    "soak_fastapi-safe_no_restart_or_oom": true,
+    "soak_fastapi-safe_rss_growth_below_20pct": true,
+    "soak_spring_failure_below_1pct": true,
+    "soak_spring_no_restart_or_oom": true,
+    "soak_spring_rss_growth_below_20pct": true
+  },
+  "failed_gates": [
+    "websocket_spring_echo_noninferior"
+  ],
+  "full_adoption": false,
+  "decision": "hybrid",
+  "websocket_500_p95_increase_percent": 160.964
+}

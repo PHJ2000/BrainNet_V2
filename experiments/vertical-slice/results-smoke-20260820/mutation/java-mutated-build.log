@@ -1,0 +1,16 @@
+[ERROR] COMPILATION ERROR : 
+[ERROR] /app/src/test/java/com/brainnet/vertical/ApiModelsTest.java:[9,24] cannot find symbol
+  symbol:   method order_index()
+  location: variable view of type com.brainnet.vertical.ApiModels.NodeView
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.15.0:testCompile (default-testCompile) on project vertical-slice: Compilation failure
+[ERROR] /app/src/test/java/com/brainnet/vertical/ApiModelsTest.java:[9,24] cannot find symbol
+[ERROR]   symbol:   method order_index()
+[ERROR]   location: variable view of type com.brainnet.vertical.ApiModels.NodeView
+[ERROR] 
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

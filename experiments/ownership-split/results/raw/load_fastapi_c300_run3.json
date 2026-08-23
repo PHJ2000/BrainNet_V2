@@ -1,0 +1,1 @@
+{"concurrency": 300, "duration_seconds": 11.036, "requests": 1778, "success": 1740, "rps": 161.116, "failure_rate": 0.021372, "statuses": {"201": 1740, "exception:TimeoutError": 34, "500": 2, "exception:ServerDisconnectedError": 2}, "latency": {"p50_ms": 1390.701, "p95_ms": 4060.743, "p99_ms": 5384.462, "max_ms": 5865.621}}
