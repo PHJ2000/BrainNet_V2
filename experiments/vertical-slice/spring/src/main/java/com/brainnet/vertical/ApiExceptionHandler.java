@@ -41,4 +41,3 @@ class ApiExceptionHandler {
         return response(HttpStatus.INTERNAL_SERVER_ERROR, "DB_ERROR", "database operation failed", request);
     }
 }
-

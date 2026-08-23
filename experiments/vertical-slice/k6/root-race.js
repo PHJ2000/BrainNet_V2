@@ -14,4 +14,3 @@ export default function () {
   check(response, { expected: (r) => r.status === 201 || r.status === 409 });
   if (response.status === 201) created.add(1); else if (response.status === 409) conflict.add(1); else unexpected.add(1);
 }
-

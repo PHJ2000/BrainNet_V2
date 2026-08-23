@@ -9,4 +9,3 @@ class ApiModelsTest {
         assertThat(view.order_index()).isEqualTo(7);
     }
 }
-

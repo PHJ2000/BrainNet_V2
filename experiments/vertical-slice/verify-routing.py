@@ -54,4 +54,3 @@ result = {
 if not result["passed"]:
     raise SystemExit("routing verification failed")
 print(OUT / "summary.md")
-

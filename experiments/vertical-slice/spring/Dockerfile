@@ -8,4 +8,3 @@ FROM eclipse-temurin:25-jre
 WORKDIR /app
 COPY --from=build /src/target/vertical-slice-0.0.1-SNAPSHOT.jar app.jar
 CMD ["java", "-XX:MaxRAMPercentage=75", "-jar", "app.jar"]
-

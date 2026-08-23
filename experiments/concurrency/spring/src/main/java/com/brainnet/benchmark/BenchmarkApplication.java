@@ -9,4 +9,3 @@ public class BenchmarkApplication {
         SpringApplication.run(BenchmarkApplication.class, args);
     }
 }
-

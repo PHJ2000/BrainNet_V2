@@ -25,4 +25,3 @@ class SchemaInitializer implements ApplicationRunner {
         jdbc.execute("CREATE UNIQUE INDEX IF NOT EXISTS uq_" + schema + "_active_root ON " + schema + ".node(project_id) WHERE parent_id IS NULL AND state='ACTIVE'");
     }
 }
-

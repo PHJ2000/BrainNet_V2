@@ -71,4 +71,3 @@ async def create_root(project_id: int, response: Response):
         response.status_code = status.HTTP_409_CONFLICT
         return {"created": False, "project_id": project_id}
     return {"created": True, "project_id": project_id}
-

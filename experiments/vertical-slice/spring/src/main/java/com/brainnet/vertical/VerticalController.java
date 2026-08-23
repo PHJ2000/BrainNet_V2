@@ -48,4 +48,3 @@ class VerticalController {
 
     @GetMapping("/benchmark/state") StateView state() { return service.state(); }
 }
-

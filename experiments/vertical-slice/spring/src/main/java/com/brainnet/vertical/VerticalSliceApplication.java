@@ -9,4 +9,3 @@ public class VerticalSliceApplication {
         SpringApplication.run(VerticalSliceApplication.class, args);
     }
 }
-

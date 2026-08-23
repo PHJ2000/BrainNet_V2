@@ -40,4 +40,3 @@ for row in rows:
     lines.append(f"| {row['implementation']} | {row['stage']} | {row['exit_code']} | {row['duration_ms']} |")
 (base / "summary.md").write_text("\n".join(lines) + "\n")
 PY
-
