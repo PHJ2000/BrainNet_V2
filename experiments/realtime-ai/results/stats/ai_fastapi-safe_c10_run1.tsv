@@ -1,0 +1,12 @@
+timestamp	name	cpu_percent	memory_usage
+2026-08-20T18:44:28+09:00	bn-rt-fastapi-safe	0.20%	40.62MiB / 1GiB
+2026-08-20T18:44:30+09:00	bn-rt-fastapi-safe	3.66%	40.89MiB / 1GiB
+2026-08-20T18:44:32+09:00	bn-rt-fastapi-safe	15.19%	40.64MiB / 1GiB
+2026-08-20T18:44:34+09:00	bn-rt-fastapi-safe	15.87%	41.13MiB / 1GiB
+2026-08-20T18:44:36+09:00	bn-rt-fastapi-safe	15.32%	40.66MiB / 1GiB
+2026-08-20T18:44:38+09:00	bn-rt-fastapi-safe	15.94%	40.66MiB / 1GiB
+2026-08-20T18:44:40+09:00	bn-rt-fastapi-safe	18.10%	40.68MiB / 1GiB
+2026-08-20T18:44:42+09:00	bn-rt-fastapi-safe	17.26%	40.7MiB / 1GiB
+2026-08-20T18:44:44+09:00	bn-rt-fastapi-safe	24.81%	40.69MiB / 1GiB
+2026-08-20T18:44:46+09:00	bn-rt-fastapi-safe	26.67%	40.69MiB / 1GiB
+2026-08-20T18:44:48+09:00	bn-rt-fastapi-safe	22.18%	40.69MiB / 1GiB

@@ -1,0 +1,3 @@
+timestamp	name	cpu_percent	memory_usage
+2026-08-20T18:59:24+09:00	bn-rt-fastapi-safe	0.20%	67.9MiB / 1GiB
+2026-08-20T18:59:27+09:00	bn-rt-fastapi-safe	54.84%	69.04MiB / 1GiB

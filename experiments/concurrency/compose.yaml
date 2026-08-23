@@ -1,0 +1,92 @@
+name: brainnet-concurrency
+
+services:
+  postgres:
+    image: postgres:15.13-alpine
+    container_name: bn-bench-postgres
+    command: ["postgres", "-c", "max_connections=200"]
+    environment:
+      POSTGRES_DB: benchmark
+      POSTGRES_USER: benchmark
+      POSTGRES_PASSWORD: benchmark
+    volumes:
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U benchmark -d benchmark && test $(psql -U benchmark -d benchmark -Atc 'SHOW max_connections') = 200"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+    cpus: 2.0
+    mem_limit: 1g
+
+  fastapi-current:
+    build: ./fastapi
+    container_name: bn-fastapi-current
+    environment:
+      WAIT_MODE: blocking
+      DATABASE_URL: postgresql://benchmark:benchmark@postgres:5432/benchmark
+      DB_POOL_SIZE: 30
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports: ["18001:8080"]
+    cpus: 2.0
+    mem_limit: 1g
+
+  fastapi-async:
+    build: ./fastapi
+    container_name: bn-fastapi-async
+    environment:
+      WAIT_MODE: async
+      DATABASE_URL: postgresql://benchmark:benchmark@postgres:5432/benchmark
+      DB_POOL_SIZE: 30
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports: ["18002:8080"]
+    cpus: 2.0
+    mem_limit: 1g
+
+  spring-platform:
+    build: ./spring
+    container_name: bn-spring-platform
+    environment:
+      VIRTUAL_THREADS: "false"
+      DATABASE_URL: jdbc:postgresql://postgres:5432/benchmark
+      DATABASE_USERNAME: benchmark
+      DATABASE_PASSWORD: benchmark
+      DB_POOL_SIZE: 30
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports: ["18003:8080"]
+    cpus: 2.0
+    mem_limit: 1g
+
+  spring-virtual:
+    build: ./spring
+    container_name: bn-spring-virtual
+    environment:
+      VIRTUAL_THREADS: "true"
+      DATABASE_URL: jdbc:postgresql://postgres:5432/benchmark
+      DATABASE_USERNAME: benchmark
+      DATABASE_PASSWORD: benchmark
+      DB_POOL_SIZE: 30
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports: ["18004:8080"]
+    cpus: 2.0
+    mem_limit: 1g
+
+  k6:
+    image: grafana/k6:1.2.3
+    environment:
+      BASE_URL: http://fastapi-current:8080
+      SCENARIO: io
+      VUS: 10
+      DURATION: 30s
+    volumes:
+      - ./k6:/scripts:ro
+      - ./results:/results
+    profiles: ["tools"]

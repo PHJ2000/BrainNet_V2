@@ -1,0 +1,7 @@
+runtime,concurrency,rps,p95_ms,failure_rate
+fastapi,10,38.491,275.594,0.0
+fastapi,100,128.553,1385.213,0.0
+fastapi,300,161.116,4060.743,0.016
+spring,10,47.827,220.713,0.0
+spring,100,419.893,304.904,0.0
+spring,300,550.474,881.588,0.0

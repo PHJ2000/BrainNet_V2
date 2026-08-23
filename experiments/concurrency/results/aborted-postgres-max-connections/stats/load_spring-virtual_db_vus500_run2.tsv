@@ -1,0 +1,17 @@
+timestamp	name	cpu_percent	memory_usage
+2026-08-20T15:53:23+09:00	bn-spring-virtual	7.87%	903.5MiB / 1GiB
+2026-08-20T15:53:24+09:00	bn-spring-virtual	0.03%	903MiB / 1GiB
+2026-08-20T15:53:26+09:00	bn-spring-virtual	10.44%	903MiB / 1GiB
+2026-08-20T15:53:28+09:00	bn-spring-virtual	9.35%	903MiB / 1GiB
+2026-08-20T15:53:30+09:00	bn-spring-virtual	11.16%	903.7MiB / 1GiB
+2026-08-20T15:53:32+09:00	bn-spring-virtual	10.94%	903.2MiB / 1GiB
+2026-08-20T15:53:34+09:00	bn-spring-virtual	10.27%	903.5MiB / 1GiB
+2026-08-20T15:53:36+09:00	bn-spring-virtual	12.72%	903.7MiB / 1GiB
+2026-08-20T15:53:38+09:00	bn-spring-virtual	10.23%	903.5MiB / 1GiB
+2026-08-20T15:53:40+09:00	bn-spring-virtual	8.45%	903.3MiB / 1GiB
+2026-08-20T15:53:42+09:00	bn-spring-virtual	8.09%	903.3MiB / 1GiB
+2026-08-20T15:53:44+09:00	bn-spring-virtual	9.36%	903.8MiB / 1GiB
+2026-08-20T15:53:46+09:00	bn-spring-virtual	10.02%	903.2MiB / 1GiB
+2026-08-20T15:53:48+09:00	bn-spring-virtual	10.62%	903.2MiB / 1GiB
+2026-08-20T15:53:50+09:00	bn-spring-virtual	13.21%	903.2MiB / 1GiB
+2026-08-20T15:53:52+09:00	bn-spring-virtual	5.26%	902.7MiB / 1GiB

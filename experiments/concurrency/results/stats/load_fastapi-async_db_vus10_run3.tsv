@@ -1,0 +1,16 @@
+timestamp	name	cpu_percent	memory_usage
+2026-08-20T15:58:24+09:00	bn-fastapi-async	6.09%	34.84MiB / 1GiB
+2026-08-20T15:58:24+09:00	bn-fastapi-async	0.14%	34.84MiB / 1GiB
+2026-08-20T15:58:26+09:00	bn-fastapi-async	16.21%	35.12MiB / 1GiB
+2026-08-20T15:58:28+09:00	bn-fastapi-async	21.88%	34.87MiB / 1GiB
+2026-08-20T15:58:30+09:00	bn-fastapi-async	16.09%	34.87MiB / 1GiB
+2026-08-20T15:58:32+09:00	bn-fastapi-async	14.16%	35.14MiB / 1GiB
+2026-08-20T15:58:35+09:00	bn-fastapi-async	16.79%	35.12MiB / 1GiB
+2026-08-20T15:58:37+09:00	bn-fastapi-async	19.30%	35.36MiB / 1GiB
+2026-08-20T15:58:39+09:00	bn-fastapi-async	17.00%	35.13MiB / 1GiB
+2026-08-20T15:58:41+09:00	bn-fastapi-async	16.34%	34.88MiB / 1GiB
+2026-08-20T15:58:43+09:00	bn-fastapi-async	15.62%	35.15MiB / 1GiB
+2026-08-20T15:58:45+09:00	bn-fastapi-async	15.19%	34.88MiB / 1GiB
+2026-08-20T15:58:47+09:00	bn-fastapi-async	14.91%	35.12MiB / 1GiB
+2026-08-20T15:58:49+09:00	bn-fastapi-async	14.94%	35.61MiB / 1GiB
+2026-08-20T15:58:51+09:00	bn-fastapi-async	13.82%	34.84MiB / 1GiB

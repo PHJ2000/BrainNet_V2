@@ -1,0 +1,19 @@
+{
+  "kind": "soak",
+  "duration_seconds": 900.876,
+  "counters": {
+    "ws_ok": 89801,
+    "ai_200": 216287,
+    "sse_ok": 30956
+  },
+  "events": 337044,
+  "failures": 0,
+  "failure_rate": 0.0,
+  "ai_latency": {
+    "count": 216287,
+    "p50_ms": 204.567,
+    "p95_ms": 222.404,
+    "p99_ms": 236.749,
+    "max_ms": 455.782
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "kind": "websocket",
+  "requested": 100,
+  "connected": 100,
+  "connection_rate": 1.0,
+  "echo_ok": 100,
+  "echo_rate": 1.0,
+  "broadcast_ok": 100,
+  "broadcast_rate": 1.0,
+  "server_reported_delivered": 100,
+  "elapsed_seconds": 0.291,
+  "connect": {
+    "count": 100,
+    "p50_ms": 197.409,
+    "p95_ms": 208.846,
+    "p99_ms": 208.991,
+    "max_ms": 218.594
+  },
+  "echo": {
+    "count": 100,
+    "p50_ms": 14.581,
+    "p95_ms": 15.405,
+    "p99_ms": 15.476,
+    "max_ms": 15.486
+  }
+}

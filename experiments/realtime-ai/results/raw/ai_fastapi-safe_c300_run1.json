@@ -1,0 +1,20 @@
+{
+  "kind": "ai",
+  "concurrency": 300,
+  "duration_seconds": 25.459,
+  "requests": 1670,
+  "success": 961,
+  "rps": 65.596,
+  "failure_rate": 0.424551,
+  "statuses": {
+    "200": 961,
+    "exception:TimeoutError": 709
+  },
+  "latency": {
+    "count": 1670,
+    "p50_ms": 5081.675,
+    "p95_ms": 6000.883,
+    "p99_ms": 6010.534,
+    "max_ms": 6016.441
+  }
+}

@@ -1,0 +1,160 @@
+{
+  "records": [
+    {
+      "backend": "spring",
+      "health": {
+        "status": "ok",
+        "mode": "spring"
+      },
+      "ai": {
+        "kind": "ai",
+        "concurrency": 2,
+        "duration_seconds": 2.114,
+        "requests": 20,
+        "success": 20,
+        "rps": 9.461,
+        "failure_rate": 0.0,
+        "statuses": {
+          "200": 20
+        },
+        "latency": {
+          "count": 20,
+          "p50_ms": 208.847,
+          "p95_ms": 227.947,
+          "p99_ms": 238.348,
+          "max_ms": 238.348
+        }
+      },
+      "sse": {
+        "kind": "sse",
+        "concurrency": 2,
+        "elapsed_seconds": 0.593,
+        "connections": 2,
+        "http_success": 2,
+        "complete": 2,
+        "success_rate": 1.0,
+        "first_event": {
+          "count": 2,
+          "p50_ms": 121.302,
+          "p95_ms": 128.486,
+          "p99_ms": 128.486,
+          "max_ms": 128.486
+        },
+        "full_stream": {
+          "count": 2,
+          "p50_ms": 585.68,
+          "p95_ms": 592.624,
+          "p99_ms": 592.624,
+          "max_ms": 592.624
+        },
+        "exceptions": {}
+      },
+      "websocket": {
+        "kind": "websocket",
+        "requested": 5,
+        "connected": 5,
+        "connection_rate": 1.0,
+        "echo_ok": 5,
+        "echo_rate": 1.0,
+        "broadcast_ok": 5,
+        "broadcast_rate": 1.0,
+        "server_reported_delivered": 5,
+        "elapsed_seconds": 0.036,
+        "connect": {
+          "count": 5,
+          "p50_ms": 11.305,
+          "p95_ms": 30.575,
+          "p99_ms": 30.575,
+          "max_ms": 30.575
+        },
+        "echo": {
+          "count": 5,
+          "p50_ms": 0.297,
+          "p95_ms": 0.41,
+          "p99_ms": 0.41,
+          "max_ms": 0.41
+        }
+      },
+      "switch_ms": 13775
+    },
+    {
+      "backend": "fastapi-safe",
+      "health": {
+        "status": "ok",
+        "mode": "safe"
+      },
+      "ai": {
+        "kind": "ai",
+        "concurrency": 2,
+        "duration_seconds": 2.132,
+        "requests": 20,
+        "success": 20,
+        "rps": 9.38,
+        "failure_rate": 0.0,
+        "statuses": {
+          "200": 20
+        },
+        "latency": {
+          "count": 20,
+          "p50_ms": 207.893,
+          "p95_ms": 241.306,
+          "p99_ms": 259.043,
+          "max_ms": 259.043
+        }
+      },
+      "sse": {
+        "kind": "sse",
+        "concurrency": 2,
+        "elapsed_seconds": 0.604,
+        "connections": 2,
+        "http_success": 2,
+        "complete": 2,
+        "success_rate": 1.0,
+        "first_event": {
+          "count": 2,
+          "p50_ms": 116.952,
+          "p95_ms": 130.798,
+          "p99_ms": 130.798,
+          "max_ms": 130.798
+        },
+        "full_stream": {
+          "count": 2,
+          "p50_ms": 588.814,
+          "p95_ms": 603.459,
+          "p99_ms": 603.459,
+          "max_ms": 603.459
+        },
+        "exceptions": {}
+      },
+      "websocket": {
+        "kind": "websocket",
+        "requested": 5,
+        "connected": 5,
+        "connection_rate": 1.0,
+        "echo_ok": 5,
+        "echo_rate": 1.0,
+        "broadcast_ok": 5,
+        "broadcast_rate": 1.0,
+        "server_reported_delivered": 5,
+        "elapsed_seconds": 0.071,
+        "connect": {
+          "count": 5,
+          "p50_ms": 49.089,
+          "p95_ms": 65.69,
+          "p99_ms": 65.69,
+          "max_ms": 65.69
+        },
+        "echo": {
+          "count": 5,
+          "p50_ms": 0.901,
+          "p95_ms": 0.927,
+          "p99_ms": 0.927,
+          "max_ms": 0.927
+        }
+      },
+      "switch_ms": 12972
+    }
+  ],
+  "passed": true,
+  "existing_connections_migrated": false
+}

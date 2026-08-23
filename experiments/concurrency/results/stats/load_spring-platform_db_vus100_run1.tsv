@@ -1,0 +1,17 @@
+timestamp	name	cpu_percent	memory_usage
+2026-08-20T16:06:15+09:00	bn-spring-platform	31.19%	179.5MiB / 1GiB
+2026-08-20T16:06:17+09:00	bn-spring-platform	135.08%	192.1MiB / 1GiB
+2026-08-20T16:06:19+09:00	bn-spring-platform	89.79%	191.7MiB / 1GiB
+2026-08-20T16:06:21+09:00	bn-spring-platform	52.07%	192.1MiB / 1GiB
+2026-08-20T16:06:23+09:00	bn-spring-platform	40.15%	192.2MiB / 1GiB
+2026-08-20T16:06:23+09:00	bn-spring-platform	0.07%	191.5MiB / 1GiB
+2026-08-20T16:06:25+09:00	bn-spring-platform	52.54%	191.9MiB / 1GiB
+2026-08-20T16:06:27+09:00	bn-spring-platform	31.77%	192.4MiB / 1GiB
+2026-08-20T16:06:29+09:00	bn-spring-platform	27.79%	192MiB / 1GiB
+2026-08-20T16:06:32+09:00	bn-spring-platform	31.49%	192MiB / 1GiB
+2026-08-20T16:06:34+09:00	bn-spring-platform	32.82%	194.6MiB / 1GiB
+2026-08-20T16:06:36+09:00	bn-spring-platform	29.99%	193.9MiB / 1GiB
+2026-08-20T16:06:38+09:00	bn-spring-platform	27.85%	194.7MiB / 1GiB
+2026-08-20T16:06:40+09:00	bn-spring-platform	28.18%	194.8MiB / 1GiB
+2026-08-20T16:06:42+09:00	bn-spring-platform	31.04%	194.6MiB / 1GiB
+2026-08-20T16:06:44+09:00	bn-spring-platform	1.99%	194.1MiB / 1GiB

@@ -1,0 +1,15 @@
+timestamp	name	cpu_percent	memory_usage	db_connections
+2026-08-20T17:53:53+09:00	bn-vs-fastapi-safe	0.75%	153.3MiB / 1GiB	34
+2026-08-20T17:53:55+09:00	bn-vs-fastapi-safe	196.88%	155.1MiB / 1GiB	34
+2026-08-20T17:53:55+09:00	bn-vs-fastapi-safe	198.59%	155.3MiB / 1GiB	34
+2026-08-20T17:53:57+09:00	bn-vs-fastapi-safe	197.25%	155.1MiB / 1GiB	34
+2026-08-20T17:54:00+09:00	bn-vs-fastapi-safe	200.41%	155.1MiB / 1GiB	34
+2026-08-20T17:54:02+09:00	bn-vs-fastapi-safe	199.41%	155.1MiB / 1GiB	34
+2026-08-20T17:54:04+09:00	bn-vs-fastapi-safe	198.57%	155.2MiB / 1GiB	34
+2026-08-20T17:54:07+09:00	bn-vs-fastapi-safe	194.34%	155.4MiB / 1GiB	34
+2026-08-20T17:54:09+09:00	bn-vs-fastapi-safe	194.03%	154.9MiB / 1GiB	34
+2026-08-20T17:54:12+09:00	bn-vs-fastapi-safe	191.27%	154.9MiB / 1GiB	34
+2026-08-20T17:54:14+09:00	bn-vs-fastapi-safe	190.58%	155MiB / 1GiB	34
+2026-08-20T17:54:16+09:00	bn-vs-fastapi-safe	197.65%	155.4MiB / 1GiB	34
+2026-08-20T17:54:19+09:00	bn-vs-fastapi-safe	188.19%	155.1MiB / 1GiB	34
+2026-08-20T17:54:21+09:00	bn-vs-fastapi-safe	193.27%	154.5MiB / 1GiB	34

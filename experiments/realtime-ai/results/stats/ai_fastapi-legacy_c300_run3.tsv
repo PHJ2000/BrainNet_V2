@@ -1,0 +1,14 @@
+timestamp	name	cpu_percent	memory_usage
+2026-08-20T18:57:47+09:00	bn-rt-fastapi-legacy	0.20%	37.88MiB / 1GiB
+2026-08-20T18:57:49+09:00	bn-rt-fastapi-legacy	5.73%	40.73MiB / 1GiB
+2026-08-20T18:57:51+09:00	bn-rt-fastapi-legacy	1.22%	41.04MiB / 1GiB
+2026-08-20T18:57:53+09:00	bn-rt-fastapi-legacy	1.60%	40.84MiB / 1GiB
+2026-08-20T18:57:53+09:00	bn-rt-fastapi-legacy	1.68%	41.03MiB / 1GiB
+2026-08-20T18:57:55+09:00	bn-rt-fastapi-legacy	1.07%	41.1MiB / 1GiB
+2026-08-20T18:57:57+09:00	bn-rt-fastapi-legacy	0.97%	41.2MiB / 1GiB
+2026-08-20T18:57:59+09:00	bn-rt-fastapi-legacy	1.32%	41.12MiB / 1GiB
+2026-08-20T18:58:01+09:00	bn-rt-fastapi-legacy	1.25%	41.13MiB / 1GiB
+2026-08-20T18:58:03+09:00	bn-rt-fastapi-legacy	1.02%	41.15MiB / 1GiB
+2026-08-20T18:58:05+09:00	bn-rt-fastapi-legacy	1.31%	41.4MiB / 1GiB
+2026-08-20T18:58:07+09:00	bn-rt-fastapi-legacy	1.12%	41.68MiB / 1GiB
+2026-08-20T18:58:09+09:00	bn-rt-fastapi-legacy	1.22%	41.5MiB / 1GiB

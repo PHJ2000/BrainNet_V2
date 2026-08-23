@@ -1,0 +1,82 @@
+services:
+  postgres:
+    image: postgres:15.13-alpine
+    container_name: bn-vs-postgres
+    command: ["postgres", "-c", "max_connections=200"]
+    environment:
+      POSTGRES_DB: vertical
+      POSTGRES_USER: benchmark
+      POSTGRES_PASSWORD: benchmark
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U benchmark -d vertical && test \"$(psql -U benchmark -d vertical -Atc 'show max_connections')\" = 200"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  fastapi-legacy:
+    build: ./fastapi
+    image: brainnet-vertical-fastapi:local
+    container_name: bn-vs-fastapi-legacy
+    environment:
+      APP_MODE: legacy
+      DB_SCHEMA: fl
+      DATABASE_URL: postgresql+asyncpg://benchmark:benchmark@postgres:5432/vertical
+    depends_on: { postgres: { condition: service_healthy } }
+    ports: ["18101:8080"]
+    cpus: 2
+    mem_limit: 1g
+
+  fastapi-safe:
+    build: ./fastapi
+    image: brainnet-vertical-fastapi:local
+    container_name: bn-vs-fastapi-safe
+    environment:
+      APP_MODE: safe
+      DB_SCHEMA: fs
+      DB_POOL_SIZE: 15
+      DATABASE_URL: postgresql+asyncpg://benchmark:benchmark@postgres:5432/vertical
+    command: ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8080", "--workers", "2", "--no-access-log"]
+    depends_on: { postgres: { condition: service_healthy } }
+    ports: ["18102:8080"]
+    cpus: 2
+    mem_limit: 1g
+
+  spring:
+    build: ./spring
+    image: brainnet-vertical-spring:local
+    container_name: bn-vs-spring
+    environment:
+      DB_SCHEMA: j
+      JDBC_URL: jdbc:postgresql://postgres:5432/vertical
+      DB_USER: benchmark
+      DB_PASSWORD: benchmark
+    depends_on: { postgres: { condition: service_healthy } }
+    ports: ["18103:8080"]
+    cpus: 2
+    mem_limit: 1g
+    command: ["java", "-Xms128m", "-Xmx512m", "-jar", "app.jar"]
+
+  proxy:
+    image: nginx:1.29-alpine
+    container_name: bn-vs-proxy
+    environment:
+      CORE_BACKEND: ${CORE_BACKEND:-spring}
+    volumes:
+      - ./proxy/default.conf.template:/etc/nginx/templates/default.conf.template:ro
+    ports: ["18100:8080"]
+    depends_on:
+      - fastapi-legacy
+      - spring
+
+  k6:
+    image: grafana/k6:1.2.3
+    profiles: ["tools"]
+    volumes:
+      - ./k6:/scripts:ro
+      - ./results:/results
+    depends_on:
+      - fastapi-legacy
+      - fastapi-safe
+      - spring

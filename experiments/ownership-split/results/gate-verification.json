@@ -1,0 +1,27 @@
+{
+  "levels": [
+    10,
+    100,
+    300
+  ],
+  "protocol_complete": true,
+  "gates": {
+    "no_current_sse": true,
+    "spring_contract": true,
+    "spring_fault_atomicity": true,
+    "spring_failure_under_1pct": true,
+    "spring_p95_noninferior": true,
+    "spring_no_restart_or_oom": true,
+    "routing_cutover": true,
+    "routing_rollback": true,
+    "websocket_stays_fastapi": true
+  },
+  "all_pass": true,
+  "decision": "split-ai-node-to-spring-websocket-fastapi",
+  "spring_vs_fastapi_target": {
+    "concurrency": 300,
+    "rps_change_percent": 241.7,
+    "p95_change_percent": -78.3
+  },
+  "rss_ratio": 1.88
+}

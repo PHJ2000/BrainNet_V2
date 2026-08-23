@@ -1,0 +1,4 @@
+timestamp	name	cpu_percent	memory_usage	db_connections
+2026-08-20T17:01:52+09:00	bn-vs-fastapi-legacy	0.14%	53.83MiB / 1GiB	14
+2026-08-20T17:01:54+09:00	bn-vs-fastapi-legacy	95.23%	54.26MiB / 1GiB	14
+2026-08-20T17:01:54+09:00	bn-vs-fastapi-legacy	95.85%	54.66MiB / 1GiB	14
