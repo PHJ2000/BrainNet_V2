@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.util.UUID;
 import java.util.regex.Pattern;
 import org.slf4j.MDC;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -18,6 +20,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 class TraceFilter extends OncePerRequestFilter {
     static final String ATTRIBUTE = "traceId";
     private static final Pattern TRACE_ID = Pattern.compile("^[A-Za-z0-9._:-]{1,128}$");
+    private static final Logger logger = LoggerFactory.getLogger(TraceFilter.class);
 
     static String traceId(HttpServletRequest request) {
         Object value = request.getAttribute(ATTRIBUTE);
@@ -37,6 +40,8 @@ class TraceFilter extends OncePerRequestFilter {
         try {
             chain.doFilter(request, response);
         } finally {
+            logger.info("request_complete trace_id={} method={} path={} status={}",
+                    traceId, request.getMethod(), request.getRequestURI(), response.getStatus());
             MDC.remove("traceId");
         }
     }

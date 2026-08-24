@@ -57,9 +57,7 @@ class VerticalService {
 
     private void requireMember(long projectId, long userId) {
         Integer member = jdbc.queryForObject(
-                "SELECT count(*) FROM project_user_role pur "
-                        + "JOIN project p ON p.id=pur.project_id "
-                        + "WHERE pur.project_id=? AND pur.user_id=? AND p.is_deleted=false",
+                "SELECT count(*) FROM project_user_role WHERE project_id=? AND user_id=?",
                 Integer.class, projectId, userId);
         if (member == null || member == 0) {
             throw new ApiException(HttpStatus.FORBIDDEN, "FORBIDDEN", "Not a project member");
@@ -70,14 +68,13 @@ class VerticalService {
         requireMember(projectId, userId);
         List<ProjectView> projects = jdbc.query(
                 "SELECT p.id,p.name,p.description,p.owner_id,p.created_at,p.updated_at,p.is_deleted,"
-                        + "(SELECT count(*) FROM project_user_role WHERE project_id=p.id) member_count,"
                         + "(SELECT count(*) FROM node WHERE project_id=p.id) node_count,"
                         + "(SELECT count(*) FROM tag WHERE project_id=p.id) tag_count "
                         + "FROM project p WHERE p.id=? AND p.is_deleted=false",
                 (rs, row) -> new ProjectView(
                         rs.getLong("id"), rs.getString("name"), rs.getString("description"),
                         rs.getLong("owner_id"), timestamp(rs, "created_at"), timestamp(rs, "updated_at"),
-                        rs.getBoolean("is_deleted"), rs.getLong("member_count"),
+                        rs.getBoolean("is_deleted"), null,
                         rs.getLong("node_count"), rs.getLong("tag_count")), projectId);
         if (projects.isEmpty()) {
             throw new ApiException(HttpStatus.NOT_FOUND, "NOT_FOUND", "Project not found");
@@ -100,11 +97,17 @@ class VerticalService {
     @Transactional
     NodeView patchNode(long projectId, long nodeId, NodePatch body, long userId) {
         requireMember(projectId, userId);
+        if (body == null) {
+            throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY, "VALIDATION_ERROR", "Request validation failed");
+        }
         if (body.expected_version() == null) {
+            if (!body.hasChanges()) {
+                throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY, "VALIDATION_ERROR", "Request validation failed");
+            }
             throw new ApiException(HttpStatus.PRECONDITION_REQUIRED, "NODE_VERSION_REQUIRED", "expected_version is required");
         }
         if (body.expected_version() < 0 || !body.hasChanges()) {
-            throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY, "VALIDATION_ERROR", "A node field must be provided");
+            throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY, "VALIDATION_ERROR", "Request validation failed");
         }
 
         List<String> changes = new ArrayList<>();
@@ -123,7 +126,7 @@ class VerticalService {
         String sql = "UPDATE node SET " + String.join(",", changes)
                 + " WHERE id=? AND project_id=? AND version=? RETURNING id,project_id,author_id,content,state,depth,order_index,pos_x,pos_y,parent_id,created_at,updated_at,version";
         List<NodeView> updated = jdbc.query(sql, this::nodeWithoutTags, args.toArray());
-        if (!updated.isEmpty()) return withTags(updated.getFirst());
+        if (!updated.isEmpty()) return updated.getFirst();
 
         Integer exists = jdbc.queryForObject(
                 "SELECT count(*) FROM node WHERE id=? AND project_id=?", Integer.class, nodeId, projectId);

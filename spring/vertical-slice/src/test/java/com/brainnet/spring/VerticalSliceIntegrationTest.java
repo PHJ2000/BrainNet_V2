@@ -21,9 +21,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -33,6 +36,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ExtendWith(OutputCaptureExtension.class)
 class VerticalSliceIntegrationTest {
     private static final String SECRET = "spring-integration-secret-at-least-32-bytes-long";
 
@@ -67,7 +71,9 @@ class VerticalSliceIntegrationTest {
         jdbc.execute("CREATE TABLE IF NOT EXISTS tag_node (tag_id BIGINT NOT NULL, node_id BIGINT NOT NULL, PRIMARY KEY(tag_id,node_id))");
         jdbc.execute("TRUNCATE tag_node, tag, node, project_user_role, project");
         jdbc.update("INSERT INTO project(id,owner_id,name,description) VALUES (1,7,'demo','slice')");
+        jdbc.update("INSERT INTO project(id,owner_id,name,description,is_deleted) VALUES (2,7,'deleted','slice',true)");
         jdbc.update("INSERT INTO project_user_role(project_id,user_id,role) VALUES (1,7,'OWNER')");
+        jdbc.update("INSERT INTO project_user_role(project_id,user_id,role) VALUES (2,7,'OWNER')");
         jdbc.update("INSERT INTO node(id,project_id,author_id,content,state,depth,order_index,pos_x,pos_y) VALUES (11,1,7,'before','ACTIVE',0,0,1,2)");
         jdbc.update("INSERT INTO tag(id,project_id) VALUES (101,1)");
         jdbc.update("INSERT INTO tag_node(tag_id,node_id) VALUES (101,11)");
@@ -78,7 +84,7 @@ class VerticalSliceIntegrationTest {
         HttpResponse<String> project = request("GET", "/projects/1", bearer(7), null, "slice-read-1");
         assertThat(project.statusCode()).isEqualTo(200);
         assertThat(project.headers().firstValue("X-Trace-Id")).contains("slice-read-1");
-        assertThat(project.body()).contains("\"node_count\":1");
+        assertThat(project.body()).contains("\"member_count\":null").contains("\"node_count\":1");
 
         HttpResponse<String> node = request("GET", "/projects/1/nodes/11", bearer(7), null, null);
         assertThat(node.statusCode()).isEqualTo(200);
@@ -101,10 +107,11 @@ class VerticalSliceIntegrationTest {
 
     @Test
     void concurrentPatchesAllowExactlyOneWinner() throws Exception {
-        ExecutorService pool = Executors.newFixedThreadPool(20);
+        int writers = 100;
+        ExecutorService pool = Executors.newFixedThreadPool(writers);
         try {
             List<Future<Integer>> results = new ArrayList<>();
-            for (int i = 0; i < 20; i++) {
+            for (int i = 0; i < writers; i++) {
                 String content = "writer-" + i;
                 results.add(pool.submit(() -> request("PATCH", "/projects/1/nodes/11", bearer(7),
                         "{\"expected_version\":0,\"content\":\"" + content + "\"}", null).statusCode()));
@@ -117,7 +124,7 @@ class VerticalSliceIntegrationTest {
                 if (status == 409) conflicts++;
             }
             assertThat(successes).isEqualTo(1);
-            assertThat(conflicts).isEqualTo(19);
+            assertThat(conflicts).isEqualTo(writers - 1);
             assertThat(jdbc.queryForObject("SELECT version FROM node WHERE id=11", Integer.class)).isEqualTo(1);
         } finally {
             pool.shutdownNow();
@@ -134,6 +141,48 @@ class VerticalSliceIntegrationTest {
                 "{\"content\":\"unsafe\"}", null);
         assertThat(missingVersion.statusCode()).isEqualTo(428);
         assertThat(missingVersion.body()).contains("\"code\":\"NODE_VERSION_REQUIRED\"");
+    }
+
+    @Test
+    void preservesLegacyProjectAndPatchValidationContract() throws Exception {
+        HttpResponse<String> deleted = request("GET", "/projects/2", bearer(7), null, "deleted-project");
+        assertThat(deleted.statusCode()).isEqualTo(404);
+        assertThat(deleted.body()).contains("\"code\":\"NOT_FOUND\"");
+
+        HttpResponse<String> emptyPatch = request("PATCH", "/projects/1/nodes/11", bearer(7), "{}", "empty-patch");
+        assertThat(emptyPatch.statusCode()).isEqualTo(422);
+        assertThat(emptyPatch.body()).contains("\"code\":\"VALIDATION_ERROR\"")
+                .contains("\"message\":\"Request validation failed\"")
+                .contains("\"errors\"");
+
+        HttpResponse<String> negativeVersion = request("PATCH", "/projects/1/nodes/11", bearer(7),
+                "{\"expected_version\":-1,\"content\":\"invalid\"}", "negative-version");
+        assertThat(negativeVersion.statusCode()).isEqualTo(422);
+        assertThat(negativeVersion.body()).contains("\"code\":\"VALIDATION_ERROR\"");
+    }
+
+    @Test
+    void preservesLegacyPatchTagResponseShape() throws Exception {
+        HttpResponse<String> updated = request("PATCH", "/projects/1/nodes/11", bearer(7),
+                "{\"expected_version\":0,\"content\":\"after\"}", "patch-tags");
+        assertThat(updated.statusCode()).isEqualTo(200);
+        assertThat(updated.body()).contains("\"tags\":[]");
+    }
+
+    @Test
+    void missingAuthenticationUsesLegacyBearerChallenge() throws Exception {
+        HttpResponse<String> response = request("GET", "/projects/1", null, null, "missing-auth");
+        assertThat(response.statusCode()).isEqualTo(401);
+        assertThat(response.headers().firstValue("WWW-Authenticate")).contains("Bearer");
+        assertThat(response.body()).contains("\"message\":\"Not authenticated\"");
+    }
+
+    @Test
+    void emitsTraceCorrelatedErrorLogs(CapturedOutput output) throws Exception {
+        HttpResponse<String> response = request("GET", "/projects/1/nodes/999", bearer(7), null, "log-proof");
+        assertThat(response.statusCode()).isEqualTo(404);
+        assertThat(output.getOut()).contains("request_error status=404 code=NODE_NOT_FOUND trace_id=log-proof")
+                .contains("request_complete trace_id=log-proof");
     }
 
     @Test
@@ -155,8 +204,10 @@ class VerticalSliceIntegrationTest {
     private HttpResponse<String> request(String method, String path, String authorization, String body, String trace)
             throws Exception {
         HttpRequest.Builder builder = HttpRequest.newBuilder()
-                .uri(URI.create("http://127.0.0.1:" + port + path))
-                .header("Authorization", authorization);
+                .uri(URI.create("http://127.0.0.1:" + port + path));
+        if (authorization != null) {
+            builder.header("Authorization", authorization);
+        }
         if (trace != null) {
             builder.header("X-Trace-Id", trace);
         }

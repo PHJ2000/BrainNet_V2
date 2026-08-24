@@ -2,6 +2,7 @@ package com.brainnet.spring;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Map;
 
 final class ApiModels {
     private ApiModels() {}
@@ -14,7 +15,7 @@ final class ApiModels {
             OffsetDateTime created_at,
             OffsetDateTime updated_at,
             boolean is_deleted,
-            long member_count,
+            Long member_count,
             long node_count,
             long tag_count) {}
 
@@ -47,4 +48,10 @@ final class ApiModels {
     }
 
     record ErrorView(String code, String message, String trace_id) {}
+
+    record ValidationErrorView(
+            String code,
+            String message,
+            String trace_id,
+            List<Map<String, Object>> errors) {}
 }

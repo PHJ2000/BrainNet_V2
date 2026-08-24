@@ -42,8 +42,8 @@ class JwtAuthFilter extends OncePerRequestFilter {
             HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
         String traceId = TraceFilter.traceId(request);
+        String header = request.getHeader("Authorization");
         try {
-            String header = request.getHeader("Authorization");
             if (header == null || !header.startsWith("Bearer ")) {
                 throw new IllegalArgumentException("missing bearer token");
             }
@@ -60,7 +60,9 @@ class JwtAuthFilter extends OncePerRequestFilter {
             }
             request.setAttribute(USER_ID, Long.parseLong(subject));
         } catch (Exception ex) {
-            ApiErrorWriter.write(mapper, response, 401, "UNAUTHORIZED", "Could not validate credentials", traceId);
+            response.setHeader("WWW-Authenticate", "Bearer");
+            String message = header == null ? "Not authenticated" : "Could not validate credentials";
+            ApiErrorWriter.write(mapper, response, 401, "UNAUTHORIZED", message, traceId);
             return;
         }
         chain.doFilter(request, response);
