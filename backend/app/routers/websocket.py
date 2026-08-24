@@ -1,35 +1,55 @@
-# backend/app/routers/websocket.py
+from fastapi import APIRouter, Query, WebSocket, WebSocketDisconnect
+from jose import JWTError, jwt
+from sqlalchemy import select
 
-from fastapi import APIRouter, WebSocket, Query
-from jose import jwt, JWTError
-from app.core.security import SECRET_KEY, ALGORITHM
+from app.core.security import ALGORITHM, SECRET_KEY
+from app.db.models.project import Project
+from app.db.models.project_user_role import ProjectUserRole
+from app.db.session import AsyncSessionLocal
 from app.utils.ws_manager import connect, disconnect
 
 router = APIRouter()
 
+
 @router.websocket("/projects/{project_id}/ws")
 async def project_ws(
-    project_id: str,
+    project_id: int,
     websocket: WebSocket,
-    token: str = Query(...)
+    token: str = Query(...),
 ):
-    # 1) 토큰 검증
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        if not payload.get("sub"):
+        subject = payload.get("sub")
+        if (
+            not isinstance(subject, str)
+            or not subject.isdigit()
+            or int(subject) <= 0
+        ):
             raise JWTError()
-    except JWTError:
-        # 유효하지 않은 토큰이면 연결 차단
+        user_id = int(subject)
+    except (JWTError, ValueError):
         await websocket.close(code=4401)
         return
 
-    # 2) WS 매니저에 연결 등록
-    await connect(project_id, websocket)
+    async with AsyncSessionLocal() as db:
+        membership = await db.execute(
+            select(ProjectUserRole.project_id)
+            .join(Project, Project.id == ProjectUserRole.project_id)
+            .where(
+                ProjectUserRole.project_id == project_id,
+                ProjectUserRole.user_id == user_id,
+                Project.is_deleted.is_(False),
+            )
+        )
+        if membership.scalar_one_or_none() is None:
+            await websocket.close(code=4403)
+            return
 
+    await connect(project_id, websocket)
     try:
         while True:
-            # 필요에 따라 클라이언트가 보내는 메시지도 처리할 수 있음
             await websocket.receive_text()
+    except WebSocketDisconnect:
+        pass
     finally:
-        # 연결이 끊어질 때 반드시 호출하여 clean-up
         disconnect(project_id, websocket)

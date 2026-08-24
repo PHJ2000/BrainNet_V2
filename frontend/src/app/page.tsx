@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import BackgroundGraph from "./BackgroundGraph"; // 직접 import만 하면 OK
 
 export default function HomePage() {
   return (

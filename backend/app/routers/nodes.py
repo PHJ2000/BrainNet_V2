@@ -1,129 +1,244 @@
-# backend/app/routers/nodes.py
-
-import uuid, re, openai, os
+import os
+import re
+from datetime import datetime, timezone
 from typing import List, Optional
 
-
-from fastapi import APIRouter, Depends, Query, Path, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
+from openai import APIConnectionError, APIStatusError, APITimeoutError, AsyncOpenAI, OpenAIError
+from sqlalchemy import delete, select, update
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, insert, update, delete
 
-from app.models.node import NodeCreate, NodeUpdate, NodeOut
+from app.core.config import REQUIRE_NODE_VERSION
+from app.core.errors import error_detail
 from app.core.security import get_current_user_id as _uid
-from app.utils.helpers import ensure_member as _m, ensure_owner as _o
 from app.db.models.node import Node as NodeORM, NodeStateEnum
 from app.db.models.tag_node import TagNode
-from app.db.models.tag import Tag as TagORM
 from app.db.session import AsyncSessionLocal
-from app.routers.tags import get_descendant_node_ids
+from app.models.node import NodeCreate, NodeOut, NodeUpdate
+from app.utils.helpers import ensure_member as _m
 
 router = APIRouter(prefix="/projects/{project_id}/nodes", tags=["Nodes"])
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
+_ai_client: AsyncOpenAI | None = None
 
 
-# ── DB 세션 의존성 ───────────────────────────────────────────────────
+def _raise(status_code: int, code: str, message: str) -> None:
+    raise HTTPException(status_code=status_code, detail=error_detail(code, message))
+
+
+def _get_ai_client() -> AsyncOpenAI:
+    global _ai_client
+
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        _raise(503, "AI_PROVIDER_NOT_CONFIGURED", "AI provider is not configured")
+
+    if _ai_client is None:
+        _ai_client = AsyncOpenAI(
+            api_key=api_key,
+            timeout=float(os.getenv("OPENAI_TIMEOUT_SECONDS", "30")),
+            max_retries=0,
+        )
+    return _ai_client
+
+
+async def close_ai_client() -> None:
+    global _ai_client
+
+    client, _ai_client = _ai_client, None
+    if client is not None:
+        await client.close()
+
+
 async def get_db():
     async with AsyncSessionLocal() as session:
         yield session
 
 
-# ── 내부 유틸: AI Ghost Stub ────────────────────────────────────────────
-async def _gen_ai_nodes(project_id: int,body: NodeCreate, prompt: str, db: AsyncSession, uid: str = Depends(_uid)) -> List[NodeOut]:
-    """
-    GPT로 유령 노드 한 개를 생성하고, 한 노드를 반환합니다.
-    """
-    nodes_created: List[NodeORM] = []
+async def _project_descendant_node_ids(
+    project_id: int,
+    node_id: int,
+    db: AsyncSession,
+) -> list[int]:
+    # Pair every descendant's UPDATE lock with child creation's parent
+    # KEY SHARE lock so a mutation cannot miss a concurrently inserted child.
+    result = [node_id]
+    seen = {node_id}
+    queue = [node_id]
+    while queue:
+        current_id = queue.pop()
+        rows = await db.execute(_children_for_update_query(project_id, current_id))
+        children = [child_id for child_id in rows.scalars().all() if child_id not in seen]
+        seen.update(children)
+        result.extend(children)
+        queue.extend(children)
+    return result
+
+
+def _children_for_update_query(project_id: int, parent_id: int):
+    return (
+        select(NodeORM.id)
+        .where(
+            NodeORM.project_id == project_id,
+            NodeORM.parent_id == parent_id,
+        )
+        .order_by(NodeORM.id)
+        .with_for_update()
+    )
+
+
+def _parent_query(project_id: int, parent_id: int, *, for_key_share: bool = False):
+    query = select(NodeORM.id).where(
+        NodeORM.id == parent_id,
+        NodeORM.project_id == project_id,
+    )
+    if for_key_share:
+        query = query.with_for_update(read=True, key_share=True)
+    return query
+
+
+def _delete_target_query(project_id: int, node_id: int):
+    return (
+        select(NodeORM.id)
+        .where(NodeORM.id == node_id, NodeORM.project_id == project_id)
+        .with_for_update()
+    )
+
+
+def _mutation_target_query(project_id: int, node_id: int):
+    return (
+        select(NodeORM)
+        .where(NodeORM.id == node_id, NodeORM.project_id == project_id)
+        .with_for_update()
+    )
+
+
+async def _validate_parent(
+    project_id: int,
+    parent_id: int | None,
+    db: AsyncSession,
+    *,
+    for_key_share: bool = False,
+) -> None:
+    if parent_id is None:
+        return
+    parent = await db.execute(
+        _parent_query(project_id, parent_id, for_key_share=for_key_share)
+    )
+    if parent.scalar_one_or_none() is None:
+        _raise(404, "PARENT_NODE_NOT_FOUND", "Parent node not found")
+
+
+async def _inherit_parent_tags(parent_id: int | None, node_id: int, db: AsyncSession) -> None:
+    if parent_id is None:
+        return
+
+    parent_tags = await db.execute(select(TagNode.tag_id).where(TagNode.node_id == parent_id))
+    for tag_id in parent_tags.scalars().all():
+        db.add(TagNode(tag_id=tag_id, node_id=node_id))
+
+
+async def _gen_ai_nodes(
+    project_id: int,
+    body: NodeCreate,
+    prompt: str,
+    db: AsyncSession,
+    uid: str,
+) -> List[NodeOut]:
+    parent_id = body.parent_id if body.parent_id not in (None, 0) else None
+    await _validate_parent(project_id, parent_id, db)
+
+    # Membership/parent checks start an implicit read transaction. Do not keep
+    # its connection checked out while waiting on the external AI provider.
+    await db.rollback()
 
     try:
-        response = openai.chat.completions.create(
-            model="gpt-3.5-turbo",
+        response = await _get_ai_client().chat.completions.create(
+            model=os.getenv("OPENAI_MODEL", "gpt-3.5-turbo"),
             messages=[
                 {"role": "system", "content": "당신은 창의적인 아이디어를 제공하는 도우미입니다."},
-                {"role": "user", "content": f"다음 주제와 관련된 새로운 아이디어를 간략한 문장 형태로 한 개 작성해줘: {prompt}"}
+                {
+                    "role": "user",
+                    "content": f"다음 주제와 관련된 새로운 아이디어를 간략한 문장 형태로 한 개 작성해줘: {prompt}",
+                },
             ],
             max_tokens=256,
             temperature=0.7,
         )
-        answer = response.choices[0].message.content.strip()
-        first_line = answer.split('\n')[0]
-        ideas = [re.sub(r'^\d+\.\s*', '', first_line).strip()]
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    
-    # GHOST 노드 2개 생성
-    for idx, content in enumerate(ideas):
+        answer = response.choices[0].message.content
+        if not answer or not answer.strip():
+            raise ValueError("AI provider returned empty content")
+        content = re.sub(r"^\d+\.\s*", "", answer.splitlines()[0]).strip()
+    except APITimeoutError:
+        _raise(504, "AI_PROVIDER_TIMEOUT", "AI provider request timed out")
+    except (APIConnectionError, APIStatusError, OpenAIError, ValueError, IndexError):
+        _raise(502, "AI_PROVIDER_UNAVAILABLE", "AI provider request failed")
+
+    try:
+        # The provider wait is an authorization/parent race boundary. Recheck
+        # both in the write transaction, and keep a key-share lock on the
+        # parent until the node and inherited tags commit together.
+        await _m(int(uid), project_id, db)
+        await _validate_parent(
+            project_id,
+            parent_id,
+            db,
+            for_key_share=True,
+        )
         new_node = NodeORM(
             project_id=project_id,
-            parent_id=body.parent_id if body.parent_id not in (None, 0, "", "0") else None,
+            parent_id=parent_id,
             author_id=int(uid),
             content=content,
             state=NodeStateEnum.GHOST,
             depth=body.depth or 0,
-            order_index=idx,
+            order_index=body.order or 0,
             pos_x=body.pos_x or 0.0,
             pos_y=body.pos_y or 0.0,
         )
         db.add(new_node)
         await db.flush()
-        nodes_created.append(new_node)
-
-    if body.parent_id is not None:
-        parent_tags = await db.execute(
-            select(TagNode.tag_id).where(TagNode.node_id == body.parent_id)
-        )
-        for (tag_id,) in parent_tags.all():
-            tagnode = TagNode(tag_id=tag_id, node_id=new_node.id)
-            db.add(tagnode)
+        await _inherit_parent_tags(parent_id, new_node.id, db)
         await db.commit()
+    except Exception:
+        await db.rollback()
+        raise
 
-    await db.commit()
-    # 두 노드 모두 refresh
-    for node in nodes_created:
-        await db.refresh(node)
-
-    # 두 노드를 모두 NodeOut 형태로 변환하여 반환
-    return [NodeOut.from_orm(n) for n in nodes_created]
+    return [NodeOut.model_validate(new_node)]
 
 
-# ── CRUD ───────────────────────────────────────────────────────────────
 @router.get("", response_model=List[NodeOut])
 async def list_nodes(
     project_id: int,
     tag_ids: Optional[str] = Query(None),
     uid: str = Depends(_uid),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     await _m(int(uid), project_id, db)
 
     query = select(NodeORM).where(NodeORM.project_id == project_id)
-
     if tag_ids:
         wanted = [int(tid) for tid in tag_ids.split(",")]
-        query = (
-            query.join(TagNode, NodeORM.id == TagNode.node_id)
-                 .where(TagNode.tag_id.in_(wanted))
-        )
+        query = query.join(TagNode, NodeORM.id == TagNode.node_id).where(TagNode.tag_id.in_(wanted))
 
     result = await db.execute(query)
     nodes = result.scalars().all()
-    node_ids = [n.id for n in nodes]
-    tag_result = await db.execute(
-        select(TagNode.node_id, TagNode.tag_id).where(TagNode.node_id.in_(node_ids))
-    )
-    tag_map = {}
-    for node_id, tag_id in tag_result.all():
-        tag_map.setdefault(node_id, []).append(tag_id)
+    node_ids = [node.id for node in nodes]
+    tag_map: dict[int, list[int]] = {}
+    if node_ids:
+        tag_result = await db.execute(
+            select(TagNode.node_id, TagNode.tag_id).where(TagNode.node_id.in_(node_ids))
+        )
+        for node_id, tag_id in tag_result.all():
+            tag_map.setdefault(node_id, []).append(tag_id)
 
-    # NodeOut에 tags 필드 추가해서 반환
     outs = []
-    for n in nodes:
-        out = NodeOut.from_orm(n)
-        out.tags = tag_map.get(n.id, [])
+    for node in nodes:
+        out = NodeOut.model_validate(node)
+        out.tags = tag_map.get(node.id, [])
         outs.append(out)
-
     return outs
-    #return [NodeOut.from_orm(n) for n in nodes]
 
 
 @router.post("", response_model=List[NodeOut], status_code=status.HTTP_201_CREATED)
@@ -131,61 +246,78 @@ async def create_nodes(
     body: NodeCreate,
     project_id: int,
     uid: str = Depends(_uid),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     await _m(int(uid), project_id, db)
 
-    # ✅ 1. AI 모드: ai_prompt 처리
     if body.ai_prompt:
         return await _gen_ai_nodes(project_id, body, body.ai_prompt, db, uid)
-
-    # ✅ 2. content 필수 검사
     if not body.content:
-        raise HTTPException(status_code=400, detail="content is required when ai_prompt absent")
+        _raise(400, "NODE_CONTENT_REQUIRED", "content is required when ai_prompt is absent")
 
-    # ✅ 3. 루트 노드인지 확인
-    is_root = body.parent_id in (None, 0, "", "0")
-
+    is_root = body.parent_id in (None, 0)
     if is_root:
-        # ✅ 해당 프로젝트에 루트 노드가 이미 존재하는지 확인
         result = await db.execute(
-            select(NodeORM).where(NodeORM.project_id == project_id, NodeORM.parent_id == None, NodeORM.state == NodeStateEnum.ACTIVE)
-        )
-        existing_root = result.scalars().first()
-        if existing_root:
-            raise HTTPException(
-                status_code=409,
-                detail="Root node already exists for this project."
+            select(NodeORM.id).where(
+                NodeORM.project_id == project_id,
+                NodeORM.parent_id.is_(None),
+                NodeORM.state == NodeStateEnum.ACTIVE,
             )
+        )
+        if result.scalar_one_or_none() is not None:
+            _raise(409, "ROOT_NODE_CONFLICT", "Root node already exists for this project")
 
-    # ✅ 4. 노드 생성
+    parent_id = None if is_root else body.parent_id
+    await _validate_parent(project_id, parent_id, db, for_key_share=True)
     new_node = NodeORM(
         project_id=project_id,
-        parent_id=body.parent_id if not is_root else None,
+        parent_id=parent_id,
         author_id=int(uid),
         content=body.content,
-        state=NodeStateEnum.GHOST,
+        state=NodeStateEnum.ACTIVE if is_root else NodeStateEnum.GHOST,
         depth=body.depth or 0,
         order_index=body.order or 0,
         pos_x=body.pos_x or 0.0,
         pos_y=body.pos_y or 0.0,
     )
-    db.add(new_node)
-    await db.commit()
-    await db.refresh(new_node)
-
-    # ✅ 5. 부모 태그 상속
-    if body.parent_id is not None:
-        parent_tags = await db.execute(
-            select(TagNode.tag_id).where(TagNode.node_id == body.parent_id)
-        )
-        for (tag_id,) in parent_tags.all():
-            tagnode = TagNode(tag_id=tag_id, node_id=new_node.id)
-            db.add(tagnode)
+    try:
+        db.add(new_node)
+        await db.flush()
+        await _inherit_parent_tags(parent_id, new_node.id, db)
         await db.commit()
+        await db.refresh(new_node)
+    except IntegrityError:
+        await db.rollback()
+        if is_root:
+            _raise(409, "ROOT_NODE_CONFLICT", "Root node already exists for this project")
+        raise
+    except Exception:
+        await db.rollback()
+        raise
 
-    return [NodeOut.from_orm(new_node)]
+    return [NodeOut.model_validate(new_node)]
 
+
+@router.get("/{node_id}", response_model=NodeOut)
+async def get_node(
+    project_id: int = Path(...),
+    node_id: int = Path(...),
+    uid: str = Depends(_uid),
+    db: AsyncSession = Depends(get_db),
+):
+    await _m(int(uid), project_id, db)
+
+    result = await db.execute(
+        select(NodeORM).where(NodeORM.id == node_id, NodeORM.project_id == project_id)
+    )
+    node = result.scalar_one_or_none()
+    if node is None:
+        _raise(404, "NODE_NOT_FOUND", "Node not found")
+
+    out = NodeOut.model_validate(node)
+    tag_result = await db.execute(select(TagNode.tag_id).where(TagNode.node_id == node_id))
+    out.tags = list(tag_result.scalars().all())
+    return out
 
 
 @router.patch("/{node_id}", response_model=NodeOut)
@@ -194,40 +326,44 @@ async def update_node(
     project_id: int = Path(...),
     node_id: int = Path(...),
     uid: str = Depends(_uid),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     await _m(int(uid), project_id, db)
 
     result = await db.execute(
-        select(NodeORM).where(NodeORM.id == node_id, NodeORM.project_id == project_id)
+        select(NodeORM.version).where(NodeORM.id == node_id, NodeORM.project_id == project_id)
     )
-    node = result.scalar_one_or_none()
-    if not node:
-        raise HTTPException(status_code=404, detail="Node not found")
-    print("log")
-    print(body.pos_x)
-    updated = False
-    if body.content is not None:
-        node.content = body.content
-        updated = True
-    if body.pos_x is not None:
-        node.pos_x = body.pos_x
-        updated = True
-    if body.pos_y is not None:
-        node.pos_y = body.pos_y
-        updated = True
-    if body.depth is not None:
-        node.depth = body.depth
-        updated = True
-    if body.order is not None:
-        node.order_index = body.order
-        updated = True
+    current_version = result.scalar_one_or_none()
+    if current_version is None:
+        _raise(404, "NODE_NOT_FOUND", "Node not found")
+    if body.expected_version is None and REQUIRE_NODE_VERSION:
+        _raise(428, "NODE_VERSION_REQUIRED", "expected_version is required")
 
-    if updated:
-        await db.commit()
-        await db.refresh(node)
+    expected_version = body.expected_version if body.expected_version is not None else current_version
+    changes = body.model_dump(exclude_unset=True, exclude_none=True)
+    changes.pop("expected_version", None)
+    if "order" in changes:
+        changes["order_index"] = changes.pop("order")
+    changes["version"] = NodeORM.version + 1
+    changes["updated_at"] = datetime.now(timezone.utc)
 
-    return NodeOut.from_orm(node)
+    updated = await db.execute(
+        update(NodeORM)
+        .where(
+            NodeORM.id == node_id,
+            NodeORM.project_id == project_id,
+            NodeORM.version == expected_version,
+        )
+        .values(**changes)
+        .returning(NodeORM)
+    )
+    node = updated.scalar_one_or_none()
+    if node is None:
+        await db.rollback()
+        _raise(409, "NODE_VERSION_CONFLICT", "Node version does not match expected_version")
+
+    await db.commit()
+    return NodeOut.model_validate(node)
 
 
 @router.delete("/{node_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -235,33 +371,22 @@ async def delete_node(
     project_id: int = Path(...),
     node_id: int = Path(...),
     uid: str = Depends(_uid),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     await _m(int(uid), project_id, db)
 
-    # (1) 삭제할 노드 존재 여부 확인
-    result = await db.execute(
-        select(NodeORM).where(NodeORM.id == node_id, NodeORM.project_id == project_id)
-    )
-    node = result.scalar_one_or_none()
-    if not node:
-        raise HTTPException(status_code=404, detail="Node not found")
+    # Lock before scanning descendants so a concurrent child creator either
+    # finishes first and is included, or observes the committed deletion.
+    result = await db.execute(_delete_target_query(project_id, node_id))
+    if result.scalar_one_or_none() is None:
+        _raise(404, "NODE_NOT_FOUND", "Node not found")
 
-    # (2) 모든 자식 노드 id 리스트 수집 (자기 자신 포함)
-    node_ids = await get_descendant_node_ids( node_id,db)
-
-    # (3) 해당 노드들에 연결된 태그 관계 모두 삭제
+    node_ids = await _project_descendant_node_ids(project_id, node_id, db)
+    await db.execute(delete(TagNode).where(TagNode.node_id.in_(node_ids)))
     await db.execute(
-        delete(TagNode).where(TagNode.node_id.in_(node_ids))
+        delete(NodeORM).where(NodeORM.project_id == project_id, NodeORM.id.in_(node_ids))
     )
-
-    # (4) 실제 노드들 삭제
-    await db.execute(
-        delete(NodeORM).where(NodeORM.id.in_(node_ids))
-    )
-
     await db.commit()
-    return
 
 
 @router.post("/{node_id}/activate", response_model=NodeOut)
@@ -269,34 +394,38 @@ async def activate_node(
     project_id: int = Path(...),
     node_id: int = Path(...),
     uid: str = Depends(_uid),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     await _m(int(uid), project_id, db)
 
-    result = await db.execute(
-        select(NodeORM).where(NodeORM.id == node_id, NodeORM.project_id == project_id)
-    )
+    result = await db.execute(_mutation_target_query(project_id, node_id))
     node = result.scalar_one_or_none()
-    if not node:
-        raise HTTPException(status_code=404, detail="Node not found")
-
+    if node is None:
+        _raise(404, "NODE_NOT_FOUND", "Node not found")
     if node.state != NodeStateEnum.GHOST:
-        raise HTTPException(status_code=400, detail="Node is not in GHOST state")
-    node.state = NodeStateEnum.ACTIVE
+        _raise(400, "NODE_STATE_CONFLICT", "Node is not in GHOST state")
 
-    # 1. 모든 자식 노드 조회
-    node_ids = await get_descendant_node_ids(node_id,db)
-
-    # 2. 자식 노드도 ACTIVE로 변경 (GHOST 상태만)
-    await db.execute(
-        update(NodeORM)
-        .where(NodeORM.id.in_(node_ids), NodeORM.state == NodeStateEnum.GHOST)
-        .values(state=NodeStateEnum.ACTIVE)
-    )
-
-    await db.commit()
-    await db.refresh(node)
-    return NodeOut.from_orm(node)
+    node_ids = await _project_descendant_node_ids(project_id, node_id, db)
+    try:
+        await db.execute(
+            update(NodeORM)
+            .where(
+                NodeORM.project_id == project_id,
+                NodeORM.id.in_(node_ids),
+                NodeORM.state == NodeStateEnum.GHOST,
+            )
+            .values(
+                state=NodeStateEnum.ACTIVE,
+                version=NodeORM.version + 1,
+                updated_at=datetime.now(timezone.utc),
+            )
+        )
+        await db.commit()
+        await db.refresh(node)
+    except IntegrityError:
+        await db.rollback()
+        _raise(409, "ROOT_NODE_CONFLICT", "Root node already exists for this project")
+    return NodeOut.model_validate(node)
 
 
 @router.post("/{node_id}/deactivate", response_model=NodeOut)
@@ -304,29 +433,29 @@ async def deactivate_node(
     project_id: int = Path(...),
     node_id: int = Path(...),
     uid: str = Depends(_uid),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
     await _m(int(uid), project_id, db)
 
-    # (1) 노드 존재 확인
-    result = await db.execute(
-        select(NodeORM).where(NodeORM.id == node_id, NodeORM.project_id == project_id)
-    )
+    result = await db.execute(_mutation_target_query(project_id, node_id))
     node = result.scalar_one_or_none()
-    if not node:
-        raise HTTPException(status_code=404, detail="Node not found")
+    if node is None:
+        _raise(404, "NODE_NOT_FOUND", "Node not found")
 
-    # (2) 전체 자식 노드 id 수집 (자기자신 포함)
-    node_ids = await get_descendant_node_ids( node_id,db)
-
-    # (3) ACTIVE 상태인 노드만 GHOST로 일괄 비활성화
-    # bulk select
+    node_ids = await _project_descendant_node_ids(project_id, node_id, db)
     await db.execute(
         update(NodeORM)
-        .where(NodeORM.id.in_(node_ids), NodeORM.state == NodeStateEnum.ACTIVE)
-        .values(state=NodeStateEnum.GHOST)
+        .where(
+            NodeORM.project_id == project_id,
+            NodeORM.id.in_(node_ids),
+            NodeORM.state == NodeStateEnum.ACTIVE,
+        )
+        .values(
+            state=NodeStateEnum.GHOST,
+            version=NodeORM.version + 1,
+            updated_at=datetime.now(timezone.utc),
+        )
     )
-
     await db.commit()
     await db.refresh(node)
-    return NodeOut.from_orm(node)
+    return NodeOut.model_validate(node)

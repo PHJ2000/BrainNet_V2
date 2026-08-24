@@ -1,0 +1,44 @@
+BrainNet ADR-001~004 단계 전환 runbook
+
+1. 환경 준비
+   cp .env.example .env
+   JWT_SECRET_VALUE="$(openssl rand -hex 32)"
+   sed -i "s/^JWT_SECRET=.*/JWT_SECRET=${JWT_SECRET_VALUE}/" .env
+   AI 기능을 검증할 환경에서만 OPENAI_API_KEY를 설정한다.
+
+2. expand schema 적용 전 확인
+   SELECT project_id, count(*)
+   FROM node
+   WHERE parent_id IS NULL AND state = 'ACTIVE'
+   GROUP BY project_id
+   HAVING count(*) > 1;
+
+   결과가 있으면 중복 ACTIVE root를 먼저 정리한다. migration이 같은 검사를 다시 수행하며,
+   중복이 남아 있으면 schema 일부만 적용하지 않고 실패한다.
+
+3. 호환 배포 순서
+   a. Alembic expand migration 적용
+   b. REQUIRE_NODE_VERSION=false로 legacy FastAPI 계약 배포
+   c. version을 보존하고 expected_version을 보내는 frontend 배포
+   d. legacy/Spring contract shadow 검증 후 REQUIRE_NODE_VERSION=true 전환
+   e. endpoint별 proxy canary와 전체 cutover
+
+4. 검증
+   python -m compileall -q backend
+   pytest -q backend/tests
+   (cd backend && PYTHONPATH=. alembic -c alembic.ini upgrade head)
+   (cd backend && PYTHONPATH=. alembic -c alembic.ini check)
+   RUN_POSTGRES_CONCURRENCY_TESTS=1 pytest -q backend/tests/test_postgres_node_concurrency.py
+   cd frontend && npm ci && npm run build
+
+   PostgreSQL 동시성 검사는 migration이 적용된 격리 DB에서 실행한다. 100개 동시 root 생성과
+   optimistic PATCH가 각각 성공 1건/충돌 99건인지 확인하며, subtree 변경과 깊은 자식 생성의
+   실제 대기는 pg_blocking_pids()로 관찰한다.
+
+5. rollback
+   서비스 장애 시 proxy route만 legacy FastAPI로 즉시 되돌린다. expand된 version,
+   idempotency_request, outbox_event schema는 유지한다. FastAPI도 같은 version/trace/JWT 계약을
+   구현하므로 DB schema rollback 없이 요청을 처리한다.
+
+   alembic downgrade는 데이터가 없는 개발·CI schema round-trip 검증에만 사용한다. 운영 DB에서
+   실행하면 node version, idempotency 응답 cache, 미발행 outbox event가 삭제된다.
