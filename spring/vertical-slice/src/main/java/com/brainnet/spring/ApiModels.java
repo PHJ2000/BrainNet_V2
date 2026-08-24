@@ -47,6 +47,16 @@ final class ApiModels {
         }
     }
 
+    record NodeCreate(
+            String content,
+            String ai_prompt,
+            Long parent_id,
+            Integer depth,
+            Integer order,
+            Double pos_x,
+            Double pos_y,
+            String state) {}
+
     record ErrorView(String code, String message, String trace_id) {}
 
     record ValidationErrorView(

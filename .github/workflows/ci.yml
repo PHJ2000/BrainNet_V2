@@ -227,6 +227,24 @@ jobs:
           jwt_token="$(docker exec --workdir /app --env PYTHONPATH=/app "$backend_container" python /tmp/contract_seed.py)"
           JWT_TOKEN="$jwt_token" FASTAPI_BASE_URL=http://127.0.0.1:8000 SPRING_BASE_URL=http://127.0.0.1:8080 \
             python3 spring/vertical-slice/contract_probe.py
+          docker exec --workdir /app --env PYTHONPATH=/app "$backend_container" python - <<'PY'
+          import os
+          import psycopg
+
+          with psycopg.connect("postgresql://brainnet_ci:brainnet_ci@127.0.0.1:5432/brainnet_ci") as connection:
+              with connection.cursor() as cursor:
+                  cursor.execute("SELECT count(*) FROM node WHERE content='contract-created'")
+                  if cursor.fetchone()[0] != 1:
+                      raise SystemExit("expected exactly one idempotent node")
+                  cursor.execute("SELECT count(*) FROM outbox_event WHERE event_type='node.created'")
+                  if cursor.fetchone()[0] != 1:
+                      raise SystemExit("expected exactly one node.created outbox event")
+                  cursor.execute("SELECT response_status FROM idempotency_request WHERE idempotency_key='contract-node-idempotency'")
+                  row = cursor.fetchone()
+                  if row is None or row[0] != 201:
+                      raise SystemExit(f"unexpected idempotency response row: {row}")
+          print("Spring node create DB proof passed: one node, one outbox event, cached 201 response")
+          PY
           docker logs "$spring_container" | grep -q "request_error status=404 code=NODE_NOT_FOUND trace_id=contract-missing-node"
           docker logs "$spring_container" | grep -q "request_complete trace_id=contract-missing-node"
           docker logs "$spring_container" | grep -q "request_error status=409 code=NODE_VERSION_CONFLICT trace_id=contract-version-conflict"
