@@ -26,12 +26,14 @@ class Response:
 
 
 def call(base_url: str, method: str, path: str, token: str | None, trace_id: str | None,
-         body: dict[str, Any] | None = None) -> Response:
+         body: dict[str, Any] | None = None, idempotency_key: str | None = None) -> Response:
     headers = {"Accept": "application/json"}
     if token is not None:
         headers["Authorization"] = f"Bearer {token}"
     if trace_id is not None:
         headers["X-Trace-Id"] = trace_id
+    if idempotency_key is not None:
+        headers["Idempotency-Key"] = idempotency_key
     payload = None
     if body is not None:
         headers["Content-Type"] = "application/json"
@@ -100,6 +102,32 @@ def run_spring_concurrency_probe(base_url: str, token: str) -> None:
     final = call(base_url, "GET", "/projects/1/nodes/13", token, "contract-concurrency-final")
     if final.status != 200 or final.body.get("version") != 1:
         raise AssertionError(f"100-writer Spring concurrency: final response {final.status} {final.body}")
+
+
+def run_spring_node_creation_probe(base_url: str, token: str) -> None:
+    body = {"content": "contract-created", "parent_id": 12, "depth": 2, "order": 4,
+            "pos_x": 4.5, "pos_y": 5.5}
+    first = call(base_url, "POST", "/projects/1/nodes", token, "contract-node-create",
+                 body, "contract-node-idempotency")
+    second = call(base_url, "POST", "/projects/1/nodes", token, "contract-node-retry",
+                  body, "contract-node-idempotency")
+    if first.status != 201 or second.status != 201:
+        raise AssertionError(f"node create idempotency: unexpected statuses {first.status} {second.status}")
+    if first.body != second.body:
+        raise AssertionError(f"node create idempotency: retry body differs {first.body} {second.body}")
+    created = first.body[0] if isinstance(first.body, list) and first.body else {}
+    if created.get("state") != "GHOST" or created.get("parent_id") != 12 or created.get("tags") != [101]:
+        raise AssertionError(f"node create contract: unexpected response {first.body}")
+
+    reused = call(base_url, "POST", "/projects/1/nodes", token, "contract-node-reused",
+                  {"content": "different", "parent_id": 12}, "contract-node-idempotency")
+    if reused.status != 409 or reused.body.get("code") != "IDEMPOTENCY_KEY_REUSED":
+        raise AssertionError(f"node create idempotency reuse: unexpected response {reused.status} {reused.body}")
+
+    unconfigured_ai = call(base_url, "POST", "/projects/1/nodes", token, "contract-ai-unconfigured",
+                           {"ai_prompt": "contract", "parent_id": 12}, "contract-ai-idempotency")
+    if unconfigured_ai.status != 503 or unconfigured_ai.body.get("code") != "AI_PROVIDER_NOT_CONFIGURED":
+        raise AssertionError(f"AI provider gate: unexpected response {unconfigured_ai.status} {unconfigured_ai.body}")
 
 
 def main() -> int:
@@ -176,9 +204,10 @@ def main() -> int:
     if missing_node_spring.headers.get("x-trace-id") != "contract-missing-node":
         raise AssertionError("Spring missing-node response lost the supplied trace id")
 
+    run_spring_node_creation_probe(spring, token)
     run_spring_concurrency_probe(spring, token)
 
-    print("FastAPI/Spring canonical contract probe passed: project, auth, validation, patch, conflict, trace, 100-writer concurrency")
+    print("FastAPI/Spring canonical contract probe passed: project, auth, validation, patch, conflict, trace, node create/idempotency/outbox, 100-writer concurrency")
     return 0
 
 
