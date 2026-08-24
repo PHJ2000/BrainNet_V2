@@ -10,13 +10,22 @@ Implemented routes:
 - `GET /health`
 - `GET /projects/{project_id}`
 - `GET /projects/{project_id}/nodes/{node_id}`
+- `POST /projects/{project_id}/nodes` for regular and `ai_prompt` node creation
 - `PATCH /projects/{project_id}/nodes/{node_id}` with `expected_version`
 
 The service reads the Alembic public schema, validates the same HS256 JWT
 (`sub` is a positive numeric user id), checks project membership, and uses an
-atomic PostgreSQL conditional update for optimistic concurrency. It does not
-run migrations or initialize tables. Start it only against a database already
-at Alembic head. AI, POST node creation, and WebSocket routes remain in FastAPI.
+atomic PostgreSQL conditional update for optimistic concurrency. Node creation
+uses the Alembic-head `idempotency_request` and `outbox_event` tables in the
+same database transaction; AI provider calls happen before that transaction
+and a successful AI node is stored as `GHOST`. It does not run migrations or
+initialize tables. Start it only against a database already at Alembic head.
+The project WebSocket route (`/projects/{project_id}/ws`) remains owned by
+FastAPI; this service does not attempt a WebSocket cutover.
+
+This module is not itself a production proxy cutover. Before routing the live
+POST path here, run the staging provider contract, shadow/canary, soak,
+resource/JFR, and rollback gates in `docs/migration/adr-rollout-runbook.txt`.
 
 Required configuration:
 
