@@ -28,6 +28,7 @@
 
 import { useProjects } from "./useProjects";
 import Link from "next/link";
+import type { Project } from "@/types/api";
 
 export default function ProjectList() {
   const { data: projects, isLoading } = useProjects();
@@ -38,7 +39,7 @@ export default function ProjectList() {
 
   return (
     <div className="space-y-4">
-      {projects.map((project: any) => (
+      {projects.map((project: Project) => (
         <Link key={project.id} href={`/dashboard/projects/${project.id}`}>
           <div className="p-4 border rounded hover:bg-gray-100 cursor-pointer">
             <h2 className="font-semibold">{project.name}</h2>

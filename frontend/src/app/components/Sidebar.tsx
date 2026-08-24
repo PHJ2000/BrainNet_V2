@@ -4,7 +4,8 @@
 import { useProjects } from "@/features/projects/useProjects";
 import Link from "next/link";
 import { Plus } from "lucide-react";
-import { JSXElementConstructor, Key, ReactElement, ReactNode, ReactPortal, useState } from "react";
+import { useState } from "react";
+import type { Project } from "@/types/api";
 import ProjectFormModal from "./ProjectFormModal";
 
 export default function Sidebar() {
@@ -20,7 +21,7 @@ export default function Sidebar() {
         {isLoading ? (
           <div className="text-sm text-gray-400">불러오는 중...</div>
         ) : (
-          projects.map((p: { id: Key | null | undefined; name: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined; }) => (
+          projects.map((p: Project) => (
             <Link
               key={p.id}
               href={`/dashboard/projects/${p.id}`}

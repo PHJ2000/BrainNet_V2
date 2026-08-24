@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState, memo } from "react";
+import { useCallback, useEffect, useRef, useState, memo } from "react";
 import cytoscape, { Core, ElementDefinition } from "cytoscape";
-import { v4 as uuidv4 } from "uuid";
 import {
   createAINodes as apiCreateAINodes,
   NodeOut,
@@ -49,6 +48,7 @@ export type NodeMeta = {
   status?: "ACTIVE" | "GHOST";
   generated?: boolean;
   tags?: string[];
+  version: number;
   // 자동 크기 조절용
   width?: number;   // 👈 추가!
   height?: number;  // 👈 추가!
@@ -62,7 +62,6 @@ export interface GraphProps {
 const NODE_MENU_ID = "node-ctx";
 
 interface CtxProps {
-  nodeId: string | null;
   tags: Tag[];
   nodeTags: string[];
   onAdd: (tid: string) => void;
@@ -70,7 +69,6 @@ interface CtxProps {
 }
 
 const NodeContextMenu = memo(function NodeContextMenu({
-  nodeId,
   tags,
   nodeTags,
   onAdd,
@@ -119,10 +117,10 @@ function measureNodeSize(label: string, maxWidth = 220, font = "bold 18px Arial"
 
   // 줄 단위로 나누기 (text-wrap용)
   const words = label.split(' ');
-  let lines: string[] = [];
+  const lines: string[] = [];
   let curLine = '';
 
-  for (let word of words) {
+  for (const word of words) {
     const testLine = curLine ? curLine + ' ' + word : word;
     if (ctx.measureText(testLine).width > maxWidth && curLine) {
       lines.push(curLine);
@@ -140,6 +138,27 @@ function measureNodeSize(label: string, maxWidth = 220, font = "bold 18px Arial"
   return { width, height };
 }
 
+function toNodeMeta(n: NodeOut, previous?: NodeMeta): NodeMeta {
+  const { width, height } = measureNodeSize(n.content ?? "");
+  return {
+    id: String(n.id),
+    label: n.content,
+    pos_x: n.pos_x,
+    pos_y: n.pos_y,
+    parentId: n.parent_id ? String(n.parent_id) : undefined,
+    depth: n.depth,
+    order: n.order_index,
+    status: n.state,
+    opacity: n.state === "GHOST" ? 0.3 : 1,
+    frozen: n.state === "ACTIVE" ? true : previous?.frozen ?? true,
+    generated: previous?.generated,
+    version: n.version,
+    width,
+    height,
+    tags: (n.tags ?? []).map(String),
+  };
+}
+
 /* ──────────── 그래프 컴포넌트 ─────────── */
 export default function Graph({ projectId }: GraphProps) {
   const cyRef = useRef<HTMLDivElement>(null);
@@ -151,66 +170,137 @@ export default function Graph({ projectId }: GraphProps) {
   /* ----- 상태 ----- */
   const [nodes, setNodes] = useState<NodeMeta[]>([]);
   const nodesRef = useRef(nodes);
+  const projectIdRef = useRef(projectId);
+  projectIdRef.current = projectId;
   useEffect(() => {
     nodesRef.current = nodes;
   }, [nodes]);
 
-  const updateNodesAndCy = (updater: (arg0: NodeMeta[]) => any) => {
+  const addToCy = useCallback((arr: NodeMeta[]) => {
+    const cy = cyInstance.current;
+    if (!cy) return;
+    const eles: ElementDefinition[] = arr.flatMap((n) => {
+      // 이미 width, height가 있으므로 재계산 필요 없음
+      return [
+        {
+          data: { id: n.id, label: n.label, width: n.width, height: n.height, tag: (n.tags ?? []).map(String) },
+          position: { x: n.pos_x, y: n.pos_y },
+          style: { opacity: n.opacity ?? 1 },
+        },
+        ...(n.parentId
+          ? [{
+            data: {
+              id: `e-${n.parentId}-${n.id}`,
+              source: n.parentId,
+              target: n.id,
+            },
+          }]
+          : []),
+      ];
+    });
+    cy.add(eles);
+  }, []);
+
+  const updateNodesAndCy = (updater: (nodes: NodeMeta[]) => NodeMeta[]) => {
     setNodes((prev) => {
-      const next = typeof updater === "function" ? updater(prev) : updater;
+      const next = updater(prev);
       addToCy(next);
       nodesRef.current = next;
       return next;
     });
 };
 
+  const updateLocalNode = (
+    nodeId: string,
+    updater: (node: NodeMeta) => NodeMeta,
+  ) => {
+    const next = nodesRef.current.map((node) =>
+      node.id === nodeId ? updater(node) : node,
+    );
+    nodesRef.current = next;
+    setNodes(next);
+    return next.find((node) => node.id === nodeId);
+  };
+
+  const refreshNodes = useCallback(async (targetProjectId = projectIdRef.current) => {
+    const list = await fetchNodes(targetProjectId);
+    if (targetProjectId !== projectIdRef.current) {
+      return undefined;
+    }
+    const previousById = new Map(
+      nodesRef.current.map((node) => [node.id, node]),
+    );
+    const metas = list.map((node) =>
+      toNodeMeta(node, previousById.get(String(node.id))),
+    );
+
+    nodesRef.current = metas;
+    setNodes(metas);
+    if (cyInstance.current) {
+      cyInstance.current.elements().remove();
+      addToCy(metas);
+    }
+    return metas;
+  }, [addToCy]);
+
+  const resyncNodes = async (fallback?: () => void) => {
+    try {
+      await refreshNodes(projectIdRef.current);
+    } catch (refreshError) {
+      console.error("노드 서버 상태 재동기화 실패", refreshError);
+      fallback?.();
+    }
+  };
+
+  const applyAuthoritativePatchResponse = (saved: NodeOut) => {
+    const nodeId = String(saved.id);
+    const widthHeight = measureNodeSize(saved.content ?? "");
+    const updated = updateLocalNode(nodeId, (node) => ({
+      ...node,
+      label: saved.content,
+      pos_x: saved.pos_x ?? node.pos_x,
+      pos_y: saved.pos_y ?? node.pos_y,
+      version: saved.version,
+      ...widthHeight,
+    }));
+
+    const cyNode = cyInstance.current?.$id(nodeId);
+    if (cyNode && cyNode.length > 0) {
+      cyNode.data({
+        label: saved.content,
+        width: widthHeight.width,
+        height: widthHeight.height,
+      });
+      cyNode.position({
+        x: saved.pos_x ?? updated?.pos_x ?? 0,
+        y: saved.pos_y ?? updated?.pos_y ?? 0,
+      });
+    }
+    return updated;
+  };
+
 
   /* ----- 태그 초기 로드 ----- */
   useEffect(() => {
+    let cancelled = false;
     listTags(projectId)
       .then((tagList) => {
+        if (cancelled) return;
         // id를 string으로 변환해서 저장
         setTags(tagList.map(tag => ({ ...tag, id: String(tag.id) })));
       })
-      .catch((e) => console.error("listTags", e));
+      .catch((e) => {
+        if (!cancelled) console.error("listTags", e);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [projectId]);
 
-  /* fetchNodes → setNodes 하는 useEffect 안을 이렇게 교체 */
   useEffect(() => {
-    fetchNodes(projectId)
-      .then(async (list) => {
-        if (list && Array.isArray(list) && list.length > 0) {
-          console.log("서버에서 받은 노드 리스트:", list);
-        }
-        const metas: NodeMeta[] = list.map((n) => {
-          const { width, height } = measureNodeSize(n.content ?? "");
-          return {
-            id: String(n.id),
-            label: n.content,
-            pos_x: n.pos_x,
-            pos_y: n.pos_y,
-            parentId: n.parent_id ? String(n.parent_id) : undefined,
-            depth: n.depth,
-            order: n.order_index,
-            status: n.state,
-            opacity: n.state === "GHOST" ? 0.3 : 1,
-            frozen: true,
-            width,            // ⬅️ 반영
-            height,           // ⬅️ 반영
-            tags: (n.tags ?? []).map(String),
-          };
-        });
-
-        setNodes(metas);
-        nodesRef.current = metas;
-
-        if (cyInstance.current) {
-          cyInstance.current.elements().remove();
-          addToCy(metas);
-        }
-      })
+    refreshNodes(projectId)
       .catch(console.error);
-  }, [projectId]);
+  }, [projectId, refreshNodes]);
 
 
   const [ctxNodeId, setCtxNodeId] = useState<string | null>(null);
@@ -243,56 +333,37 @@ export default function Graph({ projectId }: GraphProps) {
     y: cy + r * Math.sin(rad),
   });
 
-  const addToCy = (arr: NodeMeta[]) => {
-    const cy = cyInstance.current;
-    if (!cy) return;
-    const eles: ElementDefinition[] = arr.flatMap((n) => {
-      // 이미 width, height가 있으므로 재계산 필요 없음
-      return [
-        {
-          data: { id: n.id, label: n.label, width: n.width, height: n.height, tag: (n.tags ?? []).map(String) },
-          position: { x: n.pos_x, y: n.pos_y },
-          style: { opacity: n.opacity ?? 1 },
-        },
-        ...(n.parentId
-          ? [{
-            data: {
-              id: `e-${n.parentId}-${n.id}`,
-              source: n.parentId,
-              target: n.id,
-            },
-          }]
-          : []),
-      ];
-    });
-    cy.add(eles);
-  };
-
   /* ----- 태그 attach / detach ----- */
   const handleAddTag = async (tagId: string) => {
     if (!ctxNodeId) return;
+    const targetProjectId = projectIdRef.current;
+    const targetNodeId = ctxNodeId;
+    const allNodeIds = [
+      targetNodeId,
+      ...findChildrenIds(nodesRef.current, targetNodeId),
+    ];
     let realId = tagId;
 
     if (tagId === "__new__") {
       const name = window.prompt("새 태그 이름");
       if (!name) return;
       try {
-        const t = await createTag(projectId, { name });
-        setTags((ts) => [...ts, t]);
-        realId = t.id;
+        const t = await createTag(targetProjectId, { name });
+        if (targetProjectId !== projectIdRef.current) return;
+        const newTag = { ...t, id: String(t.id) };
+        setTags((ts) => [...ts, newTag]);
+        realId = newTag.id;
       } catch (e) {
+        if (targetProjectId !== projectIdRef.current) return;
         console.error(e);
         return;
       }
     }
 
-    // 현재 노드와 모든 자식 노드 id 구하기
-    const allNodeIds = [ctxNodeId, ...findChildrenIds(nodesRef.current, ctxNodeId)];
-
-
     try {
-      // 모든 노드에 태그를 attachW
-      await attachTag(projectId, realId, ctxNodeId);
+      // 모든 노드에 태그를 attach
+      await attachTag(targetProjectId, realId, targetNodeId);
+      if (targetProjectId !== projectIdRef.current) return;
       updateNodesAndCy((ns) =>
         ns.map((n) =>
           allNodeIds.includes(n.id)
@@ -301,18 +372,23 @@ export default function Graph({ projectId }: GraphProps) {
         )
       );
     } catch (e) {
+      if (targetProjectId !== projectIdRef.current) return;
       console.error(e);
     }
   };
 
   const handleRemoveTag = async (tagId: string) => {
     if (!ctxNodeId) return;
-
-    // 현재 노드와 모든 자식 노드 id 구하기
-    const allNodeIds = [ctxNodeId, ...findChildrenIds(nodesRef.current, ctxNodeId)];
+    const targetProjectId = projectIdRef.current;
+    const targetNodeId = ctxNodeId;
+    const allNodeIds = [
+      targetNodeId,
+      ...findChildrenIds(nodesRef.current, targetNodeId),
+    ];
 
     try {
-      await detachTag(projectId, tagId, ctxNodeId);
+      await detachTag(targetProjectId, tagId, targetNodeId);
+      if (targetProjectId !== projectIdRef.current) return;
       updateNodesAndCy((ns) =>
         ns.map((n) =>
           allNodeIds.includes(n.id)
@@ -321,6 +397,7 @@ export default function Graph({ projectId }: GraphProps) {
         )
       );
     } catch (e) {
+      if (targetProjectId !== projectIdRef.current) return;
       console.error(e);
     }
   };
@@ -328,6 +405,7 @@ export default function Graph({ projectId }: GraphProps) {
   /* ----- AI·빈 노드 생성 로직 ----- */
   const spawnChildren = async (parent: NodeMeta) => {
     if (parent.generated) return;
+    const targetProjectId = projectIdRef.current;
 
     const isRoot = !parent.parentId;
     const childCnt = isRoot ? 3 : 2;
@@ -350,13 +428,14 @@ export default function Graph({ projectId }: GraphProps) {
       for (let i = 0; i < aiCnt; i++) {
         const { x, y } = polarToXY(parent.pos_x, parent.pos_y, radius, angles[i]);
         // 서버에 AI 노드 1개 생성 요청 (각각의 위치/순서/parent_id로)
-        const srvNodes: NodeOut[] = await apiCreateAINodes(projectId, parent.label, {
+        const srvNodes: NodeOut[] = await apiCreateAINodes(targetProjectId, parent.label, {
           pos_x: x,
           pos_y: y,
           depth: parent.depth + 1,
           order: i,
           parent_id: /^\d+$/.test(parent.id) ? Number(parent.id) : undefined,
         });
+        if (targetProjectId !== projectIdRef.current) return;
         // 응답값이 항상 1개라고 가정(혹시라도 여러 개면 0번째만 사용)
         const parentTags = parent.tags ?? [];
         const srv = srvNodes[0];
@@ -371,6 +450,7 @@ export default function Graph({ projectId }: GraphProps) {
           opacity: 0.3,
           status: "GHOST",
           frozen: false,
+          version: srv.version,
           ...measureNodeSize(srv.content),
           tags: parentTags
         });
@@ -378,6 +458,7 @@ export default function Graph({ projectId }: GraphProps) {
     } catch (e) {
       console.error(e);
     }
+    if (targetProjectId !== projectIdRef.current) return;
 
 
     /* ── 빈(GHOST) 노드 ── */
@@ -388,7 +469,7 @@ export default function Graph({ projectId }: GraphProps) {
       const { x, y } = polarToXY(parent.pos_x, parent.pos_y, radius, angles[idx]);
 
       /* 🌟 ❷ 서버에 빈 노드 저장 (content = "") */
-      const blank = await createNode(projectId, {
+      const blank = await createNode(targetProjectId, {
         content: "?",
         pos_x: x,
         pos_y: y,
@@ -397,6 +478,7 @@ export default function Graph({ projectId }: GraphProps) {
         parent_id: Number(parent.id),
         state: "GHOST", // 👈 추가!
       });
+      if (targetProjectId !== projectIdRef.current) return;
       const parentTags = parent.tags ?? [];
       blanks.push({
         id: String(blank.id),
@@ -409,6 +491,7 @@ export default function Graph({ projectId }: GraphProps) {
         opacity: 0.3,
         status: "GHOST",     // 프론트에서 GHOST 표현
         frozen: false,
+        version: blank.version,
         ...measureNodeSize("?"),
         tags: [...parentTags],
       });
@@ -430,18 +513,18 @@ export default function Graph({ projectId }: GraphProps) {
   };
 
   /* ----- 노드 활성화 ----- */
-  const activateNodeLocal = async (meta: NodeMeta) => {
+  const activateNodeLocal = async (meta: NodeMeta): Promise<NodeMeta | undefined> => {
+    const targetProjectId = projectIdRef.current;
     try {
-      await apiActivateNode(projectId, Number(meta.id)); // ✅
+      await apiActivateNode(targetProjectId, Number(meta.id));
+      const refreshed = await refreshNodes(targetProjectId);
+      return refreshed?.find((node) => node.id === meta.id);
     } catch (e) {
       console.error(e);
-      return;
+      if (targetProjectId !== projectIdRef.current) return undefined;
+      await resyncNodes();
+      return undefined;
     }
-
-    meta.opacity = 1;
-    meta.status = "ACTIVE";
-    meta.frozen = true;
-    cyInstance.current?.$id(meta.id).style("opacity", 1);
   };
 
   /* ───── 헬퍼 ───── */
@@ -452,6 +535,7 @@ export default function Graph({ projectId }: GraphProps) {
     const oldId = e.target.id();
     const cur = nodesRef.current.find((n) => n.id === oldId);
     if (!cur) return;
+    const targetProjectId = projectIdRef.current;
 
     /* 1) AI GHOST (서버에 이미 있음) → 바로 activate */
     if (cur.status === "GHOST") {
@@ -461,25 +545,21 @@ export default function Graph({ projectId }: GraphProps) {
         if (!input) return;
 
         try {
-          const saved = await updateNode(projectId, Number(cur.id), {
+          const saved = await updateNode(targetProjectId, Number(cur.id), {
             content: input,
             pos_x: cur.pos_x,
             pos_y: cur.pos_y,
+            expected_version: cur.version,
           });
+          if (targetProjectId !== projectIdRef.current) return;
 
-          const cy = cyInstance.current!;
-          const nodeEle = cy.$id(cur.id);
-          nodeEle.data("label", saved.content);
-          nodeEle.style("opacity", 1);
-
-          cur.label = saved.content;
-          cur.opacity = 1;
-          cur.status = "ACTIVE";
-          cur.frozen = true;
-
-          await spawnChildren(cur);
+          applyAuthoritativePatchResponse(saved);
+          const active = await activateNodeLocal(cur);
+          if (active) await spawnChildren(active);
         } catch (err) {
           console.error(err);
+          if (targetProjectId !== projectIdRef.current) return;
+          await resyncNodes();
         }
       } else {
         // AI 생성된 노드 → 바로 activate
@@ -492,28 +572,40 @@ export default function Graph({ projectId }: GraphProps) {
     const newLabel = window.prompt("노드 내용을 수정하세요", cur.label);
     if (!newLabel || newLabel === cur.label) return;
 
-    // ... handleTap 내에서 label이 바뀐 경우
-    const { width, height } = measureNodeSize(newLabel);
-    cur.label = newLabel;
-    cur.width = width;
-    cur.height = height;
-    cyInstance.current?.$id(cur.id).data({
-      label: newLabel,
-      width,
-      height,
-    });
+    const previousLabel = cur.label;
+    const previousWidth = cur.width;
+    const previousHeight = cur.height;
     try {
-      await updateNode(projectId, Number(cur.id), { content: newLabel });
-      cur.label = newLabel;
-      cyInstance.current?.$id(cur.id).data("label", newLabel);
+      const saved = await updateNode(targetProjectId, Number(cur.id), {
+        content: newLabel,
+        expected_version: cur.version,
+      });
+      if (targetProjectId !== projectIdRef.current) return;
+      const updated = applyAuthoritativePatchResponse(saved);
 
       /* ✅ 내용이 바뀐 첫 클릭이라면 spawnChildren */
-      if (!cur.generated) {
-        await spawnChildren(cur);
+      if (!updated?.generated) {
+        await spawnChildren(updated ?? cur);
       }
 
     } catch (err) {
       console.error(err);
+      if (targetProjectId !== projectIdRef.current) return;
+      await resyncNodes(() => {
+        const restored = updateLocalNode(cur.id, (node) => ({
+          ...node,
+          label: previousLabel,
+          width: previousWidth,
+          height: previousHeight,
+        }));
+        if (restored) {
+          cyInstance.current?.$id(cur.id).data({
+            label: restored.label,
+            width: restored.width,
+            height: restored.height,
+          });
+        }
+      });
     }
   };
 
@@ -537,22 +629,26 @@ export default function Graph({ projectId }: GraphProps) {
             "border-color": "#d1d5db", // 테두리 흐리게
             "label": "data(label)",
             "color": "mapData(status, 'ACTIVE', '#1e293b', 'GHOST', '#64748b')",
-            "font-weight": "600",
+            "font-weight": 600,
             "font-size": 16,
-            "letter-spacing": "0.01em",
             "text-valign": "center",
             "text-halign": "center",
             "padding": "14px",
-            "border-radius": "16px",
             "width": "data(width)",
             "height": "data(height)",
             "text-wrap": "wrap",
-            "text-max-width": 210,
-            "opacity": "mapData(status, 'ACTIVE', 1, 'GHOST', 0.88)",
+            "text-max-width": "210px",
+            "opacity": 0.88,
             "transition-property": "background-color, color, opacity, border-color",
-            "transition-duration": "0.22s",
-            "box-shadow": "0 2px 6px rgba(0,0,0,0.03)"
+            "transition-duration": 220,
           }
+        }
+,
+        {
+          selector: "node[status = 'ACTIVE']",
+          style: {
+            "opacity": 1,
+          },
         }
 ,
         {
@@ -562,7 +658,6 @@ export default function Graph({ projectId }: GraphProps) {
             "border-color": "#6366f1",
             "border-width": 3,
             "color": "#1e40af",
-            "box-shadow": "0 0 20px rgba(99, 102, 241, 0.25)",
             "z-index": 9999,
           }
         }
@@ -574,8 +669,7 @@ export default function Graph({ projectId }: GraphProps) {
             "border-color": "#facc15",
             "border-width": 4,
             "color": "#92400e",
-            "transition-duration": "0.18s",
-            "box-shadow": "0 0 12px 3px #fde68a",
+            "transition-duration": 180,
             "z-index": 10000,
           }
         }
@@ -603,12 +697,35 @@ export default function Graph({ projectId }: GraphProps) {
       const node = event.target;
       const id = node.id();
       const pos = node.position();
+      const current = nodesRef.current.find((n) => n.id === String(id));
+      if (!current) return;
+      const targetProjectId = projectIdRef.current;
+      const previousPosition = {
+        x: current.pos_x,
+        y: current.pos_y,
+      };
 
       try {
-        await updateNode(projectId, id, { pos_x: pos.x, pos_y: pos.y });
-        // NodeUpdatePayload 타입에 맞게 전달
+        const saved = await updateNode(targetProjectId, id, {
+          pos_x: pos.x,
+          pos_y: pos.y,
+          expected_version: current.version,
+        });
+        if (targetProjectId !== projectIdRef.current) return;
+        applyAuthoritativePatchResponse(saved);
       } catch (err) {
         console.error("노드 위치 업데이트 실패", err);
+        if (targetProjectId !== projectIdRef.current) return;
+        await resyncNodes(() => {
+          const restored = updateLocalNode(String(id), (localNode) => ({
+            ...localNode,
+            pos_x: previousPosition.x,
+            pos_y: previousPosition.y,
+          }));
+          if (restored) {
+            cy.$id(String(id)).position(previousPosition);
+          }
+        });
       }
     });
 
@@ -739,7 +856,6 @@ export default function Graph({ projectId }: GraphProps) {
       }
 
       <NodeContextMenu
-        nodeId={ctxNodeId}
         tags={tags}
         nodeTags={
           ctxNodeId

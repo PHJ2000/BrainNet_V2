@@ -12,4 +12,25 @@ from .node_metrics import NodeMetrics
 from .node_version import NodeVersion
 from .invite_token import InviteToken
 from .activity_log import ActivityLog
+from .idempotency_request import IdempotencyRequest
+from .outbox_event import OutboxEvent
 from .base import Base
+
+__all__ = [
+    "ActivityLog",
+    "Base",
+    "IdempotencyRequest",
+    "InviteToken",
+    "Node",
+    "NodeMetrics",
+    "NodeVersion",
+    "OutboxEvent",
+    "Project",
+    "ProjectHistory",
+    "ProjectUserRole",
+    "Tag",
+    "TagNode",
+    "TagSummary",
+    "User",
+    "Vote",
+]

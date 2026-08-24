@@ -18,6 +18,7 @@ export interface NodeOut {
   created_at: string;
   updated_at: string;
   tags: number[];
+  version: number;
 }
 
 export interface NodePayload {
@@ -30,7 +31,9 @@ export interface NodePayload {
   state?:  string;
 }
 
-type NodeUpdatePayload = Partial<NodePayload>;
+export type NodeUpdatePayload = Partial<NodePayload> & {
+  expected_version: number;
+};
 
 /* ────────── GET: 노드 목록 ──────────*/
 export async function fetchNodes(

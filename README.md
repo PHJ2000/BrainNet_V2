@@ -103,8 +103,9 @@ AI 추천으로 **창의적 사고의 폭**을 넓히고, 노드 색상·두께�
 | Method | Endpoint | 설명 |
 | ------ | -------- | ---- |
 | `GET` | `/projects/{project_id}/nodes` | 노드 리스트 |
+| `GET` | `/projects/{project_id}/nodes/{node_id}` | 노드 상세와 `version` 조회 |
 | `POST` | `/projects/{project_id}/nodes` | 노드 대량 생성(AI 추천 결과 포함) |
-| `PATCH` | `/projects/{project_id}/nodes/{node_id}` | 텍스트·위치·메타 수정 |
+| `PATCH` | `/projects/{project_id}/nodes/{node_id}` | `expected_version` 기반 텍스트·위치·메타 수정 |
 | `DELETE` | `/projects/{project_id}/nodes/{node_id}` | 노드 삭제 |
 | `POST` | `/projects/{project_id}/nodes/{node_id}/activate` | 노드 활성화 |
 | `POST` | `/projects/{project_id}/nodes/{node_id}/deactivate` | 노드 비활성화 |
@@ -173,16 +174,22 @@ BRAINNET
 
 ### 설치 & 실행
 ```bash
-git clone https://github.com/PHJ2000/BrainNet.git
-cd BrainNet
+git clone https://github.com/PHJ2000/BrainNet_V2.git
+cd BrainNet_V2
 
 # 환경 변수 설정
-cp backend/envexample .env
-cp frontend/.env.example frontend/.env.local   # OPENAI_API_KEY 등 기입
+cp .env.example .env
+JWT_SECRET_VALUE="$(openssl rand -hex 32)"
+sed -i "s/^JWT_SECRET=.*/JWT_SECRET=${JWT_SECRET_VALUE}/" .env
+# AI 노드 기능을 쓰려면 .env의 OPENAI_API_KEY도 설정
 
 # 빌드 & 기동
 docker compose up --build -d
 ```
+
+`JWT_SECRET`은 32바이트 미만이면 백엔드가 시작되지 않습니다. 운영 서비스 rollback은 proxy를
+legacy FastAPI로 되돌리고 expand된 DB schema는 유지합니다. 데이터가 생긴 환경에서 Alembic
+downgrade를 실행하면 version, idempotency, outbox 데이터가 삭제되므로 사용하지 않습니다.
 
 | 서비스 | 주소 |
 | ------- | ----------------------------- |
