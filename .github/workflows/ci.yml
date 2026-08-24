@@ -136,3 +136,98 @@ jobs:
       - name: Build frontend
         working-directory: frontend
         run: npm run build
+
+  spring-vertical-slice:
+    name: Spring vertical slice
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: brainnet_ci
+          POSTGRES_USER: brainnet_ci
+          POSTGRES_PASSWORD: brainnet_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U brainnet_ci -d brainnet_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "25"
+          cache: maven
+          cache-dependency-path: spring/vertical-slice/pom.xml
+      - name: Run Spring integration and concurrency tests
+        run: mvn -B -f spring/vertical-slice/pom.xml test
+      - name: Build Spring runtime image
+        run: docker build --file spring/vertical-slice/Dockerfile --tag brainnet-spring-vertical-slice-ci .
+      - name: Build FastAPI runtime image for differential contract
+        run: docker build --file backend/Dockerfile --tag brainnet-backend-spring-contract-ci .
+      - name: Smoke Spring health endpoint
+        env:
+          DATABASE_URL: postgresql+asyncpg://brainnet_ci:brainnet_ci@127.0.0.1:5432/brainnet_ci
+          JWT_SECRET: brainnet-ci-spring-secret-not-for-production
+          JWT_ALGORITHM: HS256
+          ACCESS_TOKEN_EXPIRE_MINUTES: "30"
+          REQUIRE_NODE_VERSION: "false"
+          SPRING_DATASOURCE_URL: jdbc:postgresql://127.0.0.1:5432/brainnet_ci
+          SPRING_DATASOURCE_USERNAME: brainnet_ci
+          SPRING_DATASOURCE_PASSWORD: brainnet_ci
+        run: |
+          spring_container="brainnet-spring-vertical-slice-ci"
+          backend_container="brainnet-backend-spring-contract-ci"
+          trap 'exit_code=$?; if [ "$exit_code" -ne 0 ]; then docker logs "$spring_container" || true; docker logs "$backend_container" || true; fi; docker rm --force "$spring_container" "$backend_container" >/dev/null 2>&1 || true; docker image rm brainnet-spring-vertical-slice-ci brainnet-backend-spring-contract-ci >/dev/null 2>&1 || true; exit "$exit_code"' EXIT
+
+          docker run --detach --network host --name "$spring_container" \
+            -e JWT_SECRET \
+            -e SPRING_DATASOURCE_URL \
+            -e SPRING_DATASOURCE_USERNAME \
+            -e SPRING_DATASOURCE_PASSWORD \
+            brainnet-spring-vertical-slice-ci
+
+          spring_ready=false
+          for _ in $(seq 1 30); do
+            if curl --fail --silent --show-error http://127.0.0.1:8080/health \
+              | grep -q '"status":"ok"'; then
+              spring_ready=true
+              break
+            fi
+            sleep 1
+          done
+
+          if [ "$spring_ready" != true ]; then
+            echo "Spring health check did not become ready" >&2
+            exit 1
+          fi
+
+          docker run --detach --network host --name "$backend_container" \
+            -e DATABASE_URL \
+            -e JWT_SECRET \
+            -e JWT_ALGORITHM \
+            -e ACCESS_TOKEN_EXPIRE_MINUTES \
+            -e REQUIRE_NODE_VERSION \
+            brainnet-backend-spring-contract-ci
+
+          for _ in $(seq 1 60); do
+            if curl --fail --silent --show-error http://127.0.0.1:8000/health \
+              | grep -q '"status":"ok"'; then
+              break
+            fi
+            sleep 1
+          done
+          curl --fail --silent --show-error http://127.0.0.1:8000/health \
+            | grep -q '"status":"ok"' || { echo "FastAPI health check did not become ready" >&2; exit 1; }
+
+          docker cp spring/vertical-slice/contract_seed.py "$backend_container:/tmp/contract_seed.py"
+          jwt_token="$(docker exec --workdir /app --env PYTHONPATH=/app "$backend_container" python /tmp/contract_seed.py)"
+          JWT_TOKEN="$jwt_token" FASTAPI_BASE_URL=http://127.0.0.1:8000 SPRING_BASE_URL=http://127.0.0.1:8080 \
+            python3 spring/vertical-slice/contract_probe.py
+          docker logs "$spring_container" | grep -q "request_error status=404 code=NODE_NOT_FOUND trace_id=contract-missing-node"
+          docker logs "$spring_container" | grep -q "request_complete trace_id=contract-missing-node"
+          docker logs "$spring_container" | grep -q "request_error status=409 code=NODE_VERSION_CONFLICT trace_id=contract-version-conflict"
+          docker logs "$spring_container" | grep -q "request_complete trace_id=contract-version-conflict"

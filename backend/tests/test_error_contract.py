@@ -3,6 +3,7 @@ import logging
 from fastapi import FastAPI, HTTPException
 from fastapi.testclient import TestClient
 from pydantic import BaseModel
+from sqlalchemy.exc import SQLAlchemyError
 
 from app.core.errors import install_error_handlers
 from app.core.trace import TraceIdMiddleware
@@ -31,6 +32,10 @@ def _test_app() -> FastAPI:
     @app.post("/unhandled")
     async def unhandled(payload: dict[str, str]):
         raise RuntimeError(f"unhandled request: {payload['attacker_value']}")
+
+    @app.get("/database-failure")
+    async def database_failure():
+        raise SQLAlchemyError("database failure must not leak")
 
     return app
 
@@ -122,4 +127,28 @@ def test_unhandled_error_uses_trace_contract_without_logging_exception_or_body(c
         "code": "INTERNAL_ERROR",
         "message": "Internal server error",
         "trace_id": "unhandled-error-trace",
+    }
+
+
+def test_database_error_has_stable_envelope_trace_and_safe_error_log(caplog):
+    with caplog.at_level(logging.ERROR, logger="app.core.errors"):
+        response = TestClient(_test_app()).get(
+            "/database-failure",
+            headers={"X-Trace-Id": "database-error-trace"},
+        )
+
+    records = [record for record in caplog.records if record.name == "app.core.errors"]
+    assert len(records) == 1
+    assert records[0].levelno == logging.ERROR
+    assert records[0].getMessage() == (
+        "request_error status=500 code=DB_ERROR method=GET "
+        "path=/database-failure trace_id=database-error-trace"
+    )
+    assert "database failure must not leak" not in records[0].getMessage()
+    assert response.status_code == 500
+    assert response.headers["X-Trace-Id"] == "database-error-trace"
+    assert response.json() == {
+        "code": "DB_ERROR",
+        "message": "database operation failed",
+        "trace_id": "database-error-trace",
     }

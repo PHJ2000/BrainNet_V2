@@ -12,3 +12,4 @@ coverage
 .DS_Store
 .python-version
 venv
+spring/vertical-slice/target
