@@ -192,7 +192,10 @@ class VerticalService {
             int inserted = jdbc.update(
                     "INSERT INTO idempotency_request(actor_id,project_id,idempotency_key,request_hash,created_at,expires_at) "
                             + "VALUES (?,?,?, ?,now(),now()+interval '24 hours') "
-                            + "ON CONFLICT (actor_id,idempotency_key) DO NOTHING",
+                            + "ON CONFLICT (actor_id,idempotency_key) DO UPDATE SET "
+                            + "project_id=EXCLUDED.project_id,request_hash=EXCLUDED.request_hash,"
+                            + "response_status=NULL,response_body=NULL,created_at=now(),expires_at=EXCLUDED.expires_at "
+                            + "WHERE idempotency_request.expires_at <= now()",
                     userId, projectId, key, requestHash);
             if (inserted == 1) return new IdempotencyClaim(true, null, null);
 

@@ -164,6 +164,22 @@ class VerticalSliceIntegrationTest {
     }
 
     @Test
+    void expiredIdempotencyClaimCanBeReused() throws Exception {
+        jdbc.update(
+                "INSERT INTO idempotency_request(actor_id,project_id,idempotency_key,request_hash,response_status,response_body,created_at,expires_at) "
+                        + "VALUES (7,1,'expired-idem',repeat('0',64),201,'[]'::jsonb,now()-interval '2 days',now()-interval '1 second')");
+
+        HttpResponse<String> response = requestWithIdempotency(
+                "POST", "/projects/1/nodes", bearer(7), "{\"content\":\"after-expiry\",\"parent_id\":11}", "expired-idem");
+
+        assertThat(response.statusCode()).isEqualTo(201);
+        assertThat(response.body()).contains("\"content\":\"after-expiry\"");
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM node WHERE content='after-expiry'", Long.class)).isEqualTo(1);
+        assertThat(jdbc.queryForObject("SELECT response_status FROM idempotency_request WHERE idempotency_key='expired-idem'", Integer.class))
+                .isEqualTo(201);
+    }
+
+    @Test
     void readsProjectAndNodeWithMembershipAndTraceContract() throws Exception {
         HttpResponse<String> project = request("GET", "/projects/1", bearer(7), null, "slice-read-1");
         assertThat(project.statusCode()).isEqualTo(200);
