@@ -5,6 +5,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from sqlalchemy.exc import SQLAlchemyError
 
 from app.core.trace import current_trace_id
 
@@ -56,6 +57,16 @@ def _log_request_error(request: Request, status_code: int, code: str, trace_id: 
     )
 
 
+def _log_server_error(request: Request, code: str, trace_id: str) -> None:
+    logger.error(
+        "request_error status=500 code=%s method=%s path=%s trace_id=%s",
+        code,
+        request.method,
+        request.url.path,
+        trace_id,
+    )
+
+
 def install_error_handlers(app: FastAPI) -> None:
     @app.exception_handler(HTTPException)
     async def http_exception_handler(request: Request, exc: HTTPException):
@@ -83,5 +94,19 @@ def install_error_handlers(app: FastAPI) -> None:
         return JSONResponse(
             status_code=422,
             content=body,
+            headers={"X-Trace-Id": trace_id},
+        )
+
+    @app.exception_handler(SQLAlchemyError)
+    async def database_exception_handler(request: Request, exc: SQLAlchemyError):
+        trace_id = _request_trace_id(request)
+        _log_server_error(request, "DB_ERROR", trace_id)
+        return JSONResponse(
+            status_code=500,
+            content={
+                "code": "DB_ERROR",
+                "message": "database operation failed",
+                "trace_id": trace_id,
+            },
             headers={"X-Trace-Id": trace_id},
         )

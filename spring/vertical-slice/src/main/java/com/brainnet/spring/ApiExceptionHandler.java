@@ -20,11 +20,17 @@ class ApiExceptionHandler {
     static final class ApiException extends RuntimeException {
         final HttpStatus status;
         final String code;
+        final List<Map<String, Object>> errors;
 
         ApiException(HttpStatus status, String code, String message) {
+            this(status, code, message, null);
+        }
+
+        ApiException(HttpStatus status, String code, String message, List<Map<String, Object>> errors) {
             super(message);
             this.status = status;
             this.code = code;
+            this.errors = errors;
         }
     }
 
@@ -35,7 +41,7 @@ class ApiExceptionHandler {
     @ExceptionHandler(ApiException.class)
     ResponseEntity<?> api(ApiException ex, HttpServletRequest request) {
         if (ex.status == HttpStatus.UNPROCESSABLE_ENTITY && "VALIDATION_ERROR".equals(ex.code)) {
-            return validationResponse(ex.getMessage(), request);
+            return validationResponse("Request validation failed", request, ex.errors);
         }
         return response(ex.status, ex.code, ex.getMessage(), trace(request));
     }
@@ -50,7 +56,7 @@ class ApiExceptionHandler {
                         "VALIDATION_ERROR",
                         "Request validation failed",
                         traceId,
-                        List.of(Map.of("type", "value_error", "loc", List.of("body"), "msg", "Request validation failed"))));
+                        defaultValidationErrors()));
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
@@ -63,7 +69,7 @@ class ApiExceptionHandler {
                         "VALIDATION_ERROR",
                         "Request validation failed",
                         traceId,
-                        List.of(Map.of("type", "value_error", "loc", List.of("body"), "msg", "Request validation failed"))));
+                        defaultValidationErrors()));
     }
 
     @ExceptionHandler(DataAccessException.class)
@@ -91,13 +97,23 @@ class ApiExceptionHandler {
                 .body(new ApiModels.ErrorView(code, message, traceId));
     }
 
-    private ResponseEntity<ApiModels.ValidationErrorView> validationResponse(String message, HttpServletRequest request) {
+    private ResponseEntity<ApiModels.ValidationErrorView> validationResponse(
+            String message, HttpServletRequest request, List<Map<String, Object>> errors) {
         String traceId = trace(request);
         logger.warn("request_error status=422 code=VALIDATION_ERROR trace_id={}", traceId);
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
                 .header("X-Trace-Id", traceId)
                 .body(new ApiModels.ValidationErrorView(
                         "VALIDATION_ERROR", message, traceId,
-                        List.of(Map.of("type", "value_error", "loc", List.of("body"), "msg", message))));
+                        errors == null ? defaultValidationErrors() : errors));
+    }
+
+    private List<Map<String, Object>> defaultValidationErrors() {
+        return List.of(Map.of(
+                "type", "value_error",
+                "loc", List.of("body"),
+                "msg", "Request validation failed",
+                "input", Map.of(),
+                "ctx", Map.of("error", Map.of())));
     }
 }

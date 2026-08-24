@@ -10,6 +10,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -102,12 +103,33 @@ class VerticalService {
         }
         if (body.expected_version() == null) {
             if (!body.hasChanges()) {
-                throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY, "VALIDATION_ERROR", "Request validation failed");
+                throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY, "VALIDATION_ERROR",
+                        "Request validation failed", List.of(Map.of(
+                                "type", "value_error",
+                                "loc", List.of("body"),
+                                "msg", "Value error, at least one node field must be provided",
+                                "input", Map.of(),
+                                "ctx", Map.of("error", Map.of()))));
             }
             throw new ApiException(HttpStatus.PRECONDITION_REQUIRED, "NODE_VERSION_REQUIRED", "expected_version is required");
         }
-        if (body.expected_version() < 0 || !body.hasChanges()) {
-            throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY, "VALIDATION_ERROR", "Request validation failed");
+        if (body.expected_version() < 0) {
+            throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY, "VALIDATION_ERROR",
+                    "Request validation failed", List.of(Map.of(
+                            "type", "greater_than_equal",
+                            "loc", List.of("body", "expected_version"),
+                            "msg", "Input should be greater than or equal to 0",
+                            "input", body.expected_version(),
+                            "ctx", Map.of("ge", 0))));
+        }
+        if (!body.hasChanges()) {
+            throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY, "VALIDATION_ERROR",
+                    "Request validation failed", List.of(Map.of(
+                            "type", "value_error",
+                            "loc", List.of("body"),
+                            "msg", "Value error, at least one node field must be provided",
+                            "input", Map.of("expected_version", body.expected_version()),
+                            "ctx", Map.of("error", Map.of()))));
         }
 
         List<String> changes = new ArrayList<>();

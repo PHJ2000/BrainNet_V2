@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,11 +29,14 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+
+import org.springframework.mock.web.MockHttpServletRequest;
 
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -153,12 +157,23 @@ class VerticalSliceIntegrationTest {
         assertThat(emptyPatch.statusCode()).isEqualTo(422);
         assertThat(emptyPatch.body()).contains("\"code\":\"VALIDATION_ERROR\"")
                 .contains("\"message\":\"Request validation failed\"")
-                .contains("\"errors\"");
+                .contains("\"errors\"")
+                .contains("\"type\":\"value_error\"")
+                .contains("\"loc\":[\"body\"]")
+                .contains("Value error, at least one node field must be provided")
+                .contains("\"input\":{}")
+                .contains("\"ctx\":{\"error\":{}");
 
         HttpResponse<String> negativeVersion = request("PATCH", "/projects/1/nodes/11", bearer(7),
                 "{\"expected_version\":-1,\"content\":\"invalid\"}", "negative-version");
         assertThat(negativeVersion.statusCode()).isEqualTo(422);
-        assertThat(negativeVersion.body()).contains("\"code\":\"VALIDATION_ERROR\"");
+        assertThat(negativeVersion.body()).contains("\"code\":\"VALIDATION_ERROR\"")
+                .contains("\"message\":\"Request validation failed\"")
+                .contains("\"type\":\"greater_than_equal\"")
+                .contains("\"loc\":[\"body\",\"expected_version\"]")
+                .contains("Input should be greater than or equal to 0")
+                .contains("\"input\":-1")
+                .contains("\"ctx\":{\"ge\":0}");
     }
 
     @Test
@@ -199,6 +214,24 @@ class VerticalSliceIntegrationTest {
         assertThat(response.statusCode()).isEqualTo(404);
         assertThat(response.headers().firstValue("X-Trace-Id")).contains("missing-node");
         assertThat(response.body()).contains("\"code\":\"NODE_NOT_FOUND\"");
+    }
+
+    @Test
+    void mapsDatabaseFailureToStableTraceableError(CapturedOutput output) {
+        HttpServletRequest request = new MockHttpServletRequest();
+        request.setAttribute(TraceFilter.ATTRIBUTE, "database-error-trace");
+
+        ApiExceptionHandler handler = new ApiExceptionHandler();
+        var response = handler.database(
+                new DataAccessResourceFailureException("database failure must not leak"), request);
+
+        assertThat(response.getStatusCode().value()).isEqualTo(500);
+        assertThat(response.getHeaders().getFirst("X-Trace-Id")).isEqualTo("database-error-trace");
+        assertThat(response.getBody()).isEqualTo(
+                new ApiModels.ErrorView("DB_ERROR", "database operation failed", "database-error-trace"));
+        assertThat(output.getOut()).contains(
+                "request_error status=500 code=DB_ERROR trace_id=database-error-trace")
+                .doesNotContain("database failure must not leak");
     }
 
     private HttpResponse<String> request(String method, String path, String authorization, String body, String trace)

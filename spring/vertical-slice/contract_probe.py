@@ -10,7 +10,9 @@ from __future__ import annotations
 import json
 import os
 import sys
+from collections import Counter
 from dataclasses import dataclass
+from concurrent.futures import ThreadPoolExecutor
 from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
@@ -66,6 +68,40 @@ def assert_same(label: str, left: Response, right: Response, fields: tuple[str, 
                 )
 
 
+def assert_body_same(label: str, left: Response, right: Response) -> None:
+    assert_same(label, left, right)
+    if left.body != right.body:
+        raise AssertionError(f"{label}: body FastAPI={left.body!r} Spring={right.body!r}")
+    for header in ("x-trace-id",):
+        if left.headers.get(header) != right.headers.get(header):
+            raise AssertionError(
+                f"{label}: header {header!r} FastAPI={left.headers.get(header)!r} "
+                f"Spring={right.headers.get(header)!r}"
+            )
+
+
+def run_spring_concurrency_probe(base_url: str, token: str) -> None:
+    def patch(index: int) -> int:
+        return call(
+            base_url,
+            "PATCH",
+            "/projects/1/nodes/13",
+            token,
+            f"contract-concurrency-{index}",
+            {"expected_version": 0, "content": f"writer-{index}"},
+        ).status
+
+    with ThreadPoolExecutor(max_workers=100) as pool:
+        statuses = list(pool.map(patch, range(100)))
+    counts = Counter(statuses)
+    if counts != Counter({200: 1, 409: 99}):
+        raise AssertionError(f"100-writer Spring concurrency: unexpected statuses {counts}")
+
+    final = call(base_url, "GET", "/projects/1/nodes/13", token, "contract-concurrency-final")
+    if final.status != 200 or final.body.get("version") != 1:
+        raise AssertionError(f"100-writer Spring concurrency: final response {final.status} {final.body}")
+
+
 def main() -> int:
     fastapi = os.environ.get("FASTAPI_BASE_URL", "http://127.0.0.1:8000")
     spring = os.environ.get("SPRING_BASE_URL", "http://127.0.0.1:8080")
@@ -100,7 +136,7 @@ def main() -> int:
 
     empty_fastapi = call(fastapi, "PATCH", "/projects/1/nodes/11", token, "contract-empty-patch", {})
     empty_spring = call(spring, "PATCH", "/projects/1/nodes/11", token, "contract-empty-patch", {})
-    assert_same("empty patch", empty_fastapi, empty_spring, ("code", "message"))
+    assert_body_same("empty patch", empty_fastapi, empty_spring)
     if not isinstance(empty_fastapi.body.get("errors"), list) or not isinstance(empty_spring.body.get("errors"), list):
         raise AssertionError("empty patch: both responses must expose validation errors")
 
@@ -110,7 +146,17 @@ def main() -> int:
     negative_spring = call(
         spring, "PATCH", "/projects/1/nodes/11", token, "contract-negative-version", {"expected_version": -1, "content": "x"}
     )
-    assert_same("negative version", negative_fastapi, negative_spring, ("code", "message"))
+    assert_body_same("negative version", negative_fastapi, negative_spring)
+
+    conflict_fastapi = call(
+        fastapi, "PATCH", "/projects/1/nodes/11", token, "contract-version-conflict", {"expected_version": 99, "content": "x"}
+    )
+    conflict_spring = call(
+        spring, "PATCH", "/projects/1/nodes/12", token, "contract-version-conflict", {"expected_version": 99, "content": "x"}
+    )
+    assert_body_same("version conflict", conflict_fastapi, conflict_spring)
+    if conflict_fastapi.status != 409 or conflict_fastapi.body.get("code") != "NODE_VERSION_CONFLICT":
+        raise AssertionError(f"version conflict: unexpected response {conflict_fastapi.status} {conflict_fastapi.body}")
 
     tagged_fastapi = call(
         fastapi, "PATCH", "/projects/1/nodes/11", token, "contract-tagged-patch", {"expected_version": 0, "content": "contract"}
@@ -130,7 +176,9 @@ def main() -> int:
     if missing_node_spring.headers.get("x-trace-id") != "contract-missing-node":
         raise AssertionError("Spring missing-node response lost the supplied trace id")
 
-    print("FastAPI/Spring canonical contract probe passed: project, auth, validation, patch, trace")
+    run_spring_concurrency_probe(spring, token)
+
+    print("FastAPI/Spring canonical contract probe passed: project, auth, validation, patch, conflict, trace, 100-writer concurrency")
     return 0
 
 

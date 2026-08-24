@@ -229,3 +229,5 @@ jobs:
             python3 spring/vertical-slice/contract_probe.py
           docker logs "$spring_container" | grep -q "request_error status=404 code=NODE_NOT_FOUND trace_id=contract-missing-node"
           docker logs "$spring_container" | grep -q "request_complete trace_id=contract-missing-node"
+          docker logs "$spring_container" | grep -q "request_error status=409 code=NODE_VERSION_CONFLICT trace_id=contract-version-conflict"
+          docker logs "$spring_container" | grep -q "request_complete trace_id=contract-version-conflict"

@@ -32,7 +32,8 @@ with psycopg.connect("postgresql://brainnet_ci:brainnet_ci@127.0.0.1:5432/brainn
             INSERT INTO node (id, project_id, parent_id, author_id, content, state, depth,
                               order_index, pos_x, pos_y, version, created_at, updated_at)
             VALUES (11, 1, NULL, 7, 'root', 'ACTIVE', 0, 0, 0, 0, 0, now(), now()),
-                   (12, 1, 11, 7, 'root-spring', 'GHOST', 1, 0, 0, 0, 0, now(), now())
+                   (12, 1, 11, 7, 'root-spring', 'GHOST', 1, 0, 0, 0, 0, now(), now()),
+                   (13, 1, 11, 7, 'concurrency', 'GHOST', 1, 0, 0, 0, 0, now(), now())
             """
         )
         cursor.execute(
@@ -41,6 +42,6 @@ with psycopg.connect("postgresql://brainnet_ci:brainnet_ci@127.0.0.1:5432/brainn
             VALUES (101, 1, 'contract', '#000000')
             """
         )
-        cursor.execute("INSERT INTO tag_node (tag_id, node_id) VALUES (101, 11), (101, 12)")
+        cursor.execute("INSERT INTO tag_node (tag_id, node_id) VALUES (101, 11), (101, 12), (101, 13)")
 
 print(create_access_token("7"))
