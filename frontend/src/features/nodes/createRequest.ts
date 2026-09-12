@@ -12,6 +12,11 @@ export function isProviderFailure(error: unknown): boolean {
     typeof error.response.data?.code === "string" && error.response.data.code.startsWith("AI_PROVIDER_");
 }
 
+function isCreationBusy(error: unknown): boolean {
+  return axios.isAxiosError(error) && error.response?.status === 503 &&
+    error.response.data?.code === "NODE_CREATION_BUSY";
+}
+
 /** One user operation keeps its key across transport retries. */
 export async function createRequest<T>(
   send: (key: string) => Promise<T>,
@@ -22,8 +27,10 @@ export async function createRequest<T>(
     try {
       return await send(key);
     } catch (error) {
-      if (attempt >= 2 || !isUncertainCreation(error)) throw error;
-      await wait(250 * (attempt + 1));
+      const busy = isCreationBusy(error);
+      if (attempt >= 2 || (!busy && !isUncertainCreation(error))) throw error;
+      // The admission gate returns Retry-After: 1 without claiming the key.
+      await wait(busy ? 1000 : 250 * (attempt + 1));
     }
   }
 }

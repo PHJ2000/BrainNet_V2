@@ -1,6 +1,6 @@
 """HTTP input, authentication, and session ownership for node operations."""
 from typing import Annotated, List, Optional
-from fastapi import APIRouter, Depends, Header, Path, Query, status
+from fastapi import APIRouter, Depends, Header, Path, Query, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.security import get_current_user_id as _uid
 from app.db.session import AsyncSessionLocal
@@ -27,11 +27,15 @@ async def list_nodes(
 async def create_nodes(
     body: NodeCreate,
     project_id: int,
+    request: Request,
     uid: str = Depends(_uid),
     db: AsyncSession = Depends(get_db),
     idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
 ):
-    return await node_service.create_nodes(body=body, project_id=project_id, uid=uid, db=db, idempotency_key=idempotency_key)
+    # get_db constructs a lazy session; no connection is checked out while queued.
+    kind = "ai" if body.ai_prompt else "regular"
+    async with request.app.state.node_creation_admission[kind].enter():
+        return await node_service.create_nodes(body=body, project_id=project_id, uid=uid, db=db, idempotency_key=idempotency_key)
 
 
 @router.get("/{node_id}", response_model=NodeOut)

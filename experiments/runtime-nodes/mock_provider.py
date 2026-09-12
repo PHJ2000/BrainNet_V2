@@ -1,17 +1,37 @@
 """Local OpenAI-compatible HTTP fault fixture. Never contacts an external provider."""
 import asyncio
 from collections import Counter
+from contextlib import asynccontextmanager
 import time
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse, PlainTextResponse
 import uvicorn
 
-app = FastAPI()
+loop_lag_max_ms = 0.0
+
+
+@asynccontextmanager
+async def lifespan(_app):
+    async def heartbeat():
+        global loop_lag_max_ms
+        while True:
+            before = time.perf_counter()
+            await asyncio.sleep(.1)
+            loop_lag_max_ms = max(loop_lag_max_ms, (time.perf_counter() - before - .1) * 1000)
+    task = asyncio.create_task(heartbeat())
+    try:
+        yield
+    finally:
+        task.cancel()
+        await asyncio.gather(task, return_exceptions=True)
+
+
+app = FastAPI(lifespan=lifespan)
 calls = Counter()
 
 @app.get('/health')
 async def health():
-    return {'status': 'ok', 'calls': dict(calls)}
+    return {'status': 'ok', 'calls': dict(calls), 'event_loop_lag_max_ms': round(loop_lag_max_ms, 3)}
 
 @app.post('/v1/chat/completions')
 async def completion(request: Request):

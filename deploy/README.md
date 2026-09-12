@@ -40,6 +40,14 @@ cd ..
 - 발행된 Outbox는 기본 7일 후, claim은 만료 1일 후 정리한다. 60초 간격, 트랜잭션당 각각 최대 1,000행이다. 미발행 Outbox와 유효 claim은 정리하지 않는다.
 - proxy access log는 WebSocket token이 포함되는 query string을 기록하지 않는다.
 
+## 생성 요청의 동시 처리와 대기
+
+FastAPI worker마다 일반 생성과 AI 생성을 별도 대기열로 처리한다. 각각 기본 동시 실행 32개, 대기 512개, 최대 대기 5초다. AI provider가 지연되어도 일반 생성의 실행 자리를 점유하지 않는다. 대기 중에는 DB 연결과 멱등성 claim을 확보하지 않는다.
+
+일반 생성은 `NODE_CREATE_CONCURRENCY`, `NODE_CREATE_MAX_WAITING`, `NODE_CREATE_WAIT_SECONDS`로 설정하고, AI 생성은 접두사를 `NODE_AI_CREATE`로 바꾼다. worker를 늘리면 이 한도와 DB 연결 수도 worker 수만큼 늘어나므로 전체 용량을 함께 계산한다. 현재 Spring에는 이 Python 대기열 설정이 적용되지 않는다.
+
+대기열 포화·대기시간 초과는 `503 NODE_CREATION_BUSY`와 `Retry-After: 1`을 반환한다. 프론트는 같은 멱등성 키로 1초 뒤 최대 2번 재시도하며, 이 응답을 AI provider 오류로 간주해 빈 노드를 만들지 않는다. `/metrics`의 `brainnet_node_creation_{active,waiting,capacity,rejected_total}`은 `kind="regular"|"ai"`별 상태를 제공한다. provider의 2초 검증 timeout과 부하 발생기의 10초 timeout은 늘리지 않았다.
+
 ## 한 시간 연속 검증
 
 기능 테스트와 별도 DB를 사용하되 같은 PostgreSQL 서버를 공유한다. DB 생성은 새 스택에서 한 번 실행한다.

@@ -10,11 +10,16 @@ from app.core.trace import TraceIdMiddleware
 from app.core.config import bool_env
 from app.services.node_events import NodeEventBridge
 from app.services.ai_provider import close_ai_client
+from app.services.node_admission import NodeCreationAdmission
 from fastapi.responses import PlainTextResponse
 
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
+    _app.state.node_creation_admission = {
+        "regular": NodeCreationAdmission.from_env(),
+        "ai": NodeCreationAdmission.from_env("NODE_AI_CREATE"),
+    }
     bridge = NodeEventBridge() if bool_env("NODE_EVENTS_ENABLED", "true") else None
     _app.state.node_events = bridge
     if bridge is not None:
@@ -54,6 +59,13 @@ async def metrics():
         "brainnet_outbox_pruned_total": values.get("pruned_events", 0),
         "brainnet_idempotency_pruned_total": values.get("pruned_claims", 0),
     }
+    for kind, admission in getattr(app.state, "node_creation_admission", {}).items():
+        samples.update({
+            f'brainnet_node_creation_active{{kind="{kind}"}}': admission.active,
+            f'brainnet_node_creation_waiting{{kind="{kind}"}}': admission.waiting,
+            f'brainnet_node_creation_capacity{{kind="{kind}"}}': admission.capacity,
+            f'brainnet_node_creation_rejected_total{{kind="{kind}"}}': admission.rejected,
+        })
     return PlainTextResponse("".join(f"{key} {value}\n" for key,value in samples.items()),
                              media_type="text/plain; version=0.0.4")
 

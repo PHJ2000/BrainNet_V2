@@ -35,6 +35,7 @@ async def main():
     event_times={}
     samples=[]
     completed=0
+    loop_lag=[]
     db=await asyncpg.connect(os.environ['POSTGRES_URL'])
     async with httpx.AsyncClient(headers={'Authorization':'Bearer '+token},timeout=10) as http, contextlib.AsyncExitStack() as stack:
         async def receive(index,socket):
@@ -54,6 +55,12 @@ async def main():
             sockets.append(await stack.enter_async_context(connect(ws_url,open_timeout=30,ping_timeout=30)))
         readers=[asyncio.create_task(receive(i,s)) for i,s in enumerate(sockets)]
         started=time.perf_counter()
+        async def heartbeat():
+            while True:
+                before=time.perf_counter()
+                await asyncio.sleep(.1)
+                loop_lag.append(max(0,(time.perf_counter()-before-.1)*1000))
+        heartbeat_task=asyncio.create_task(heartbeat())
         async def operation(index):
             nonlocal completed
             key=str(uuid4())
@@ -97,19 +104,37 @@ async def main():
                     task.add_done_callback(active.discard)
                     index+=1
                 if now>=next_sample:
-                    health=(await http.get(apis[0]+'/health/events')).json()
-                    db_states=[dict(r) for r in await db.fetch("SELECT state,wait_event_type,count(*) AS count FROM pg_stat_activity WHERE datname=current_database() GROUP BY state,wait_event_type")]
-                    sample={'elapsed_seconds':round(now,1),'completed':completed,'errors':sum(errors.values()),'event_health':health,'db_connections':db_states}
+                    try:
+                        health=(await http.get(apis[0]+'/health/events')).json()
+                        provider_health=(await http.get(os.getenv('PROVIDER_HEALTH_URL','http://provider:8090/health'))).json()
+                        if db.is_closed(): db=await asyncpg.connect(os.environ['POSTGRES_URL'])
+                        db_states=[dict(r) for r in await db.fetch("SELECT state,wait_event_type,count(*) AS count FROM pg_stat_activity WHERE datname=current_database() GROUP BY state,wait_event_type")]
+                    except Exception as error:
+                        errors['monitor:'+type(error).__name__]+=1
+                        health={'ready':False,'probe_error':type(error).__name__}
+                        provider_health={}
+                        db_states=[]
+                    sample={'elapsed_seconds':round(now,1),'completed':completed,'errors':sum(errors.values()),'event_health':health,'db_connections':db_states,
+                            'client_loop_lag_max_ms':round(max(loop_lag,default=0),3),
+                            'provider_loop_lag_max_ms':provider_health.get('event_loop_lag_max_ms')}
                     samples.append(sample)
                     (path/'soak-progress.json').write_text(json.dumps(sample,indent=2)+'\n')
                     print(json.dumps(sample),flush=True)
                     next_sample+=60
                 await asyncio.sleep(.01)
             await asyncio.gather(*active)
-            async with asyncio.timeout(30):
-                while any(c['node.created']<completed or c['node.deleted']<completed for c in counters): await asyncio.sleep(.1)
-            remaining=await db.fetchval('SELECT count(*) FROM node')
-            pending=await db.fetchval('SELECT count(*) FROM outbox_event WHERE published_at IS NULL')
+            try:
+                async with asyncio.timeout(30):
+                    while any(c['node.created']<completed or c['node.deleted']<completed for c in counters): await asyncio.sleep(.1)
+            except TimeoutError:
+                errors['event_drain:TimeoutError']+=1
+            try:
+                if db.is_closed(): db=await asyncpg.connect(os.environ['POSTGRES_URL'])
+                remaining=await db.fetchval('SELECT count(*) FROM node')
+                pending=await db.fetchval('SELECT count(*) FROM outbox_event WHERE published_at IS NULL')
+            except Exception as error:
+                errors['database_audit:'+type(error).__name__]+=1
+                remaining=pending=None
             def p95(values): return sorted(values)[int((len(values)-1)*.95)] if values else None
             result={'duration_seconds':round(time.perf_counter()-started,3),'target_seconds':duration,'websocket_clients':clients,
                     'target_operations_per_second':rate,'attempted_operations':index,'completed_operations':completed,
@@ -118,11 +143,14 @@ async def main():
                     'operation_p95_ms':p95(latency),'creation_to_event_p95_ms':p95(lag),
                     'delivered_events':sum(sum(c.values()) for c in counters),'expected_delivered_events':completed*clients*2,
                     'every_client_complete':all(c['node.created']==completed and c['node.deleted']==completed for c in counters),
+                    'client_loop_lag_p95_ms':p95(loop_lag),'client_loop_lag_max_ms':max(loop_lag,default=0),
                     'remaining_nodes':remaining,'pending_events':pending,'samples':samples}
             (path/'soak.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
             assert not errors and result['every_client_complete'] and remaining==3 and pending==0, 'Soak gate failed; complete evidence saved in ' + str(path/'soak.json')
             print('SOAK PASSED '+json.dumps({k:v for k,v in result.items() if k!='samples'}),flush=True)
         finally:
+            heartbeat_task.cancel()
+            await asyncio.gather(heartbeat_task,return_exceptions=True)
             for reader in readers: reader.cancel()
             await asyncio.gather(*readers,return_exceptions=True)
             await db.close()
