@@ -1,0 +1,18 @@
+{
+  "client_timeout_seconds": 10,
+  "client_processes": 4,
+  "backend_image": "sha256:e7bc2472804ed0a3bab8db7ebc1fb0a3771a6648e6292c39852ed1170ce8890e",
+  "queue_timeout_seconds": 5,
+  "base_commit": "2db413ee35199a655b72b6d3f6a376b94125f9fb",
+  "fastapi_regular_creation_concurrency": 32,
+  "app_memory": "1 GiB",
+  "queue_limit_per_kind": 512,
+  "spring_image": "sha256:6a9b27feb84e2cfd21559fe4c95436819bd50e0db20d3647a71912947ecc9731",
+  "background": "no concurrent soak or build",
+  "max_db_connections": 30,
+  "provider_timeout_seconds": 2,
+  "client_pool_size": 20,
+  "app_cpus": 2,
+  "fastapi_ai_creation_concurrency": 32,
+  "implementation_commit": "2adbcc16d32e26e2b5f08bfe13ecea16c0f05994"
+}

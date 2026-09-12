@@ -1,0 +1,123 @@
+name: brainnet-validation
+
+x-backend-env: &backend-env
+  DATABASE_URL: postgresql+asyncpg://brainnet_test:brainnet_test@db:5432/brainnet_test
+  POSTGRES_URL: postgresql://brainnet_test:brainnet_test@db:5432/brainnet_test
+  JWT_SECRET: brainnet-local-validation-only-not-for-production
+  ACCESS_TOKEN_EXPIRE_MINUTES: "180"
+  REQUIRE_NODE_VERSION: "true"
+  NODE_EVENTS_ENABLED: "true"
+  OPENAI_API_KEY: local-provider-only
+  OPENAI_BASE_URL: http://provider:8090/v1
+  OPENAI_TIMEOUT_SECONDS: "2"
+
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: brainnet_test
+      POSTGRES_USER: brainnet_test
+      POSTGRES_PASSWORD: brainnet_test
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U brainnet_test -d brainnet_test"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+    volumes: [validation-db:/var/lib/postgresql/data]
+  provider:
+    image: brainnet-validation-backend
+    command: [python, /workspace/experiments/runtime-nodes/mock_provider.py]
+    volumes: ["../:/workspace:ro"]
+  fastapi:
+    image: brainnet-validation-backend
+    build: {context: .., dockerfile: backend/Dockerfile}
+    environment: *backend-env
+    cpus: 2
+    mem_limit: 1g
+    depends_on:
+      db: {condition: service_healthy}
+  fastapi-secondary:
+    image: brainnet-validation-backend
+    command: [python, -m, uvicorn, app.main:app, --host, 0.0.0.0, --port, "8000"]
+    environment: *backend-env
+    cpus: 2
+    mem_limit: 1g
+    depends_on: [fastapi]
+  spring:
+    image: brainnet-validation-spring
+    build: {context: .., dockerfile: spring/vertical-slice/Dockerfile}
+    environment:
+      JWT_SECRET: brainnet-local-validation-only-not-for-production
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/brainnet_test
+      SPRING_DATASOURCE_USERNAME: brainnet_test
+      SPRING_DATASOURCE_PASSWORD: brainnet_test
+      OPENAI_API_KEY: local-provider-only
+      OPENAI_API_URL: http://provider:8090/v1/chat/completions
+      OPENAI_TIMEOUT_SECONDS: "2"
+    cpus: 2
+    mem_limit: 1g
+    depends_on:
+      db: {condition: service_healthy}
+  tools:
+    image: brainnet-validation-backend
+    command: [sleep, infinity]
+    working_dir: /workspace
+    environment:
+      <<: *backend-env
+      PYTHONPATH: /workspace/backend
+      ALLOW_TEST_DATABASE_RESET: "1"
+      FASTAPI_BASE_URL: http://fastapi:8000
+      FASTAPI_SECONDARY_URL: http://fastapi-secondary:8000
+      SPRING_BASE_URL: http://spring:8080
+      PROXY_BASE_URL: http://proxy:8080
+    volumes: ["../:/workspace"]
+  frontend:
+    image: node:20-alpine
+    working_dir: /app
+    command: [sh, -c, "npm ci && npm run build && npm start -- --hostname 0.0.0.0"]
+    environment:
+      NEXT_PUBLIC_API_BASE_URL: http://localhost:18080
+      NEXT_TELEMETRY_DISABLED: "1"
+    volumes: ["../frontend:/app", "validation-node-modules:/app/node_modules", "validation-next:/app/.next"]
+  proxy:
+    image: nginx:1.28-alpine
+    ports: ["127.0.0.1:18080:8080"]
+    volumes: ["./routing:/etc/nginx/brainnet:ro"]
+    command: [nginx, -c, /etc/nginx/brainnet/nginx.conf, -g, "daemon off;"]
+    depends_on: [fastapi, fastapi-secondary, spring, frontend]
+  prometheus:
+    image: prom/prometheus:v3.5.0
+    ports: ["127.0.0.1:19090:9090"]
+    volumes: ["./monitoring:/etc/prometheus:ro"]
+    command: [--config.file=/etc/prometheus/prometheus.yml, --storage.tsdb.retention.time=2d]
+    depends_on: [fastapi, fastapi-secondary]
+  soak-fastapi:
+    profiles: [soak]
+    image: brainnet-validation-backend
+    environment:
+      <<: *backend-env
+      DATABASE_URL: postgresql+asyncpg://brainnet_test:brainnet_test@db:5432/brainnet_soak
+    cpus: 2
+    mem_limit: 1g
+    depends_on:
+      db: {condition: service_healthy}
+  soak-spring:
+    profiles: [soak]
+    image: brainnet-validation-spring
+    environment:
+      JWT_SECRET: brainnet-local-validation-only-not-for-production
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/brainnet_soak
+      SPRING_DATASOURCE_USERNAME: brainnet_test
+      SPRING_DATASOURCE_PASSWORD: brainnet_test
+      OPENAI_API_KEY: local-provider-only
+      OPENAI_API_URL: http://provider:8090/v1/chat/completions
+      OPENAI_TIMEOUT_SECONDS: "2"
+    cpus: 2
+    mem_limit: 1g
+    depends_on:
+      db: {condition: service_healthy}
+
+volumes:
+  validation-db:
+  validation-node-modules:
+  validation-next:

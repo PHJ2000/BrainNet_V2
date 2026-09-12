@@ -22,7 +22,7 @@ from urllib.request import Request, urlopen
 class Response:
     status: int
     headers: dict[str, str]
-    body: dict[str, Any]
+    body: Any
 
 
 def call(base_url: str, method: str, path: str, token: str | None, trace_id: str | None,
@@ -124,10 +124,43 @@ def run_spring_node_creation_probe(base_url: str, token: str) -> None:
     if reused.status != 409 or reused.body.get("code") != "IDEMPOTENCY_KEY_REUSED":
         raise AssertionError(f"node create idempotency reuse: unexpected response {reused.status} {reused.body}")
 
-    unconfigured_ai = call(base_url, "POST", "/projects/1/nodes", token, "contract-ai-unconfigured",
-                           {"ai_prompt": "contract", "parent_id": 12}, "contract-ai-idempotency")
-    if unconfigured_ai.status != 503 or unconfigured_ai.body.get("code") != "AI_PROVIDER_NOT_CONFIGURED":
-        raise AssertionError(f"AI provider gate: unexpected response {unconfigured_ai.status} {unconfigured_ai.body}")
+    if os.getenv("CONTRACT_PROVIDER_CONFIGURED") != "1":
+        unconfigured_ai = call(base_url, "POST", "/projects/1/nodes", token, "contract-ai-unconfigured",
+                               {"ai_prompt": "contract", "parent_id": 12}, "contract-ai-idempotency")
+        if unconfigured_ai.status != 503 or unconfigured_ai.body.get("code") != "AI_PROVIDER_NOT_CONFIGURED":
+            raise AssertionError(f"AI provider gate: unexpected response {unconfigured_ai.status} {unconfigured_ai.body}")
+
+
+def run_cross_runtime_idempotency(fastapi: str, spring: str, token: str) -> None:
+    for index, (writer, replay) in enumerate(((fastapi, spring), (spring, fastapi))):
+        # Exercise omitted defaults, Unicode and IEEE-754 formatting differences.
+        body = {"content": f"cross-runtime-{index} 한글 😀", "parent_id": 12,
+                "pos_x": 1e-7, "pos_y": -0.0}
+        key = f"cross-runtime-{index}"
+        first = call(writer, "POST", "/projects/1/nodes", token, key, body, key)
+        retried = call(replay, "POST", "/projects/1/nodes", token, key, body, key)
+        if first.status != 201:
+            raise AssertionError(f"cross-runtime create failed: {first.status} {first.body}")
+        assert_body_same("cross-runtime response replay", first, retried)
+        for runtime in (writer, replay):
+            reused = call(runtime, "POST", "/projects/3/nodes", token, key, body, key)
+            if reused.status != 409 or reused.body.get("code") != "IDEMPOTENCY_KEY_REUSED":
+                raise AssertionError(f"project-scoped idempotency failed: {reused.status} {reused.body}")
+
+    body = {"content": "mixed-writer", "parent_id": 12}
+    def create(index: int) -> Response:
+        return call(fastapi if index % 2 else spring, "POST", "/projects/1/nodes",
+                    token, "mixed-writer", body, "mixed-writer")
+    with ThreadPoolExecutor(max_workers=100) as pool:
+        results = list(pool.map(create, range(100)))
+    successes = [response for response in results if response.status == 201]
+    if not successes:
+        raise AssertionError("mixed-writer: no successful creation")
+    for response in results:
+        if response.status == 201:
+            assert_body_same("mixed-writer cached response", successes[0], response)
+        elif response.status != 409 or response.body.get("code") != "IDEMPOTENCY_IN_PROGRESS":
+            raise AssertionError(f"mixed-writer unexpected response {response.status} {response.body}")
 
 
 def main() -> int:
@@ -176,6 +209,12 @@ def main() -> int:
     )
     assert_body_same("negative version", negative_fastapi, negative_spring)
 
+    missing_version = [call(runtime, "PATCH", "/projects/1/nodes/11", token, "missing-version",
+                            {"content": "missing"}) for runtime in (fastapi, spring)]
+    assert_body_same("required version", *missing_version)
+    if missing_version[0].status != 428:
+        raise AssertionError("both runtimes must require expected_version")
+
     conflict_fastapi = call(
         fastapi, "PATCH", "/projects/1/nodes/11", token, "contract-version-conflict", {"expected_version": 99, "content": "x"}
     )
@@ -205,9 +244,10 @@ def main() -> int:
         raise AssertionError("Spring missing-node response lost the supplied trace id")
 
     run_spring_node_creation_probe(spring, token)
+    run_cross_runtime_idempotency(fastapi, spring, token)
     run_spring_concurrency_probe(spring, token)
 
-    print("FastAPI/Spring canonical contract probe passed: project, auth, validation, patch, conflict, trace, node create/idempotency/outbox, 100-writer concurrency")
+    print("FastAPI/Spring canonical contract probe passed: project, auth, required version, trace, bidirectional replay, mixed-runtime 100-writer idempotency, 100-writer patch concurrency")
     return 0
 
 

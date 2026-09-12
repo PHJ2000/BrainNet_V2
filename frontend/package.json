@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint .",
+    "test:e2e": "playwright test",
+    "test": "tsc -p tsconfig.test.json && node --test .test-dist/tests/*.test.js"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
@@ -15,7 +17,7 @@
     "cytoscape": "^3.32.0",
     "cytoscape-layers": "^3.0.0",
     "lucide-react": "^0.511.0",
-    "next": "15.3.2",
+    "next": "16.3.5",
     "react": "^19.0.0",
     "react-contexify": "^6.0.0",
     "react-cytoscapejs": "^2.0.0",
@@ -26,6 +28,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4",
     "@types/cytoscape": "^3.21.9",
     "@types/node": "^20",
@@ -33,7 +36,7 @@
     "@types/react-dom": "^19.1.5",
     "@types/uuid": "^10.0.0",
     "eslint": "^9",
-    "eslint-config-next": "15.3.2",
+    "eslint-config-next": "16.3.5",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

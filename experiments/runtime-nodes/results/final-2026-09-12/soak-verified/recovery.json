@@ -1,0 +1,14 @@
+{
+  "strict_soak_passed": false,
+  "recovery_passed": true,
+  "events_before_recovery": {
+    "node.deleted": 17994,
+    "node.created": 17995
+  },
+  "recovered_node_ids": [
+    17115
+  ],
+  "replay_created_extra_nodes_or_events": false,
+  "remaining_nodes": 3,
+  "pending_events": 0
+}

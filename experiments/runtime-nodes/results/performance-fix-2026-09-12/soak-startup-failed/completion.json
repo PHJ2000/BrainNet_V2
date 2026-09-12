@@ -1,0 +1,7 @@
+{
+  "gates_passed": false,
+  "cleanup_succeeded": true,
+  "error": "Cannot inspect brainnet-validation-soak-fastapi-1",
+  "finished_at": "2026-09-12T10:37:07.1575847Z",
+  "state": "FAILED"
+}

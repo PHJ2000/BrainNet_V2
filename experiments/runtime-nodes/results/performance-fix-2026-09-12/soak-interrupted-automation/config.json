@@ -1,0 +1,11 @@
+{
+  "target_seconds": 3600,
+  "websocket_clients": 100,
+  "operations_per_second": 5,
+  "started_at_utc": "2026-09-12T10:10:59.7425521Z",
+  "background": "No parallel load or build; default app instances stopped",
+  "database": "brainnet_soak",
+  "raw_error_budget": 0,
+  "backend_image": "sha256:e7bc2472804ed0a3bab8db7ebc1fb0a3771a6648e6292c39852ed1170ce8890e",
+  "spring_image": "sha256:6a9b27feb84e2cfd21559fe4c95436819bd50e0db20d3647a71912947ecc9731"
+}

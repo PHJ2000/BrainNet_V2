@@ -1,0 +1,22 @@
+{
+  "duration_seconds": 60.371,
+  "requests": 14581,
+  "success": 14581,
+  "success_rps": 241.522,
+  "total_rps": 241.522,
+  "failure_rate": 0.0,
+  "statuses": {
+    "201": 14581
+  },
+  "p50_ms": 272.357,
+  "p95_ms": 1283.303,
+  "p99_ms": 2020.906,
+  "successful_p95_ms": 1283.303,
+  "runtime": "spring",
+  "concurrency": 100,
+  "repetition": 3,
+  "mode": "regular",
+  "finished_at": "2026-09-12T05:08:01.692524+00:00",
+  "verified_created_nodes": 14581,
+  "unpublished_events": 44
+}

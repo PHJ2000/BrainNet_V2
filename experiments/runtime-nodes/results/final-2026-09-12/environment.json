@@ -1,0 +1,16 @@
+{
+  "captured_utc": "2026-09-12T07:27:42.1306475Z",
+  "source_commit": "923935448db0c456943ce58b5cd34864be4d0452",
+  "cpu": [
+    {
+      "Name": "13th Gen Intel(R) Core(TM) i5-13600KF",
+      "NumberOfCores": 14,
+      "NumberOfLogicalProcessors": 20
+    }
+  ],
+  "docker": "Docker Desktop; CPUs=20; MemoryBytes=33538863104",
+  "limits": "2 CPUs and 1 GiB per measured application",
+  "fastapi_pool": "10 persistent + 20 overflow",
+  "spring_pool": "30 maximum",
+  "ai_provider": "Local HTTP fixture, nominal 200ms; no external provider calls"
+}

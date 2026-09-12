@@ -1,0 +1,12 @@
+{
+  "websocket_clients": 100,
+  "started_at_utc": "2026-09-12T10:36:42.8799904Z",
+  "spring_image": "sha256:6a9b27feb84e2cfd21559fe4c95436819bd50e0db20d3647a71912947ecc9731",
+  "backend_image": "sha256:e7bc2472804ed0a3bab8db7ebc1fb0a3771a6648e6292c39852ed1170ce8890e",
+  "target_seconds": 3600,
+  "implementation_commit": "2adbcc16d32e26e2b5f08bfe13ecea16c0f05994",
+  "background": "Standalone runner, no parallel load or build",
+  "raw_error_budget": 0,
+  "operations_per_second": 5,
+  "database": "brainnet_soak"
+}

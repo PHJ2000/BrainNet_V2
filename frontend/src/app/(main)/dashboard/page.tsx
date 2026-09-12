@@ -1,8 +1,12 @@
 // app/(main)/dashboard/page.tsx
-import Link from "next/link";
+"use client";
+
+import { useState } from "react";
+import ProjectFormModal from "../../components/ProjectFormModal";
 
 
 export default function DashboardPage() {
+  const [modalOpen, setModalOpen] = useState(false);
   return (
     <div className="h-full flex flex-col items-center justify-center py-28">
       {/* 아이콘(원하면 삭제해도 됨) */}
@@ -14,12 +18,14 @@ export default function DashboardPage() {
         아직 프로젝트가 없어요.<br/>
         새로운 프로젝트를 만들어 <span className="text-blue-500 font-semibold">아이디어</span>를 시작해보세요.
       </p>
-      <Link
-        href="/dashboard/projects/new"
+      <button
+        type="button"
+        onClick={() => setModalOpen(true)}
         className="px-6 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold shadow hover:brightness-110 transition"
       >
         + 새 프로젝트 만들기
-      </Link>
+      </button>
+      {modalOpen && <ProjectFormModal onClose={() => setModalOpen(false)} />}
     </div>
   );
 }

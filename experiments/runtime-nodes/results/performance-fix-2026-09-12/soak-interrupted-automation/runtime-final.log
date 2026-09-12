@@ -1,0 +1,928 @@
+soak-spring-1   | 2026-09-12T10:31:23.338Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6787] com.brainnet.spring.TraceFilter          : request_complete trace_id=d38890ce-2c57-45a2-ae51-32e7426b8223 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:23.726Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6788] com.brainnet.spring.TraceFilter          : request_complete trace_id=c1c2cdb9-1966-4c85-bb38-eb0b4a5ba39d method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:23.745Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6789] com.brainnet.spring.TraceFilter          : request_complete trace_id=b57afc13-231c-4930-92a1-0d5f29a1c48f method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:28.947Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6790] com.brainnet.spring.TraceFilter          : request_complete trace_id=545dfc9a-b20d-4838-8351-461477449b95 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:23.844Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6791] com.brainnet.spring.TraceFilter          : request_complete trace_id=5ac1af3a-4bfe-4029-ac10-769602db2f92 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:23.865Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6792] com.brainnet.spring.TraceFilter          : request_complete trace_id=a012ee36-005a-4c41-b2e9-69be8dd8bda7 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/6941 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:31:24.053Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6793] com.brainnet.spring.TraceFilter          : request_complete trace_id=00bc94d9-fc84-4fdb-924b-1c02da3af972 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/6942 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:31:24.448Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6794] com.brainnet.spring.TraceFilter          : request_complete trace_id=452b01ba-abe2-4b77-ab78-89727b614de4 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/6943 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/6944 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:31:24.451Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6795] com.brainnet.spring.TraceFilter          : request_complete trace_id=3df76723-c3c0-4e06-a400-fa537be73b7f method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/6945 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:31:24.639Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6796] com.brainnet.spring.TraceFilter          : request_complete trace_id=d21ece6e-131e-448a-8bfd-5d74359e66ee method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/6946 HTTP/1.1" 204 No Content
+db-1            | The files belonging to this database system will be owned by user "postgres".
+soak-spring-1   | 2026-09-12T10:31:25.036Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6797] com.brainnet.spring.TraceFilter          : request_complete trace_id=60d0259a-d760-4c83-abcc-7ee37f30c83b method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:25.070Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6798] com.brainnet.spring.TraceFilter          : request_complete trace_id=d412bf13-7e04-48cc-a5ee-587dd7a06879 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+provider-1      | INFO:     Started server process [1]
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/6947 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/6948 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+db-1            | This user must also own the server process.
+soak-spring-1   | 2026-09-12T10:31:25.266Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6799] com.brainnet.spring.TraceFilter          : request_complete trace_id=30459f68-db91-487b-9ac3-8d664d0ccd7a method=POST path=/projects/1/nodes status=201
+db-1            |
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/6949 HTTP/1.1" 204 No Content
+db-1            | The database cluster will be initialized with locale "en_US.utf8".
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:31:25.643Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6800] com.brainnet.spring.TraceFilter          : request_complete trace_id=9215c5a9-806b-4257-b77c-eac9e4aa1f01 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:25.667Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6801] com.brainnet.spring.TraceFilter          : request_complete trace_id=89c269e5-0258-44c9-96a1-10de2d228cc2 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:25.847Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6802] com.brainnet.spring.TraceFilter          : request_complete trace_id=a6cb88db-e9fe-4d79-9287-1f3632adebc3 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:26.239Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6803] com.brainnet.spring.TraceFilter          : request_complete trace_id=ee55b2f2-85a2-4851-90f1-469d59dcc09e method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:26.279Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6804] com.brainnet.spring.TraceFilter          : request_complete trace_id=50e14cb9-943e-48e7-8327-d7825d560689 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:26.449Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6805] com.brainnet.spring.TraceFilter          : request_complete trace_id=41c990c8-dcc6-488b-b27f-2a1dc9277ba6 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:26.841Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6806] com.brainnet.spring.TraceFilter          : request_complete trace_id=9b063d8d-4cf6-48b1-b029-c909f29a0299 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:26.859Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6807] com.brainnet.spring.TraceFilter          : request_complete trace_id=5f51c883-8f7a-4fd8-87cf-c2f4c3f591a9 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/6950 HTTP/1.1" 204 No Content
+provider-1      | INFO:     Waiting for application startup.
+db-1            | The default database encoding has accordingly been set to "UTF8".
+provider-1      | INFO:     Application startup complete.
+db-1            | The default text search configuration will be set to "english".
+db-1            |
+soak-spring-1   | 2026-09-12T10:31:27.040Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6808] com.brainnet.spring.TraceFilter          : request_complete trace_id=8d534394-d3f9-4b49-a479-e5bbbc9d9aa7 method=POST path=/projects/1/nodes status=201
+db-1            | Data page checksums are disabled.
+soak-spring-1   | 2026-09-12T10:31:27.446Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6809] com.brainnet.spring.TraceFilter          : request_complete trace_id=49fda41f-5b07-4d23-a4e7-ceb5b7a9b794 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:27.462Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6810] com.brainnet.spring.TraceFilter          : request_complete trace_id=77384ef7-1253-44d6-bada-3f2c3e0183c7 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:27.657Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6811] com.brainnet.spring.TraceFilter          : request_complete trace_id=666707d6-ea0b-4317-b0ad-72e176bf212d method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/6951 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/6952 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:31:28.046Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6812] com.brainnet.spring.TraceFilter          : request_complete trace_id=94b65300-7c83-4f12-a024-d125e968b881 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:28.051Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6813] com.brainnet.spring.TraceFilter          : request_complete trace_id=2a0af286-1b26-4145-a6b6-61ac77a6dca8 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+provider-1      | INFO:     Uvicorn running on http://0.0.0.0:8090 (Press CTRL+C to quit)
+provider-1      | INFO:     Shutting down
+soak-spring-1   | 2026-09-12T10:31:28.243Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6814] com.brainnet.spring.TraceFilter          : request_complete trace_id=684f71e9-e938-4d86-ae3c-707133486f0d method=POST path=/projects/1/nodes status=201
+db-1            |
+soak-spring-1   | 2026-09-12T10:31:28.644Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6815] com.brainnet.spring.TraceFilter          : request_complete trace_id=4985aad8-e570-4d88-81f0-9aa9e6c5704a method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:28.665Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6816] com.brainnet.spring.TraceFilter          : request_complete trace_id=dd944213-5a03-4170-ad5c-5f4b0b96a094 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:33.874Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6817] com.brainnet.spring.TraceFilter          : request_complete trace_id=164177b1-edec-4302-8195-3677b6b7235d method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:31:28.758Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6818] com.brainnet.spring.TraceFilter          : request_complete trace_id=5804d744-e044-4cdc-9660-5672f524e374 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/6953 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/6954 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:31:28.763Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6819] com.brainnet.spring.TraceFilter          : request_complete trace_id=443c7831-61a8-4702-8de6-7b8a7d01976b method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:28.951Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6820] com.brainnet.spring.TraceFilter          : request_complete trace_id=45ed3b85-925b-4b1b-b8e7-4fd8a24665e2 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:29.354Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6821] com.brainnet.spring.TraceFilter          : request_complete trace_id=ad2353c7-dce7-43b8-9b07-32ced11f5f7b method=POST path=/projects/1/nodes status=201
+provider-1      | INFO:     Waiting for application shutdown.
+soak-spring-1   | 2026-09-12T10:31:29.374Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6822] com.brainnet.spring.TraceFilter          : request_complete trace_id=36c7d371-952d-4206-9151-4cc443200765 method=POST path=/projects/1/nodes status=201
+db-1            | fixing permissions on existing directory /var/lib/postgresql/data ... ok
+soak-spring-1   | 2026-09-12T10:31:29.565Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6823] com.brainnet.spring.TraceFilter          : request_complete trace_id=d25e8426-89a3-4a1b-b451-feaf3f626f52 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/6955 HTTP/1.1" 204 No Content
+db-1            | creating subdirectories ... ok
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+db-1            | selecting dynamic shared memory implementation ... posix
+db-1            | selecting default max_connections ... 100
+db-1            | selecting default shared_buffers ... 128MB
+provider-1      | INFO:     Application shutdown complete.
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/6956 HTTP/1.1" 204 No Content
+provider-1      | INFO:     Finished server process [1]
+provider-1      | INFO:     Started server process [1]
+soak-spring-1   | 2026-09-12T10:31:29.960Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6824] com.brainnet.spring.TraceFilter          : request_complete trace_id=dd0eb0eb-794e-4f28-8494-733e2ef636e1 method=POST path=/projects/1/nodes status=201
+provider-1      | INFO:     Waiting for application startup.
+soak-spring-1   | 2026-09-12T10:31:29.968Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6825] com.brainnet.spring.TraceFilter          : request_complete trace_id=b2c6a5d2-9548-4b4b-979c-8a6e88c6f249 method=POST path=/projects/1/nodes status=201
+provider-1      | INFO:     Application startup complete.
+provider-1      | INFO:     Uvicorn running on http://0.0.0.0:8090 (Press CTRL+C to quit)
+provider-1      | INFO:     Shutting down
+db-1            | selecting default time zone ... UTC
+db-1            | creating configuration files ... ok
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/6957 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:31:30.157Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6826] com.brainnet.spring.TraceFilter          : request_complete trace_id=1141e040-3b5f-4c40-a854-886cda746fc3 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:31:30.557Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6827] com.brainnet.spring.TraceFilter          : request_complete trace_id=229c88cc-35fb-4d34-b4b6-eb06481fa083 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/6958 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:31:30.585Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6828] com.brainnet.spring.TraceFilter          : request_complete trace_id=85c2a6d0-95db-4c54-b909-0e01a1e36336 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+db-1            | running bootstrap script ... ok
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:31:30.764Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6829] com.brainnet.spring.TraceFilter          : request_complete trace_id=6f0ac246-ac0c-48d8-9e11-da7b2b701b27 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:31.161Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6830] com.brainnet.spring.TraceFilter          : request_complete trace_id=32cf9231-c527-4541-b4b2-8b4c4533f8a2 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:31.164Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6831] com.brainnet.spring.TraceFilter          : request_complete trace_id=63edc933-a735-416d-ad04-e587b54ea6b4 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:31.359Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6832] com.brainnet.spring.TraceFilter          : request_complete trace_id=99daf200-e48f-4133-96c5-33a434fc784e method=POST path=/projects/1/nodes status=201
+provider-1      | INFO:     Waiting for application shutdown.
+provider-1      | INFO:     Application shutdown complete.
+soak-spring-1   | 2026-09-12T10:31:31.757Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6833] com.brainnet.spring.TraceFilter          : request_complete trace_id=77a83eb3-2a5f-4a17-88d8-8d5f639c21bf method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/6959 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/6960 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:31:31.779Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6834] com.brainnet.spring.TraceFilter          : request_complete trace_id=d52c1d83-7e0a-4efe-97b3-e35fecf1ba48 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/6961 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:31:31.973Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6835] com.brainnet.spring.TraceFilter          : request_complete trace_id=8ebe7c4a-a5c0-48ee-a51e-ccf970794bb0 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+db-1            | sh: locale: not found
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/6962 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:31:32.355Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6836] com.brainnet.spring.TraceFilter          : request_complete trace_id=1ad1ee26-c926-4f34-8615-6d65a98aad7f method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:32.373Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6837] com.brainnet.spring.TraceFilter          : request_complete trace_id=e56b6308-e7a5-47e2-af25-98be8635b81c method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:32.556Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6838] com.brainnet.spring.TraceFilter          : request_complete trace_id=d33768c1-1e33-40ea-9683-c2a96663905b method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:32.953Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6839] com.brainnet.spring.TraceFilter          : request_complete trace_id=b64b595d-655b-4149-bd8f-9f216081dc3f method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:32.973Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6840] com.brainnet.spring.TraceFilter          : request_complete trace_id=03b4f427-abb5-4c34-b893-38b87211e60f method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:33.165Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6841] com.brainnet.spring.TraceFilter          : request_complete trace_id=149101ac-cbed-456e-a816-3cb7838bc485 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:33.557Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6842] com.brainnet.spring.TraceFilter          : request_complete trace_id=f2af02ea-a50c-49c8-8163-95fa14a42164 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:31:33.565Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6843] com.brainnet.spring.TraceFilter          : request_complete trace_id=208b322b-9172-4ddd-a3cf-4b19ae4fa8b6 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:33.754Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6844] com.brainnet.spring.TraceFilter          : request_complete trace_id=22ecc8b0-1618-46b2-bc6f-54a41a5ff7a5 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:33.669Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6845] com.brainnet.spring.TraceFilter          : request_complete trace_id=c28c744c-2e02-4cb3-b440-91cf1eb5edc6 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:33.690Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6846] com.brainnet.spring.TraceFilter          : request_complete trace_id=2de2ae45-f291-4322-baf9-ce300b25df87 method=POST path=/projects/1/nodes status=201
+provider-1      | INFO:     Finished server process [1]
+soak-spring-1   | 2026-09-12T10:31:33.887Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6847] com.brainnet.spring.TraceFilter          : request_complete trace_id=fbcbb3be-0ae6-4e06-ad14-eb1399df1555 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:34.269Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6848] com.brainnet.spring.TraceFilter          : request_complete trace_id=a4fabe63-9258-4672-945c-1d9bb1f5d347 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:34.280Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6849] com.brainnet.spring.TraceFilter          : request_complete trace_id=d6b9d7d8-cee7-4bb7-b879-270164d35528 method=POST path=/projects/1/nodes status=201
+db-1            | 2026-09-12 09:12:49.122 UTC [35] WARNING:  no usable system locales were found
+db-1            | performing post-bootstrap initialization ... ok
+provider-1      | INFO:     Started server process [1]
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/6963 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:31:34.468Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6850] com.brainnet.spring.TraceFilter          : request_complete trace_id=1827dfcc-a2a1-4043-b772-5e88d4704465 method=POST path=/projects/1/nodes status=201
+provider-1      | INFO:     Waiting for application startup.
+provider-1      | INFO:     Application startup complete.
+provider-1      | INFO:     Uvicorn running on http://0.0.0.0:8090 (Press CTRL+C to quit)
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/6964 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+db-1            | initdb: warning: enabling "trust" authentication for local connections
+soak-spring-1   | 2026-09-12T10:31:34.873Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6851] com.brainnet.spring.TraceFilter          : request_complete trace_id=6787361b-bf00-475a-8c21-d4be51da21f8 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:34.893Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6852] com.brainnet.spring.TraceFilter          : request_complete trace_id=9e140391-c70a-4f31-be4a-28265b8d5f3d method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:35.087Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6853] com.brainnet.spring.TraceFilter          : request_complete trace_id=c4e6992e-57c4-4d81-bfe9-54bb5870689d method=POST path=/projects/1/nodes status=201
+db-1            | initdb: hint: You can change this by editing pg_hba.conf or using the option -A, or --auth-local and --auth-host, the next time you run initdb.
+db-1            | syncing data to disk ... ok
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+db-1            |
+soak-spring-1   | 2026-09-12T10:31:35.469Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6854] com.brainnet.spring.TraceFilter          : request_complete trace_id=453b2362-364a-4bba-939a-5d92b9c99734 method=POST path=/projects/1/nodes status=201
+db-1            |
+soak-spring-1   | 2026-09-12T10:31:35.480Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6855] com.brainnet.spring.TraceFilter          : request_complete trace_id=b62442ca-12d3-49f6-b663-18d4bad9a962 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/6966 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:31:35.670Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6856] com.brainnet.spring.TraceFilter          : request_complete trace_id=b973f19c-17ef-469d-9901-8c4c1ed9f7d7 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:36.062Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6858] com.brainnet.spring.TraceFilter          : request_complete trace_id=da421910-992f-4b2d-bbbe-d013a6de80b2 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:36.097Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6859] com.brainnet.spring.TraceFilter          : request_complete trace_id=537f0b36-5d06-4c82-8e27-3cb70288fae3 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/6965 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/6967 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:31:36.292Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6860] com.brainnet.spring.TraceFilter          : request_complete trace_id=82800f4e-1ee4-4156-a384-449dbebb0e68 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:31:36.669Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6861] com.brainnet.spring.TraceFilter          : request_complete trace_id=f7bde301-3d1f-4dc8-8b70-18cf00976df9 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:36.716Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6862] com.brainnet.spring.TraceFilter          : request_complete trace_id=08ccc193-28a4-4703-9a15-9f26a1c0439e method=POST path=/projects/1/nodes status=201
+db-1            | Success. You can now start the database server using:
+db-1            |
+db-1            |     pg_ctl -D /var/lib/postgresql/data -l logfile start
+soak-spring-1   | 2026-09-12T10:31:36.867Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6863] com.brainnet.spring.TraceFilter          : request_complete trace_id=7a9f7bb1-9d14-40fb-bbb9-2b4a7dda0526 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:37.270Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6864] com.brainnet.spring.TraceFilter          : request_complete trace_id=397e9140-5ec6-4093-bba5-d367741214c9 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:37.287Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6865] com.brainnet.spring.TraceFilter          : request_complete trace_id=3386c442-2b8e-4a4a-aae4-00e4f804f150 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:37.477Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6866] com.brainnet.spring.TraceFilter          : request_complete trace_id=25dc6233-1b9a-4e26-80e4-62dc3c5f75e2 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:37.867Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6867] com.brainnet.spring.TraceFilter          : request_complete trace_id=7286fa02-8ed5-4427-845e-3a17d4c7011f method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:37.883Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6868] com.brainnet.spring.TraceFilter          : request_complete trace_id=75f2f635-f7b8-4a7c-aaa1-e607241aadf7 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:38.070Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6869] com.brainnet.spring.TraceFilter          : request_complete trace_id=e512b28a-98c8-4684-aea6-002eedd875ec method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:31:38.467Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6870] com.brainnet.spring.TraceFilter          : request_complete trace_id=b7a75b94-c333-4792-b597-1ade1dae2f0a method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/6968 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/6969 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:31:38.493Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6871] com.brainnet.spring.TraceFilter          : request_complete trace_id=62063e73-40fd-4763-9a79-803a31baa8e0 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:38.675Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6872] com.brainnet.spring.TraceFilter          : request_complete trace_id=0786858b-fe5f-4dbb-a77d-d80d52ea04a7 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:44.088Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6873] com.brainnet.spring.TraceFilter          : request_complete trace_id=0aef80f5-6419-4b17-aadf-c7e397b9f5d7 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:44.097Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6874] com.brainnet.spring.TraceFilter          : request_complete trace_id=28ac50b1-646d-4ce5-ace5-bea20c2a9304 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/6970 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:31:38.769Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6875] com.brainnet.spring.TraceFilter          : request_complete trace_id=0559bb58-dfd4-4d2d-bfd5-52566d2f2af0 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:31:39.170Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6876] com.brainnet.spring.TraceFilter          : request_complete trace_id=fdf7aafe-b767-4ed4-b6d3-1ee4d68438f8 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+db-1            |
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/6971 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/6972 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:31:39.192Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6877] com.brainnet.spring.TraceFilter          : request_complete trace_id=167bb07c-123d-43c7-9462-64b9a44af958 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:39.382Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6878] com.brainnet.spring.TraceFilter          : request_complete trace_id=4055a034-6eeb-4219-9886-d2e4ba9bbc73 method=POST path=/projects/1/nodes status=201
+db-1            | waiting for server to start....2026-09-12 09:12:50.174 UTC [47] LOG:  starting PostgreSQL 15.19 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/6973 HTTP/1.1" 204 No Content
+db-1            | 2026-09-12 09:12:50.178 UTC [47] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+db-1            | 2026-09-12 09:12:50.193 UTC [50] LOG:  database system was shut down at 2026-09-12 09:12:49 UTC
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+db-1            | 2026-09-12 09:12:50.200 UTC [47] LOG:  database system is ready to accept connections
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+db-1            |  done
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/6974 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:31:39.771Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6879] com.brainnet.spring.TraceFilter          : request_complete trace_id=7071f6d2-9624-462a-be00-e70400c25752 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:39.781Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6880] com.brainnet.spring.TraceFilter          : request_complete trace_id=a368deeb-41e1-4ed4-8270-d549c91c414e method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:39.972Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6881] com.brainnet.spring.TraceFilter          : request_complete trace_id=759b26a7-820d-44d7-ae84-337c9a88e36b method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:40.371Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6882] com.brainnet.spring.TraceFilter          : request_complete trace_id=b5de28ae-e1a3-4869-87df-0d68ee971916 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:40.390Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6883] com.brainnet.spring.TraceFilter          : request_complete trace_id=8248fd7b-b3c9-4e5a-afd6-5222966c36b4 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:40.582Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6884] com.brainnet.spring.TraceFilter          : request_complete trace_id=c989ecf3-0d44-41e6-9bbb-95c5bb647f58 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:40.982Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6885] com.brainnet.spring.TraceFilter          : request_complete trace_id=9413d694-448b-44fb-a707-ecac0d81d132 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:40.994Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6886] com.brainnet.spring.TraceFilter          : request_complete trace_id=49d500a6-5fd6-4267-a1f8-9e76f1e50e95 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:41.167Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6887] com.brainnet.spring.TraceFilter          : request_complete trace_id=aa85ef1d-4d15-4e09-8787-25512d1b0cef method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:41.570Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6888] com.brainnet.spring.TraceFilter          : request_complete trace_id=b41e1be6-faae-4cce-b052-36ae17e99ff4 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:41.598Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6889] com.brainnet.spring.TraceFilter          : request_complete trace_id=ee4d60bb-52e7-4812-aa89-158ccd327d3f method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:41.791Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6890] com.brainnet.spring.TraceFilter          : request_complete trace_id=d6a052ae-ecd7-4550-a904-bfe85892de58 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:42.179Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6891] com.brainnet.spring.TraceFilter          : request_complete trace_id=9f992d2c-2cbd-4ee8-ab87-b78382f97809 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/6975 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:31:42.189Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6892] com.brainnet.spring.TraceFilter          : request_complete trace_id=d14f9b21-126a-4fbd-9e36-9ac5ec016e01 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:42.377Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6893] com.brainnet.spring.TraceFilter          : request_complete trace_id=714f994a-c824-4d5e-b538-6c9bd5b3e004 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+db-1            | server started
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/6976 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+db-1            | CREATE DATABASE
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/6977 HTTP/1.1" 204 No Content
+db-1            |
+soak-spring-1   | 2026-09-12T10:31:42.776Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6894] com.brainnet.spring.TraceFilter          : request_complete trace_id=2d875bd9-27f2-4883-8e87-9dbe0a0b8504 method=POST path=/projects/1/nodes status=201
+db-1            |
+soak-spring-1   | 2026-09-12T10:31:42.796Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6895] com.brainnet.spring.TraceFilter          : request_complete trace_id=7b744965-b07d-48b9-b59e-b367ef552094 method=POST path=/projects/1/nodes status=201
+db-1            | /usr/local/bin/docker-entrypoint.sh: ignoring /docker-entrypoint-initdb.d/*
+db-1            |
+db-1            | waiting for server to shut down....2026-09-12 09:12:50.330 UTC [47] LOG:  received fast shutdown request
+db-1            | 2026-09-12 09:12:50.335 UTC [47] LOG:  aborting any active transactions
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/6978 HTTP/1.1" 204 No Content
+db-1            | 2026-09-12 09:12:50.337 UTC [47] LOG:  background worker "logical replication launcher" (PID 53) exited with exit code 1
+db-1            | 2026-09-12 09:12:50.337 UTC [48] LOG:  shutting down
+soak-spring-1   | 2026-09-12T10:31:42.987Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6896] com.brainnet.spring.TraceFilter          : request_complete trace_id=184ebe30-176e-4e70-8bac-3d5c03d58f1c method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:31:43.374Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6897] com.brainnet.spring.TraceFilter          : request_complete trace_id=c81189e3-856b-49a6-8eec-1097bdd0f617 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/6979 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:31:43.379Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6898] com.brainnet.spring.TraceFilter          : request_complete trace_id=1c0eb5b0-4c74-4eea-99c4-492e71eeec9a method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:48.617Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6899] com.brainnet.spring.TraceFilter          : request_complete trace_id=98a7a30d-5996-4e12-ae3f-935720c930c2 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:43.508Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6900] com.brainnet.spring.TraceFilter          : request_complete trace_id=207e4180-5a76-4a81-b89b-591dbf22356a method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:43.532Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6901] com.brainnet.spring.TraceFilter          : request_complete trace_id=9bcd62aa-5bbf-4176-b5e4-c466d99b9cba method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:31:43.733Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6902] com.brainnet.spring.TraceFilter          : request_complete trace_id=1c43cf86-b7a6-4632-8404-1667d641b990 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:44.113Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6903] com.brainnet.spring.TraceFilter          : request_complete trace_id=8d470f15-efa1-46a3-b3bd-f61777abe187 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:44.130Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6904] com.brainnet.spring.TraceFilter          : request_complete trace_id=38673bc3-d56b-4eb6-92e5-5786110c84ea method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:44.310Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6905] com.brainnet.spring.TraceFilter          : request_complete trace_id=784efb07-ddd1-4428-b7d1-ef635abb982b method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:44.711Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6906] com.brainnet.spring.TraceFilter          : request_complete trace_id=9f91e57d-0d77-4e93-9fa1-9e324fac7db7 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:44.728Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6907] com.brainnet.spring.TraceFilter          : request_complete trace_id=46eb693c-0c36-4fa2-a67a-041e94423358 method=POST path=/projects/1/nodes status=201
+db-1            | 2026-09-12 09:12:50.342 UTC [48] LOG:  checkpoint starting: shutdown immediate
+soak-spring-1   | 2026-09-12T10:31:44.925Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6908] com.brainnet.spring.TraceFilter          : request_complete trace_id=40b28e66-838c-4f37-bfe3-063c20927181 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:45.310Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6909] com.brainnet.spring.TraceFilter          : request_complete trace_id=14eac857-553a-49eb-8e71-424817689842 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:45.335Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6910] com.brainnet.spring.TraceFilter          : request_complete trace_id=9c0b5824-74c7-4fcf-8757-9f749519fe6f method=POST path=/projects/1/nodes status=201
+db-1            | 2026-09-12 09:12:50.617 UTC [48] LOG:  checkpoint complete: wrote 922 buffers (5.6%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.018 s, sync=0.241 s, total=0.280 s; sync files=301, longest=0.006 s, average=0.001 s; distance=4249 kB, estimate=4249 kB
+soak-spring-1   | 2026-09-12T10:31:45.510Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6911] com.brainnet.spring.TraceFilter          : request_complete trace_id=29614ccc-b57a-410b-a8c5-e8377d0a2cd1 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:45.910Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6912] com.brainnet.spring.TraceFilter          : request_complete trace_id=9a3a03a4-169b-4505-8252-1c0dae063654 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:45.946Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6913] com.brainnet.spring.TraceFilter          : request_complete trace_id=2a5729e0-756b-4204-bfa5-feba462dfac0 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:46.132Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6914] com.brainnet.spring.TraceFilter          : request_complete trace_id=88ee7b74-82ea-41fc-8560-089fa4946fce method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:46.520Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6915] com.brainnet.spring.TraceFilter          : request_complete trace_id=42f75521-ac34-436d-992e-c5d2d6015576 method=POST path=/projects/1/nodes status=201
+db-1            | 2026-09-12 09:12:50.623 UTC [47] LOG:  database system is shut down
+db-1            |  done
+db-1            | server stopped
+db-1            |
+db-1            | PostgreSQL init process complete; ready for start up.
+db-1            |
+db-1            | 2026-09-12 09:12:50.661 UTC [1] LOG:  starting PostgreSQL 15.19 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit
+db-1            | 2026-09-12 09:12:50.662 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+db-1            | 2026-09-12 09:12:50.662 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+db-1            | 2026-09-12 09:12:50.671 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+soak-spring-1   | 2026-09-12T10:31:46.531Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6916] com.brainnet.spring.TraceFilter          : request_complete trace_id=f86fbfd2-700e-4ed5-80e0-1c7263fcc314 method=POST path=/projects/1/nodes status=201
+db-1            | 2026-09-12 09:12:50.682 UTC [63] LOG:  database system was shut down at 2026-09-12 09:12:50 UTC
+db-1            | 2026-09-12 09:12:50.690 UTC [1] LOG:  database system is ready to accept connections
+db-1            | 2026-09-12 09:17:55.302 UTC [61] LOG:  checkpoint starting: time
+db-1            | 2026-09-12 09:19:02.120 UTC [61] LOG:  checkpoint complete: wrote 231 buffers (1.4%); 0 WAL file(s) added, 0 removed, 1 recycled; write=65.989 s, sync=0.775 s, total=66.818 s; sync files=396, longest=0.015 s, average=0.002 s; distance=12594 kB, estimate=12594 kB
+db-1            | 2026-09-12 09:22:55.637 UTC [61] LOG:  checkpoint starting: time
+db-1            | 2026-09-12 09:23:49.776 UTC [61] LOG:  checkpoint complete: wrote 247 buffers (1.5%); 0 WAL file(s) added, 0 removed, 3 recycled; write=53.926 s, sync=0.177 s, total=54.139 s; sync files=229, longest=0.005 s, average=0.001 s; distance=49097 kB, estimate=49097 kB
+db-1            | 2026-09-12 09:27:55.807 UTC [61] LOG:  checkpoint starting: time
+db-1            | 2026-09-12 09:28:53.645 UTC [61] LOG:  checkpoint complete: wrote 666 buffers (4.1%); 0 WAL file(s) added, 0 removed, 2 recycled; write=57.699 s, sync=0.115 s, total=57.839 s; sync files=155, longest=0.004 s, average=0.001 s; distance=27823 kB, estimate=46969 kB
+db-1            | 2026-09-12 09:32:55.805 UTC [61] LOG:  checkpoint starting: time
+db-1            | 2026-09-12 09:33:35.915 UTC [61] LOG:  checkpoint complete: wrote 494 buffers (3.0%); 0 WAL file(s) added, 0 removed, 17 recycled; write=39.484 s, sync=0.449 s, total=40.111 s; sync files=361, longest=0.008 s, average=0.002 s; distance=289934 kB, estimate=289934 kB
+db-1            | 2026-09-12 09:36:27.115 UTC [6169] ERROR:  duplicate key value violates unique constraint "uq_node_active_root_per_project"
+db-1            | 2026-09-12 09:36:27.115 UTC [6169] DETAIL:  Key (project_id)=(1) already exists.
+db-1            | 2026-09-12 09:36:27.115 UTC [6169] STATEMENT:  INSERT INTO node (project_id, parent_id, author_id, content, state, depth, order_index, pos_x, pos_y, version, created_at, updated_at) VALUES ($1::BIGINT, $2::BIGINT, $3::BIGINT, $4::VARCHAR, $5::node_state_t, $6::INTEGER, $7::INTEGER, $8::FLOAT, $9::FLOAT, $10::INTEGER, $11::TIMESTAMP WITH TIME ZONE, $12::TIMESTAMP WITH TIME ZONE) RETURNING node.id
+db-1            | 2026-09-12 09:36:27.115 UTC [6174] ERROR:  duplicate key value violates unique constraint "uq_node_active_root_per_project"
+db-1            | 2026-09-12 09:36:27.115 UTC [6174] DETAIL:  Key (project_id)=(1) already exists.
+db-1            | 2026-09-12 09:36:27.115 UTC [6174] STATEMENT:  INSERT INTO node (project_id, parent_id, author_id, content, state, depth, order_index, pos_x, pos_y, version, created_at, updated_at) VALUES ($1::BIGINT, $2::BIGINT, $3::BIGINT, $4::VARCHAR, $5::node_state_t, $6::INTEGER, $7::INTEGER, $8::FLOAT, $9::FLOAT, $10::INTEGER, $11::TIMESTAMP WITH TIME ZONE, $12::TIMESTAMP WITH TIME ZONE) RETURNING node.id
+db-1            | 2026-09-12 09:36:27.115 UTC [6173] ERROR:  duplicate key value violates unique constraint "uq_node_active_root_per_project"
+db-1            | 2026-09-12 09:36:27.115 UTC [6173] DETAIL:  Key (project_id)=(1) already exists.
+db-1            | 2026-09-12 09:36:27.115 UTC [6173] STATEMENT:  INSERT INTO node (project_id, parent_id, author_id, content, state, depth, order_index, pos_x, pos_y, version, created_at, updated_at) VALUES ($1::BIGINT, $2::BIGINT, $3::BIGINT, $4::VARCHAR, $5::node_state_t, $6::INTEGER, $7::INTEGER, $8::FLOAT, $9::FLOAT, $10::INTEGER, $11::TIMESTAMP WITH TIME ZONE, $12::TIMESTAMP WITH TIME ZONE) RETURNING node.id
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+db-1            | 2026-09-12 09:36:27.119 UTC [6172] ERROR:  duplicate key value violates unique constraint "uq_node_active_root_per_project"
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/6980 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/6981 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:31:46.713Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6917] com.brainnet.spring.TraceFilter          : request_complete trace_id=9b1270b3-6bfd-4b30-afec-ba61531597cd method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:47.116Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6918] com.brainnet.spring.TraceFilter          : request_complete trace_id=7db3e407-ab6b-448c-b73d-63e65ac76612 method=POST path=/projects/1/nodes status=201
+db-1            | 2026-09-12 09:36:27.119 UTC [6172] DETAIL:  Key (project_id)=(1) already exists.
+soak-spring-1   | 2026-09-12T10:31:47.139Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6919] com.brainnet.spring.TraceFilter          : request_complete trace_id=ec821b24-5ec0-4594-830b-d277036e5d43 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:47.344Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6920] com.brainnet.spring.TraceFilter          : request_complete trace_id=ea3557a8-eafb-489b-b422-1c3b9ba24875 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/6982 HTTP/1.1" 204 No Content
+db-1            | 2026-09-12 09:36:27.119 UTC [6172] STATEMENT:  INSERT INTO node (project_id, parent_id, author_id, content, state, depth, order_index, pos_x, pos_y, version, created_at, updated_at) VALUES ($1::BIGINT, $2::BIGINT, $3::BIGINT, $4::VARCHAR, $5::node_state_t, $6::INTEGER, $7::INTEGER, $8::FLOAT, $9::FLOAT, $10::INTEGER, $11::TIMESTAMP WITH TIME ZONE, $12::TIMESTAMP WITH TIME ZONE) RETURNING node.id
+soak-spring-1   | 2026-09-12T10:31:47.712Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6921] com.brainnet.spring.TraceFilter          : request_complete trace_id=37707996-0df6-4840-a487-e9be4365baf3 method=POST path=/projects/1/nodes status=201
+db-1            | 2026-09-12 09:36:27.119 UTC [6170] ERROR:  duplicate key value violates unique constraint "uq_node_active_root_per_project"
+soak-spring-1   | 2026-09-12T10:31:47.720Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6922] com.brainnet.spring.TraceFilter          : request_complete trace_id=a8607324-0d88-4b0f-8750-26782152d303 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:31:47.906Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6923] com.brainnet.spring.TraceFilter          : request_complete trace_id=f28e9609-f1e0-4e9e-9c7b-4298dfe09b65 method=POST path=/projects/1/nodes status=201
+db-1            | 2026-09-12 09:36:27.119 UTC [6170] DETAIL:  Key (project_id)=(1) already exists.
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/6983 HTTP/1.1" 204 No Content
+db-1            | 2026-09-12 09:36:27.119 UTC [6170] STATEMENT:  INSERT INTO node (project_id, parent_id, author_id, content, state, depth, order_index, pos_x, pos_y, version, created_at, updated_at) VALUES ($1::BIGINT, $2::BIGINT, $3::BIGINT, $4::VARCHAR, $5::node_state_t, $6::INTEGER, $7::INTEGER, $8::FLOAT, $9::FLOAT, $10::INTEGER, $11::TIMESTAMP WITH TIME ZONE, $12::TIMESTAMP WITH TIME ZONE) RETURNING node.id
+db-1            | 2026-09-12 09:36:25.993 UTC [6224] ERROR:  new row for relation "outbox_event" violates check constraint "reject_test_event"
+db-1            | 2026-09-12 09:36:25.993 UTC [6224] DETAIL:  Failing row contains (2, 9e10f23e-cfce-4909-b9ac-6147b1fa964d, node, 2, node.created, {"node": {"id": 2, "tags": [1], "depth": 0, "pos_x": 0.0, "pos_y..., 2026-09-12 09:36:25.99127+00, null, 0, null, null).
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/6984 HTTP/1.1" 204 No Content
+db-1            | 2026-09-12 09:36:25.993 UTC [6224] STATEMENT:  INSERT INTO outbox_event (event_id, aggregate_type, aggregate_id, event_type, payload, occurred_at, published_at, attempt_count, lease_until, last_error) VALUES ($1::VARCHAR, $2::VARCHAR, $3::BIGINT, $4::VARCHAR, $5::JSONB, $6::TIMESTAMP WITH TIME ZONE, $7::TIMESTAMP WITH TIME ZONE, $8::INTEGER, $9::TIMESTAMP WITH TIME ZONE, $10::VARCHAR) RETURNING outbox_event.id
+db-1            | 2026-09-12 09:37:55.825 UTC [61] LOG:  checkpoint starting: time
+db-1            | 2026-09-12 09:38:06.385 UTC [61] LOG:  checkpoint complete: wrote 164 buffers (1.0%); 0 WAL file(s) added, 0 removed, 11 recycled; write=9.528 s, sync=0.957 s, total=10.561 s; sync files=1271, longest=0.008 s, average=0.001 s; distance=168241 kB, estimate=277765 kB
+db-1            | 2026-09-12 09:41:09.792 UTC [61] LOG:  checkpoint starting: wal
+db-1            | 2026-09-12 09:45:36.571 UTC [61] LOG:  checkpoint complete: wrote 460 buffers (2.8%); 0 WAL file(s) added, 0 removed, 33 recycled; write=269.174 s, sync=0.000 s, total=266.780 s; sync files=710, longest=0.025 s, average=0.004 s; distance=540688 kB, estimate=540688 kB
+db-1            | 2026-09-12 09:45:54.031 UTC [61] LOG:  checkpoint starting: wal
+db-1            | 2026-09-12 09:49:39.330 UTC [61] LOG:  checkpoint complete: wrote 2224 buffers (13.6%); 0 WAL file(s) added, 0 removed, 33 recycled; write=223.732 s, sync=1.294 s, total=225.299 s; sync files=408, longest=0.019 s, average=0.004 s; distance=540606 kB, estimate=540680 kB
+db-1            | 2026-09-12 09:49:45.794 UTC [61] LOG:  checkpoint starting: wal
+db-1            | 2026-09-12 09:54:10.374 UTC [61] LOG:  checkpoint complete: wrote 2556 buffers (15.6%); 0 WAL file(s) added, 0 removed, 33 recycled; write=269.251 s, sync=0.000 s, total=264.581 s; sync files=356, longest=0.014 s, average=0.002 s; distance=540676 kB, estimate=540680 kB
+db-1            | 2026-09-12 09:54:50.484 UTC [61] LOG:  checkpoint starting: time
+db-1            | 2026-09-12 09:55:32.777 UTC [61] LOG:  checkpoint complete: wrote 491 buffers (3.0%); 0 WAL file(s) added, 0 removed, 24 recycled; write=41.621 s, sync=0.408 s, total=42.293 s; sync files=160, longest=0.022 s, average=0.003 s; distance=406720 kB, estimate=527284 kB
+db-1            | 2026-09-12 09:59:25.277 UTC [61] LOG:  checkpoint starting: wal
+db-1            | 2026-09-12 10:03:52.033 UTC [61] LOG:  checkpoint complete: wrote 1420 buffers (8.7%); 0 WAL file(s) added, 0 removed, 33 recycled; write=270.913 s, sync=0.000 s, total=266.756 s; sync files=603, longest=0.015 s, average=0.002 s; distance=527231 kB, estimate=527278 kB
+db-1            | 2026-09-12 10:04:25.110 UTC [61] LOG:  checkpoint starting: time
+db-1            | 2026-09-12 10:06:38.878 UTC [61] LOG:  checkpoint complete: wrote 308 buffers (1.9%); 0 WAL file(s) added, 0 removed, 19 recycled; write=133.304 s, sync=0.254 s, total=133.768 s; sync files=177, longest=0.007 s, average=0.002 s; distance=326244 kB, estimate=507175 kB
+db-1            | 2026-09-12 10:09:25.512 UTC [61] LOG:  checkpoint starting: time
+db-1            | 2026-09-12 10:10:05.523 UTC [61] LOG:  checkpoint complete: wrote 471 buffers (2.9%); 0 WAL file(s) added, 3 removed, 4 recycled; write=39.699 s, sync=0.239 s, total=40.011 s; sync files=231, longest=0.006 s, average=0.002 s; distance=104067 kB, estimate=466864 kB
+db-1            | 2026-09-12 10:14:30.619 UTC [61] LOG:  checkpoint starting: time
+db-1            | 2026-09-12 10:18:09.300 UTC [61] LOG:  checkpoint complete: wrote 2430 buffers (14.8%); 0 WAL file(s) added, 1 removed, 0 recycled; write=218.293 s, sync=0.364 s, total=218.682 s; sync files=477, longest=0.005 s, average=0.001 s; distance=23697 kB, estimate=422547 kB
+db-1            | 2026-09-12 10:19:35.046 UTC [61] LOG:  checkpoint starting: time
+db-1            | 2026-09-12 10:20:27.772 UTC [61] LOG:  checkpoint complete: wrote 581 buffers (3.5%); 0 WAL file(s) added, 1 removed, 0 recycled; write=52.645 s, sync=0.052 s, total=52.726 s; sync files=39, longest=0.006 s, average=0.002 s; distance=9546 kB, estimate=381247 kB
+db-1            | 2026-09-12 10:24:35.887 UTC [61] LOG:  checkpoint starting: time
+db-1            | 2026-09-12 10:25:42.700 UTC [61] LOG:  checkpoint complete: wrote 798 buffers (4.9%); 0 WAL file(s) added, 0 removed, 0 recycled; write=66.752 s, sync=0.042 s, total=66.814 s; sync files=36, longest=0.005 s, average=0.002 s; distance=10230 kB, estimate=344145 kB
+db-1            | 2026-09-12 10:29:35.294 UTC [61] LOG:  checkpoint starting: time
+db-1            | 2026-09-12 10:30:56.655 UTC [61] LOG:  checkpoint complete: wrote 885 buffers (5.4%); 0 WAL file(s) added, 1 removed, 0 recycled; write=81.281 s, sync=0.054 s, total=81.362 s; sync files=37, longest=0.006 s, average=0.002 s; distance=10357 kB, estimate=310767 kB
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/6985 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/6986 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/6987 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/6988 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:31:48.314Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6924] com.brainnet.spring.TraceFilter          : request_complete trace_id=ea449d0e-c6f6-47a0-b6ae-5291e3c6ad96 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:31:48.333Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6925] com.brainnet.spring.TraceFilter          : request_complete trace_id=a874047e-b6b2-4688-9852-57d2fafca0aa method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:31:48.521Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6926] com.brainnet.spring.TraceFilter          : request_complete trace_id=34e3a2a7-d15a-4a89-bd29-2984704b52f8 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/6989 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/6990 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:31:48.915Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6927] com.brainnet.spring.TraceFilter          : request_complete trace_id=6c8f07ca-ac7f-4dc8-b033-b883ed3dc608 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/6991 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/6992 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/6993 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:31:48.928Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6928] com.brainnet.spring.TraceFilter          : request_complete trace_id=059ec9e1-1d1a-4fb7-b948-f5bd4fdd1908 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/6994 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:31:49.111Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6929] com.brainnet.spring.TraceFilter          : request_complete trace_id=1146ee9f-e5d2-4fa3-b595-729d6b0504e5 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:49.508Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6930] com.brainnet.spring.TraceFilter          : request_complete trace_id=100a402b-52da-4fbc-b08a-eed24f6ee90d method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:31:49.525Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6931] com.brainnet.spring.TraceFilter          : request_complete trace_id=16eef561-6502-4c7d-9b87-fc9a49f83091 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/6995 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/6996 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/6997 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/6998 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/6999 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7000 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:31:49.718Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6932] com.brainnet.spring.TraceFilter          : request_complete trace_id=b86334c8-59d0-40bc-b653-c90685fcd99e method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:50.119Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6933] com.brainnet.spring.TraceFilter          : request_complete trace_id=5f04e7e7-605a-4f1e-91de-6331791d9a3e method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:31:50.129Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6934] com.brainnet.spring.TraceFilter          : request_complete trace_id=2bcc3c5e-9ca1-45bf-88a2-7355c6292e5b method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:31:50.306Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6935] com.brainnet.spring.TraceFilter          : request_complete trace_id=9a731298-037f-40a1-a27c-f0e52b2e539b method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7001 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:31:50.711Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6936] com.brainnet.spring.TraceFilter          : request_complete trace_id=dc23c415-9d46-4bd7-8ea6-c4ab2f8c79d8 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:50.738Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6937] com.brainnet.spring.TraceFilter          : request_complete trace_id=7e700f3e-2e60-4385-b14c-5fba5b45877a method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/7002 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:31:50.922Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6938] com.brainnet.spring.TraceFilter          : request_complete trace_id=3ee62a36-6b09-41a7-88b5-c0732ce7a58d method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7003 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:31:51.317Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6939] com.brainnet.spring.TraceFilter          : request_complete trace_id=44a18fc8-d446-469b-92dc-7c0d31e2c7cb method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:31:51.325Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6940] com.brainnet.spring.TraceFilter          : request_complete trace_id=5e28b00f-59a3-42c0-9cfc-2e6b5cc771c8 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:51.508Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6941] com.brainnet.spring.TraceFilter          : request_complete trace_id=a11e4237-5ca8-482f-b6c5-cd37062cac15 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:51.916Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6942] com.brainnet.spring.TraceFilter          : request_complete trace_id=754d8ce8-cae3-4c83-a6c9-5f13aadf10ca method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/7004 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:31:51.935Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6943] com.brainnet.spring.TraceFilter          : request_complete trace_id=92418752-8c5e-4d63-a7d9-11d3c91f34d4 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:52.126Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6944] com.brainnet.spring.TraceFilter          : request_complete trace_id=b1f81e70-6528-4c90-8223-c3c2ef73ce70 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:52.516Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6945] com.brainnet.spring.TraceFilter          : request_complete trace_id=9c0b3d1c-8cf5-4596-af53-790e91e9e240 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:52.528Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6946] com.brainnet.spring.TraceFilter          : request_complete trace_id=bf33f081-3f64-4683-891e-014a5a3258c3 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:31:52.713Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6947] com.brainnet.spring.TraceFilter          : request_complete trace_id=f05d2be6-e400-4915-ba01-1311978058a0 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:53.113Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6948] com.brainnet.spring.TraceFilter          : request_complete trace_id=bb093984-8990-4a99-be98-e988966da420 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:53.145Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6949] com.brainnet.spring.TraceFilter          : request_complete trace_id=cdb110e9-deed-4e9c-b569-b6b7a650366b method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:53.323Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6950] com.brainnet.spring.TraceFilter          : request_complete trace_id=bc19f1b1-eb02-49da-a153-6c427725399c method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:53.716Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6951] com.brainnet.spring.TraceFilter          : request_complete trace_id=bf2f1ad0-8d4c-4120-bfd6-1a22825a8e68 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7005 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:31:53.722Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6952] com.brainnet.spring.TraceFilter          : request_complete trace_id=5e9aadfb-adec-469a-9bcf-728b5f33e1d0 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:53.912Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6953] com.brainnet.spring.TraceFilter          : request_complete trace_id=f62808ea-1d1a-4071-80c5-67d2a0f49d1f method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:54.313Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6954] com.brainnet.spring.TraceFilter          : request_complete trace_id=ebc046cb-faef-4a79-99a5-71624edf8691 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:54.332Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6955] com.brainnet.spring.TraceFilter          : request_complete trace_id=0c131990-cb45-4d9c-b088-927c7092fa6f method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7006 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:31:54.519Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6956] com.brainnet.spring.TraceFilter          : request_complete trace_id=1687c7f4-e0aa-475f-bace-e0c5b93d7984 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/7007 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7008 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:31:54.913Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6957] com.brainnet.spring.TraceFilter          : request_complete trace_id=42a86861-85b6-4722-8602-c903afc1df29 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7009 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:31:54.928Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6958] com.brainnet.spring.TraceFilter          : request_complete trace_id=60f66f86-9875-4b4f-942b-aba1aa335c2f method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/7010 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:31:55.112Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6959] com.brainnet.spring.TraceFilter          : request_complete trace_id=cc6a27eb-0e1e-4fc2-a9c4-de5b5c5cd1f6 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7011 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7012 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/7013 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7014 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7015 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:31:55.514Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6960] com.brainnet.spring.TraceFilter          : request_complete trace_id=658873b8-71b2-4620-b693-a1507db80d9d method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/7016 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:31:55.539Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6961] com.brainnet.spring.TraceFilter          : request_complete trace_id=0de2c188-919d-4c47-ba5d-826fa5a8e96e method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:55.743Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6962] com.brainnet.spring.TraceFilter          : request_complete trace_id=2b2e5c8f-b8cc-4960-82e3-955f55db4427 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7017 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7018 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:31:56.114Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6963] com.brainnet.spring.TraceFilter          : request_complete trace_id=1fe8750d-4a0b-42bb-977f-6fe402ca84ef method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:56.126Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6964] com.brainnet.spring.TraceFilter          : request_complete trace_id=d4771209-ab35-4d7a-bdac-9d9db0891070 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:31:56.311Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6965] com.brainnet.spring.TraceFilter          : request_complete trace_id=73b2fce9-b592-4fa1-8730-85e796edf4f0 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:56.718Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6966] com.brainnet.spring.TraceFilter          : request_complete trace_id=26674d5c-d350-4aa1-a8eb-247c48668316 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:56.731Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6967] com.brainnet.spring.TraceFilter          : request_complete trace_id=02ab9d42-cb0d-4294-b5d1-39efe3cd5943 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:56.931Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6968] com.brainnet.spring.TraceFilter          : request_complete trace_id=f9c0b7b7-2c87-4354-b187-2627c57e371f method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:31:57.320Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6969] com.brainnet.spring.TraceFilter          : request_complete trace_id=272c34e9-365c-4509-b8cd-5b97b74a97bb method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7019 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:31:57.326Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6970] com.brainnet.spring.TraceFilter          : request_complete trace_id=655e4d7d-39a3-4454-b547-65c35800d757 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:57.512Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6971] com.brainnet.spring.TraceFilter          : request_complete trace_id=51cad8ff-3628-427e-8e6c-ae9d272d4f29 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:57.910Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6972] com.brainnet.spring.TraceFilter          : request_complete trace_id=722caffb-5663-4370-abee-e34f514768dc method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:57.936Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6973] com.brainnet.spring.TraceFilter          : request_complete trace_id=cac85601-4473-4cd1-9145-c9b13741bfcf method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:58.127Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6974] com.brainnet.spring.TraceFilter          : request_complete trace_id=9d88c93c-21dd-4359-b8c9-e371302bea95 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/7020 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:31:58.511Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6975] com.brainnet.spring.TraceFilter          : request_complete trace_id=b2caccf3-b99f-4cef-9b1d-908c39bbfbce method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:58.533Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6976] com.brainnet.spring.TraceFilter          : request_complete trace_id=5bb9c3d1-7189-404d-9a9e-a8b21b933fd8 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7021 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:31:58.717Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6977] com.brainnet.spring.TraceFilter          : request_complete trace_id=d321ab4d-c390-4d50-ad8a-1a781aa1b9ee method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:59.115Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6978] com.brainnet.spring.TraceFilter          : request_complete trace_id=77179b98-8a31-4791-8f25-b5117bd59344 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:59.135Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6979] com.brainnet.spring.TraceFilter          : request_complete trace_id=a5284ea0-0b02-47e9-9af1-d21a90e1aa19 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:59.337Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6980] com.brainnet.spring.TraceFilter          : request_complete trace_id=ca49fd9a-d412-47f0-ac2c-cb06aaa28f3f method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:59.712Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6981] com.brainnet.spring.TraceFilter          : request_complete trace_id=dae2a840-6008-47cc-a5fa-7dae6260ea0e method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:59.723Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6982] com.brainnet.spring.TraceFilter          : request_complete trace_id=9c73b824-99e9-4389-b5ea-61a3d618d773 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:31:59.907Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6983] com.brainnet.spring.TraceFilter          : request_complete trace_id=e3be8388-6239-4069-bd9b-ea179784369c method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:00.314Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6984] com.brainnet.spring.TraceFilter          : request_complete trace_id=5e78bf73-b04b-439d-9243-463126ba1ced method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:00.343Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6985] com.brainnet.spring.TraceFilter          : request_complete trace_id=a4dc0499-1728-4395-bfc1-d9ec3cbbf7d9 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:00.528Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6986] com.brainnet.spring.TraceFilter          : request_complete trace_id=1466e380-402c-47ae-9d19-8b4cddc4cf89 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:00.917Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6987] com.brainnet.spring.TraceFilter          : request_complete trace_id=bf158397-69db-4ab8-b652-08f78ea8cb20 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:00.928Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6988] com.brainnet.spring.TraceFilter          : request_complete trace_id=03192482-17bf-47f7-b111-744294af4b27 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:01.123Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6989] com.brainnet.spring.TraceFilter          : request_complete trace_id=e01081dc-3200-4697-b175-bfb241b30168 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/7022 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:32:01.506Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6990] com.brainnet.spring.TraceFilter          : request_complete trace_id=71837799-90ca-44f3-b742-8804a01440db method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:01.535Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6991] com.brainnet.spring.TraceFilter          : request_complete trace_id=425ec822-d4a6-4c6b-9db6-5dbc6c8a44e2 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:32:01.718Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6992] com.brainnet.spring.TraceFilter          : request_complete trace_id=90f69b7b-966a-47f5-840b-51194cdbbc4e method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7023 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:32:02.113Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6993] com.brainnet.spring.TraceFilter          : request_complete trace_id=54a2df3e-e930-4fc3-8fd6-d4643aeca72e method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:02.130Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6994] com.brainnet.spring.TraceFilter          : request_complete trace_id=421485f4-3af4-4495-89d2-d14c80a7e176 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:32:02.314Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6995] com.brainnet.spring.TraceFilter          : request_complete trace_id=345ee2b3-bb84-4d8e-84ad-765e5d6e90b2 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7024 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:32:02.716Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6997] com.brainnet.spring.TraceFilter          : request_complete trace_id=ac226226-0b44-4bf4-938f-bd42885b022c method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:32:02.737Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6998] com.brainnet.spring.TraceFilter          : request_complete trace_id=0c93a314-201a-4d97-ba2a-56828e73c014 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/7025 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7026 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:32:02.922Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-6999] com.brainnet.spring.TraceFilter          : request_complete trace_id=b004971a-f7c9-40ce-a87c-dcd540c92503 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:03.308Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7000] com.brainnet.spring.TraceFilter          : request_complete trace_id=7c7b6c61-f370-40a3-b04f-0889908fb4db method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7027 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:32:03.329Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7001] com.brainnet.spring.TraceFilter          : request_complete trace_id=19ba2dce-8eef-45f5-8a5f-3e20c3cef394 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/7028 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:32:03.516Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7002] com.brainnet.spring.TraceFilter          : request_complete trace_id=0b3aa181-aaee-45dd-bb1f-0aefb6971c9b method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:32:03.909Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7003] com.brainnet.spring.TraceFilter          : request_complete trace_id=b7f4ded1-6bea-40b9-bcfb-451acdf83769 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7029 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:32:03.927Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7004] com.brainnet.spring.TraceFilter          : request_complete trace_id=42f3dc22-ed5e-447d-bcd7-1e39785f5d2d method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:04.121Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7005] com.brainnet.spring.TraceFilter          : request_complete trace_id=a1b3fc6f-2f5a-411a-b612-f4f6e67916b0 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:04.511Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7006] com.brainnet.spring.TraceFilter          : request_complete trace_id=86525c2a-d774-4d2d-9a2d-61e0ea293421 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:32:04.530Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7007] com.brainnet.spring.TraceFilter          : request_complete trace_id=e5f3c35f-1d67-4c98-992d-6c7001361076 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7030 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:32:04.710Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7008] com.brainnet.spring.TraceFilter          : request_complete trace_id=42210fd0-aaaf-46b5-af47-5ab0eec39562 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:32:05.115Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7009] com.brainnet.spring.TraceFilter          : request_complete trace_id=703d7171-17d2-4e8d-83b8-3683991a2474 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/7032 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7031 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:32:05.148Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7010] com.brainnet.spring.TraceFilter          : request_complete trace_id=3003ad08-64e5-4a6c-962e-1f00b28c3f1a method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7033 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:32:05.324Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7011] com.brainnet.spring.TraceFilter          : request_complete trace_id=f02300c3-36ee-463e-b789-954baf6b20d3 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:05.717Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7012] com.brainnet.spring.TraceFilter          : request_complete trace_id=22d0b69f-e694-4dab-88f0-4061cb87ec40 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:05.724Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7013] com.brainnet.spring.TraceFilter          : request_complete trace_id=4b1ac1c6-bceb-4ab3-865f-5281e4954aa6 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:05.914Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7014] com.brainnet.spring.TraceFilter          : request_complete trace_id=95b25a9e-6cb7-4f6c-9c68-17d33ce99c52 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:06.309Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7015] com.brainnet.spring.TraceFilter          : request_complete trace_id=b8e3b26d-ff90-437d-b0e3-13c74986e214 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:06.331Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7016] com.brainnet.spring.TraceFilter          : request_complete trace_id=c08b3314-4aca-41d7-8d45-75d98eacb4c4 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:06.519Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7017] com.brainnet.spring.TraceFilter          : request_complete trace_id=50deaac6-6bfc-4f67-bb7e-b1a684fdbe49 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:06.912Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7018] com.brainnet.spring.TraceFilter          : request_complete trace_id=1768d308-2f37-48e3-b206-85647e0bb505 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:06.926Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7019] com.brainnet.spring.TraceFilter          : request_complete trace_id=5fe2edcd-3102-4f21-9b06-79d96a2f0143 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:07.121Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7020] com.brainnet.spring.TraceFilter          : request_complete trace_id=d164e4b5-dfd8-427f-a773-4476edd50441 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:32:07.514Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7021] com.brainnet.spring.TraceFilter          : request_complete trace_id=b359870a-a4ae-46c3-8871-6aafe60a7f8a method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/7034 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7035 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:32:07.539Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7022] com.brainnet.spring.TraceFilter          : request_complete trace_id=82a40045-205b-4393-bb95-e96ac5cebb49 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7036 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7038 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/7037 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:32:07.730Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7023] com.brainnet.spring.TraceFilter          : request_complete trace_id=231a744f-e329-4ff5-b0ce-fab9ef8d6f60 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:08.110Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7024] com.brainnet.spring.TraceFilter          : request_complete trace_id=005f49fa-3c5c-45cf-8512-535372aeb6d5 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:32:08.131Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7025] com.brainnet.spring.TraceFilter          : request_complete trace_id=475a4506-6b5a-47c4-93e5-bf58c9f6c946 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7039 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:32:08.311Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7026] com.brainnet.spring.TraceFilter          : request_complete trace_id=c0cbf9ce-2007-4118-ba28-2fb5d5db20a1 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:32:08.711Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7027] com.brainnet.spring.TraceFilter          : request_complete trace_id=49c8a901-f537-4b8b-9aff-54c0755d317d method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:08.731Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7028] com.brainnet.spring.TraceFilter          : request_complete trace_id=d50055b2-4772-40b1-98a2-9cf08130f963 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:08.925Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7029] com.brainnet.spring.TraceFilter          : request_complete trace_id=15e17d0b-750d-4e95-b977-fc82ea2ff206 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:09.311Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7030] com.brainnet.spring.TraceFilter          : request_complete trace_id=c0de49b3-fe91-4ac5-b11c-c40bf3073221 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:09.319Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7031] com.brainnet.spring.TraceFilter          : request_complete trace_id=7548dd02-60d3-4244-8616-6e32c2f5fb19 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/7040 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:32:09.518Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7032] com.brainnet.spring.TraceFilter          : request_complete trace_id=a635cc83-c9a2-443f-a10c-71d78bda7291 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7041 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:32:09.908Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7033] com.brainnet.spring.TraceFilter          : request_complete trace_id=7943e5f7-5117-4755-baa6-1599c640b1c3 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:09.932Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7034] com.brainnet.spring.TraceFilter          : request_complete trace_id=8b0acfcd-cdac-4e22-9af5-e9c9bb312bdb method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7042 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7044 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:32:10.128Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7035] com.brainnet.spring.TraceFilter          : request_complete trace_id=00e02978-035d-4fde-a7f1-26fe5f185d4e method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:10.518Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7036] com.brainnet.spring.TraceFilter          : request_complete trace_id=d10dd278-6470-457d-89d7-0272665393ea method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/7043 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7045 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:32:10.527Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7037] com.brainnet.spring.TraceFilter          : request_complete trace_id=4a93bf02-3dd7-41bc-b5f3-e9450f57347c method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:10.715Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7038] com.brainnet.spring.TraceFilter          : request_complete trace_id=688a44c5-8bfc-4d98-900d-579a83a4d69f method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:11.115Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7039] com.brainnet.spring.TraceFilter          : request_complete trace_id=98d13baf-a328-4d05-9a48-ed15067b0ec5 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/7046 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7047 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:32:11.134Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7040] com.brainnet.spring.TraceFilter          : request_complete trace_id=282c720c-ef65-42af-aaaf-fc57a7cd2c82 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:32:11.321Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7041] com.brainnet.spring.TraceFilter          : request_complete trace_id=c519e09d-e90e-402e-83b2-24ff3648d681 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:11.714Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7042] com.brainnet.spring.TraceFilter          : request_complete trace_id=b06519ef-aa75-4214-a715-72ada7adb133 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:11.724Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7043] com.brainnet.spring.TraceFilter          : request_complete trace_id=58e1eb04-a0c0-4100-8f32-2ab9357b2f97 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7048 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:32:11.908Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7044] com.brainnet.spring.TraceFilter          : request_complete trace_id=34217665-61a7-4f2d-9b61-3204a1aac201 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:32:12.309Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7045] com.brainnet.spring.TraceFilter          : request_complete trace_id=3e4415ef-5504-43c7-b6fb-0780d7765483 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:12.331Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7046] com.brainnet.spring.TraceFilter          : request_complete trace_id=01f97b34-5037-4aa5-a89f-27a891b183cf method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:12.521Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7047] com.brainnet.spring.TraceFilter          : request_complete trace_id=787fbee6-e721-4022-bd7c-b234486737b6 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:12.910Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7048] com.brainnet.spring.TraceFilter          : request_complete trace_id=8638e09d-87a2-4393-9e7e-67278ca210e7 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:12.925Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7049] com.brainnet.spring.TraceFilter          : request_complete trace_id=72330988-ad55-4c38-a756-6aebaabd2ad7 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:15.913Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7050] com.brainnet.spring.TraceFilter          : request_complete trace_id=64a06a03-730b-4583-92ae-9590b47dbbad method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:05.295Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7051] com.brainnet.spring.TraceFilter          : request_complete trace_id=98a3c74e-1544-45ed-a0b3-74a45b7ab7f8 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7050 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:32:05.324Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7052] com.brainnet.spring.TraceFilter          : request_complete trace_id=61988506-cead-4f95-b3a8-5d36b1181c95 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:05.512Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7053] com.brainnet.spring.TraceFilter          : request_complete trace_id=177e5b0e-2d72-4691-b16f-1076b46f42a9 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:05.898Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7054] com.brainnet.spring.TraceFilter          : request_complete trace_id=ae3f7120-d0db-4cfc-910f-922d47265323 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:05.918Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7055] com.brainnet.spring.TraceFilter          : request_complete trace_id=7a9f37bf-7a5d-4d8c-9536-221e92defea5 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:06.105Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7056] com.brainnet.spring.TraceFilter          : request_complete trace_id=9f0a7a9e-c833-414b-a7a3-0a17711d5152 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:06.506Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7057] com.brainnet.spring.TraceFilter          : request_complete trace_id=345141e3-1b60-4daf-afee-555a1bcd62e1 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:06.523Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7058] com.brainnet.spring.TraceFilter          : request_complete trace_id=b9cdee81-dc3d-496b-87c3-7108a2e29ad7 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:06.716Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7059] com.brainnet.spring.TraceFilter          : request_complete trace_id=85b4318e-427f-441d-a6a5-7e1879127dd2 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:07.109Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7060] com.brainnet.spring.TraceFilter          : request_complete trace_id=d96ee6f3-199a-4275-ac9b-77eb8e915705 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:07.115Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7061] com.brainnet.spring.TraceFilter          : request_complete trace_id=596d0b20-4c82-4cc3-ab96-579ae4ed69f8 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:07.293Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7062] com.brainnet.spring.TraceFilter          : request_complete trace_id=428f25f1-2e4a-494b-9655-90ccf8e519c4 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:07.696Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7063] com.brainnet.spring.TraceFilter          : request_complete trace_id=c79ab637-7be0-48fa-aa3d-7a7dc57a384e method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:07.723Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7064] com.brainnet.spring.TraceFilter          : request_complete trace_id=e24b905a-6140-4b72-a414-91eec08f0d98 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:07.910Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7065] com.brainnet.spring.TraceFilter          : request_complete trace_id=4f91de1d-758c-440f-8821-a119e595f70d method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:19.017Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7066] com.brainnet.spring.TraceFilter          : request_complete trace_id=87dc9be2-c33c-4752-b35a-d254d2416598 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:19.026Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7067] com.brainnet.spring.TraceFilter          : request_complete trace_id=7bf277d0-4cef-43ae-b84f-c7b6620998b7 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/7049 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:32:13.709Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7068] com.brainnet.spring.TraceFilter          : request_complete trace_id=417b249d-11b2-44fe-b6b7-19bc441129d0 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7051 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:32:14.102Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7069] com.brainnet.spring.TraceFilter          : request_complete trace_id=7bc93996-9d14-4f65-a3fa-28ed8bbbe190 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:32:14.143Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7070] com.brainnet.spring.TraceFilter          : request_complete trace_id=cb817f50-641d-4f7a-ab89-9181b59a983f method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/7052 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:32:14.324Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7071] com.brainnet.spring.TraceFilter          : request_complete trace_id=246c687d-68da-4ba4-8f0b-19f3643e7de0 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7053 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:32:14.715Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7072] com.brainnet.spring.TraceFilter          : request_complete trace_id=83fdf4ce-7e84-417f-86b2-2135877ee428 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7054 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:32:14.719Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7073] com.brainnet.spring.TraceFilter          : request_complete trace_id=d4558333-6ae3-4439-b55a-5cd50af3e22e method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:14.904Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7074] com.brainnet.spring.TraceFilter          : request_complete trace_id=8d2f6e01-51ee-4a71-a8d7-756e9c6387cb method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:32:15.303Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7075] com.brainnet.spring.TraceFilter          : request_complete trace_id=0a3fedd2-0915-4074-8c67-21022de7fbe9 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:15.332Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7076] com.brainnet.spring.TraceFilter          : request_complete trace_id=ec96c2ae-d7c0-4c0c-ae6d-777529148add method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:15.519Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7077] com.brainnet.spring.TraceFilter          : request_complete trace_id=aeb5e392-3d2e-4472-9598-c23843eff85d method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:15.911Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7078] com.brainnet.spring.TraceFilter          : request_complete trace_id=7e9e3e9c-680a-456c-b92c-7325678d400a method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:15.920Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7079] com.brainnet.spring.TraceFilter          : request_complete trace_id=b5a0501f-4aab-44e7-9c0b-b1438ddb3a0b method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:16.110Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7080] com.brainnet.spring.TraceFilter          : request_complete trace_id=5e289135-e85a-4f5e-aafa-fbfdba00027c method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:16.508Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7081] com.brainnet.spring.TraceFilter          : request_complete trace_id=99ff982b-6ffd-426a-aa3b-0a3e89fa3258 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:16.525Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7082] com.brainnet.spring.TraceFilter          : request_complete trace_id=3f3f0273-7390-4043-bf87-112b3d6f0de9 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:16.746Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7083] com.brainnet.spring.TraceFilter          : request_complete trace_id=e1ae096a-3f1b-4ed8-a011-b0ae400155c2 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:32:17.107Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7084] com.brainnet.spring.TraceFilter          : request_complete trace_id=b2447446-a9ca-4504-b915-f753f2dd2f89 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:17.115Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7085] com.brainnet.spring.TraceFilter          : request_complete trace_id=69d59c47-d21b-4802-9d2a-015f0b89b064 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:17.309Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7086] com.brainnet.spring.TraceFilter          : request_complete trace_id=ee74b6de-1bfd-494d-9a09-3375c65a37bb method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:17.701Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7087] com.brainnet.spring.TraceFilter          : request_complete trace_id=97c6dbde-60e9-49a6-9b68-f656f760d8b8 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:17.736Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7088] com.brainnet.spring.TraceFilter          : request_complete trace_id=12f66c57-c26c-42b6-9a77-c1c402cb75be method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:17.921Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7089] com.brainnet.spring.TraceFilter          : request_complete trace_id=16ed15b4-6fff-4290-97a2-6bdfa94056a4 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:18.314Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7090] com.brainnet.spring.TraceFilter          : request_complete trace_id=5b89002a-9ba6-4fe7-97c2-b6fa84956a47 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:18.322Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7091] com.brainnet.spring.TraceFilter          : request_complete trace_id=7381859a-ed63-4755-8fc6-b0ab983bc2ff method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:18.506Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7092] com.brainnet.spring.TraceFilter          : request_complete trace_id=0a1c4d3d-ff3d-4ad0-95d2-b06031f65721 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7055 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:32:23.922Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7093] com.brainnet.spring.TraceFilter          : request_complete trace_id=c4bbb09f-d3fb-48cb-96c1-b985871da5d4 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/7056 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:32:23.946Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7094] com.brainnet.spring.TraceFilter          : request_complete trace_id=a9905c3c-9c00-40d1-a54e-e0e244966040 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:32:24.140Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7095] com.brainnet.spring.TraceFilter          : request_complete trace_id=bb8a6566-77fb-49eb-9b93-c435dbe62fae method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:19.022Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7096] com.brainnet.spring.TraceFilter          : request_complete trace_id=3e01cade-8987-4aa9-963c-44b936159797 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7057 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:32:19.031Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7097] com.brainnet.spring.TraceFilter          : request_complete trace_id=d1d69d05-e188-4864-b8c3-85694654863f method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:19.217Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7098] com.brainnet.spring.TraceFilter          : request_complete trace_id=b435cf26-c10a-46f9-b3e2-43ca3a70d535 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:19.620Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7100] com.brainnet.spring.TraceFilter          : request_complete trace_id=f1faba1c-5fc3-4cc8-8f0e-42974dec17be method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:19.638Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7101] com.brainnet.spring.TraceFilter          : request_complete trace_id=03baf1e7-424e-44d7-bc97-fa1901f0166b method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:19.833Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7102] com.brainnet.spring.TraceFilter          : request_complete trace_id=704a6104-083b-43c1-aa6d-9b92c64d121f method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:20.221Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7103] com.brainnet.spring.TraceFilter          : request_complete trace_id=6030050b-59a7-4b52-81a2-6131ee96da3d method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:20.237Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7104] com.brainnet.spring.TraceFilter          : request_complete trace_id=8b3b541a-ed47-4f19-829a-72459c62f30e method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:20.423Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7105] com.brainnet.spring.TraceFilter          : request_complete trace_id=7b42def0-054e-415e-82d1-8a56f206856b method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:20.816Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7106] com.brainnet.spring.TraceFilter          : request_complete trace_id=2f93dc2e-9242-451a-a3dc-40562deccd85 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:20.848Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7107] com.brainnet.spring.TraceFilter          : request_complete trace_id=7b8d8550-0854-4dcf-84d5-5301b865303d method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:21.025Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7108] com.brainnet.spring.TraceFilter          : request_complete trace_id=8568efea-1230-4399-948d-c4634d540978 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:21.425Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7109] com.brainnet.spring.TraceFilter          : request_complete trace_id=75f07ae2-f393-4c85-b87c-c57bc055c404 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:21.427Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7110] com.brainnet.spring.TraceFilter          : request_complete trace_id=ca0863fd-b7c0-4f20-bace-df6387e95993 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:21.619Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7111] com.brainnet.spring.TraceFilter          : request_complete trace_id=148383ca-bf3b-45ea-bf91-42271ff1a733 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:22.015Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7112] com.brainnet.spring.TraceFilter          : request_complete trace_id=79e8ef58-3565-4455-9420-8499b7e7d59d method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:22.052Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7113] com.brainnet.spring.TraceFilter          : request_complete trace_id=d17e5bf5-1d5d-4428-b6cc-8a819e845362 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:22.235Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7114] com.brainnet.spring.TraceFilter          : request_complete trace_id=fb1bc1f8-73cb-4571-9805-4a564f6a014f method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:22.618Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7115] com.brainnet.spring.TraceFilter          : request_complete trace_id=4215ae32-fbdf-4b28-a876-5252967054eb method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:22.627Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7116] com.brainnet.spring.TraceFilter          : request_complete trace_id=3f17f974-84f9-4448-b662-50d4856acbdf method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:22.817Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7117] com.brainnet.spring.TraceFilter          : request_complete trace_id=7e1d25eb-8661-46e0-9284-7eae5e972f54 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:23.212Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7118] com.brainnet.spring.TraceFilter          : request_complete trace_id=9bed9038-2710-44fe-8634-e9a3f819b833 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:23.235Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7119] com.brainnet.spring.TraceFilter          : request_complete trace_id=a153947e-1485-4544-b741-42a66365037c method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:32:23.431Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7120] com.brainnet.spring.TraceFilter          : request_complete trace_id=d0754d6c-36c4-4fcc-a323-02ad892c152d method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/7058 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7059 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7060 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:32:23.816Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7121] com.brainnet.spring.TraceFilter          : request_complete trace_id=11bbd05f-c90d-4b24-9b00-8250264478cb method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:23.835Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7122] com.brainnet.spring.TraceFilter          : request_complete trace_id=2fbf87aa-5289-4976-9868-eaaff5f58fae method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:32:29.037Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7123] com.brainnet.spring.TraceFilter          : request_complete trace_id=aeb1cc25-a42b-44c2-aa4b-6a4571358601 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/7061 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7062 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:32:23.927Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7124] com.brainnet.spring.TraceFilter          : request_complete trace_id=b895100e-7f89-494e-b7c8-82c6ed1c0493 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7063 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/7064 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7065 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:32:23.954Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7125] com.brainnet.spring.TraceFilter          : request_complete trace_id=a035efbe-ae4c-47c1-b9e8-74f7e4dc10fd method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7066 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:32:24.169Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7126] com.brainnet.spring.TraceFilter          : request_complete trace_id=563aa032-6651-4b03-be7b-68d2bef8f209 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:32:24.537Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7127] com.brainnet.spring.TraceFilter          : request_complete trace_id=12f2085d-0114-4cf6-8ee1-c81c8096f64e method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7068 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:32:24.543Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7128] com.brainnet.spring.TraceFilter          : request_complete trace_id=36faf51d-0549-4e72-bf68-8dc2e021285f method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/7067 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7069 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:32:24.729Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7129] com.brainnet.spring.TraceFilter          : request_complete trace_id=1ed50b47-c2af-403b-bcff-72599e6ef6af method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:25.131Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7130] com.brainnet.spring.TraceFilter          : request_complete trace_id=34c50526-1975-4ecb-a5a3-c67ca27d9a3a method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:32:25.163Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7131] com.brainnet.spring.TraceFilter          : request_complete trace_id=90f69c80-a95b-4210-a700-e4ac8347981b method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/7070 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7071 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:32:25.343Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7132] com.brainnet.spring.TraceFilter          : request_complete trace_id=397a6ecc-19a7-41f7-9cfa-9f657e644166 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:25.737Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7133] com.brainnet.spring.TraceFilter          : request_complete trace_id=79b95aef-bb62-4276-9607-6e63dbea8bbf method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:25.750Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7134] com.brainnet.spring.TraceFilter          : request_complete trace_id=2f2381fa-1a29-416a-bfd2-8ca37e0f9751 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:25.937Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7135] com.brainnet.spring.TraceFilter          : request_complete trace_id=5f079d9a-ea40-4086-9369-bfbff28d82c5 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:26.329Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7136] com.brainnet.spring.TraceFilter          : request_complete trace_id=6a2deae2-38b6-4cca-b0f1-3dd9ce7dbec1 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:26.350Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7137] com.brainnet.spring.TraceFilter          : request_complete trace_id=1ffcad50-66c1-4070-b02e-cb9e13a73e92 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:26.543Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7138] com.brainnet.spring.TraceFilter          : request_complete trace_id=f840ba49-b7e0-4315-86bd-4041656a9035 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:26.932Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7139] com.brainnet.spring.TraceFilter          : request_complete trace_id=e003dff8-640b-47bb-bb09-d0a6227af882 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:26.945Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7140] com.brainnet.spring.TraceFilter          : request_complete trace_id=1948b1bd-4dd1-41f0-9d9b-0afc1dd9947b method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:27.130Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7141] com.brainnet.spring.TraceFilter          : request_complete trace_id=a191e0e1-8735-44d6-8346-2a5ce90d1a35 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:27.533Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7142] com.brainnet.spring.TraceFilter          : request_complete trace_id=e52cfdb3-8c60-41a0-ade1-a246d0f0a194 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:27.547Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7143] com.brainnet.spring.TraceFilter          : request_complete trace_id=036dda5d-93b5-431b-90e4-cfafc9294e7d method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:27.762Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7144] com.brainnet.spring.TraceFilter          : request_complete trace_id=daa95dde-902f-49af-9dd8-029212355ee8 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:28.137Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7145] com.brainnet.spring.TraceFilter          : request_complete trace_id=7dd428f2-7ad7-45ca-bdcf-8f3583981531 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:28.144Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7146] com.brainnet.spring.TraceFilter          : request_complete trace_id=946dbafe-bb2a-45da-b510-95a89e87cce3 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:28.329Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7147] com.brainnet.spring.TraceFilter          : request_complete trace_id=03df669c-e237-4bc7-946a-b0176157a84b method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7072 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/7073 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7074 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:32:28.733Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7148] com.brainnet.spring.TraceFilter          : request_complete trace_id=27dfbc3d-f8a3-4ac0-bac6-06c7091a9580 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:28.751Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7149] com.brainnet.spring.TraceFilter          : request_complete trace_id=a77aceba-f3d1-4fb3-a6f7-1e7fde319642 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:33.957Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7150] com.brainnet.spring.TraceFilter          : request_complete trace_id=be0fe6c4-6d2a-4b0c-a0b6-a1e3d7e563bf method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:32:26.089Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7151] com.brainnet.spring.TraceFilter          : request_complete trace_id=bee021bd-9361-47f8-82c9-c1df0246763b method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:26.106Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7152] com.brainnet.spring.TraceFilter          : request_complete trace_id=f8903d47-0629-42ce-8455-80412a96b9b3 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7075 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:32:26.298Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7153] com.brainnet.spring.TraceFilter          : request_complete trace_id=eb43f151-a536-4c49-b6df-fc8f930f36e2 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/7076 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:32:26.695Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7155] com.brainnet.spring.TraceFilter          : request_complete trace_id=65451a83-4449-4ae0-bbb5-3ebc47d2bdfb method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:26.710Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7156] com.brainnet.spring.TraceFilter          : request_complete trace_id=4e99a05d-1b2c-470e-b677-a818443cc605 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:26.897Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7157] com.brainnet.spring.TraceFilter          : request_complete trace_id=2a0c8376-dafc-4e31-b195-b7ee8932df0e method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:27.299Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7158] com.brainnet.spring.TraceFilter          : request_complete trace_id=903e09a1-264d-4213-8442-4ed559d1e1d0 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:27.303Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7159] com.brainnet.spring.TraceFilter          : request_complete trace_id=3e43e36e-4b07-461d-8374-c48dfa689372 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:32:27.492Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7160] com.brainnet.spring.TraceFilter          : request_complete trace_id=bb2f5726-139f-4ed2-a5cc-00e0250dea6a method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7077 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:32:27.894Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7161] com.brainnet.spring.TraceFilter          : request_complete trace_id=993d0f11-1160-4537-b137-16d03390fc3a method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7078 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:32:27.915Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7162] com.brainnet.spring.TraceFilter          : request_complete trace_id=69044c04-e4a1-441d-931e-77bcabaa6464 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:28.099Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7163] com.brainnet.spring.TraceFilter          : request_complete trace_id=dae76673-cadf-4649-898b-49ca5b059afc method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-spring-1   | 2026-09-12T10:32:28.489Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7164] com.brainnet.spring.TraceFilter          : request_complete trace_id=9758e709-c66f-4788-8aed-7c1d56008642 method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/7079 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:32:28.500Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7165] com.brainnet.spring.TraceFilter          : request_complete trace_id=d3a5e743-d9c3-464a-8522-bc104345de6f method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7080 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:32:28.694Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7166] com.brainnet.spring.TraceFilter          : request_complete trace_id=1838f5b1-e852-499b-8274-1f51d1838684 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:29.091Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7167] com.brainnet.spring.TraceFilter          : request_complete trace_id=ad33b97d-7516-4aa2-8f67-9b8b8a65ba9e method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7081 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/7082 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7083 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7084 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7085 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/7086 HTTP/1.1" 204 No Content
+soak-spring-1   | 2026-09-12T10:32:29.113Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7168] com.brainnet.spring.TraceFilter          : request_complete trace_id=430eeb37-532f-4c3e-ba02-736ce1700533 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:29.308Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7169] com.brainnet.spring.TraceFilter          : request_complete trace_id=01708a52-6a7c-4f21-a6e8-bb28565ffd52 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:29.698Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7170] com.brainnet.spring.TraceFilter          : request_complete trace_id=e5a779db-8b95-4d1a-8cb7-1088a1f811f6 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:29.707Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7171] com.brainnet.spring.TraceFilter          : request_complete trace_id=6d64b9ba-4e67-4b76-8da0-c703d65a1909 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:29.890Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7172] com.brainnet.spring.TraceFilter          : request_complete trace_id=2775e8ac-1c8b-47c5-ab83-faec3186e973 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:30.287Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7173] com.brainnet.spring.TraceFilter          : request_complete trace_id=86c7715c-32f2-4126-b34e-fb8c0490b24c method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:30.307Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7174] com.brainnet.spring.TraceFilter          : request_complete trace_id=db2d4270-4cfb-4e68-90a4-7e1eb201c773 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:30.506Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7175] com.brainnet.spring.TraceFilter          : request_complete trace_id=ead35f81-b16e-4df1-88b1-ddfbdf88b3e9 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:30.892Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7176] com.brainnet.spring.TraceFilter          : request_complete trace_id=ea19972e-f9e5-45b9-8f5d-1e5ab44294d6 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:30.901Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7177] com.brainnet.spring.TraceFilter          : request_complete trace_id=85db2219-dece-459d-94ee-451e82c0d6f8 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:31.087Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7178] com.brainnet.spring.TraceFilter          : request_complete trace_id=50ab800f-b548-497f-bb0d-8f342929e821 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:33.743Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7179] com.brainnet.spring.TraceFilter          : request_complete trace_id=21dd2043-135d-4a0e-b5c1-31fc7db4cbb0 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:33.765Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7180] com.brainnet.spring.TraceFilter          : request_complete trace_id=b051ed4a-f7c4-40ee-80e1-aee49370d442 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:33.953Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7181] com.brainnet.spring.TraceFilter          : request_complete trace_id=e6acb0b0-3bba-44e7-a0d9-9d46f02e463b method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:34.342Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7182] com.brainnet.spring.TraceFilter          : request_complete trace_id=7f2138c9-7008-4098-a8da-46ebe7860a19 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:34.351Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7183] com.brainnet.spring.TraceFilter          : request_complete trace_id=f864d5d2-7ada-4171-b4bd-f5474ae08849 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:34.539Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7184] com.brainnet.spring.TraceFilter          : request_complete trace_id=090c2521-21d2-45dc-84bb-87afe1796771 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:34.943Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7186] com.brainnet.spring.TraceFilter          : request_complete trace_id=c625920d-8a7b-43fe-8c9b-ac52c9021067 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:34.966Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7187] com.brainnet.spring.TraceFilter          : request_complete trace_id=ba9e2681-b9d8-4fab-bbf2-e003fd36bb12 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:35.154Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7188] com.brainnet.spring.TraceFilter          : request_complete trace_id=0608b195-2568-4d37-a491-ae2d1687ce85 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:35.545Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7189] com.brainnet.spring.TraceFilter          : request_complete trace_id=e3773db0-2089-4cb3-bb49-ffaab6814cb1 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:35.564Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7190] com.brainnet.spring.TraceFilter          : request_complete trace_id=dceb92b5-1a2d-483b-ae4f-86588bb45374 method=POST path=/projects/1/nodes status=201
+soak-spring-1   | 2026-09-12T10:32:35.736Z  INFO 1 --- [brainnet-spring-vertical-slice] [at-handler-7191] com.brainnet.spring.TraceFilter          : request_complete trace_id=0cd3a84a-78bd-4237-a5a9-ab37e07a3a8f method=POST path=/projects/1/nodes status=201
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7087 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/7088 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7089 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7090 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7091 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/7092 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7093 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/7094 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7095 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7096 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/7097 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7098 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7099 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/7100 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7101 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7102 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/7103 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7104 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7105 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7106 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/7107 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7108 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/7109 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7110 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7111 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/7112 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7113 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7114 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7116 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/7115 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7117 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/7118 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7119 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7120 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/7122 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7121 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7123 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/7124 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7125 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7126 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7128 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/7127 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7129 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/7130 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7131 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7132 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7134 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/7133 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7135 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/7136 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7137 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7138 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7139 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44828 - "DELETE /projects/1/nodes/7140 HTTP/1.1" 204 No Content
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "POST /projects/1/nodes HTTP/1.1" 201 Created
+soak-fastapi-1  | INFO:     172.26.0.3:44830 - "DELETE /projects/1/nodes/7141 HTTP/1.1" 204 No Content

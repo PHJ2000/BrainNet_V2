@@ -1,0 +1,50 @@
+name: brainnet-local
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: brainnet_local
+      POSTGRES_USER: brainnet_local
+      POSTGRES_PASSWORD: ${BRAINNET_LOCAL_DB_PASSWORD:?Run deploy/start-local.ps1 first}
+    volumes: [local-db:/var/lib/postgresql/data]
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U brainnet_local -d brainnet_local"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+  backend:
+    build: {context: .., dockerfile: backend/Dockerfile}
+    environment:
+      DATABASE_URL: postgresql+asyncpg://brainnet_local:${BRAINNET_LOCAL_DB_PASSWORD}@db:5432/brainnet_local
+      JWT_SECRET: ${JWT_SECRET:?Run deploy/start-local.ps1 first}
+      REQUIRE_NODE_VERSION: "true"
+      NODE_EVENTS_ENABLED: "true"
+      # This local profile runs without paid AI calls.
+      OPENAI_API_KEY: ""
+    ports: ["127.0.0.1:18000:8000"]
+    cpus: 2
+    mem_limit: 1g
+    depends_on:
+      db: {condition: service_healthy}
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)"]
+      interval: 3s
+      timeout: 5s
+      retries: 30
+  frontend:
+    build: {context: .., dockerfile: frontend/Dockerfile.local}
+    environment:
+      NEXT_TELEMETRY_DISABLED: "1"
+    ports: ["127.0.0.1:3000:3000"]
+    mem_limit: 1g
+    depends_on:
+      backend: {condition: service_healthy}
+    healthcheck:
+      test: [CMD, node, -e, "fetch('http://127.0.0.1:3000').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 3s
+      timeout: 5s
+      retries: 30
+
+volumes:
+  local-db:

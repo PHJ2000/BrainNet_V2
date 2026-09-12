@@ -1,0 +1,2313 @@
+{
+  "duration_seconds": 3600.175,
+  "target_seconds": 3600,
+  "websocket_clients": 100,
+  "target_operations_per_second": 5.0,
+  "attempted_operations": 18000,
+  "completed_operations": 18000,
+  "errors": {},
+  "error_details": [],
+  "client_event_counts": [
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    },
+    {
+      "node.created": 18000,
+      "node.deleted": 18000
+    }
+  ],
+  "operation_p95_ms": 247.82391599728726,
+  "creation_to_event_p95_ms": 443.11216899950523,
+  "delivered_events": 3600000,
+  "expected_delivered_events": 3600000,
+  "every_client_complete": true,
+  "client_loop_lag_p95_ms": 1.9386329935514313,
+  "client_loop_lag_max_ms": 57.12056399934226,
+  "remaining_nodes": 3,
+  "pending_events": 0,
+  "samples": [
+    {
+      "elapsed_seconds": 0.0,
+      "completed": 0,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 2
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 2
+        }
+      ],
+      "client_loop_lag_max_ms": 0,
+      "provider_loop_lag_max_ms": 10.09
+    },
+    {
+      "elapsed_seconds": 60.0,
+      "completed": 299,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 9
+        }
+      ],
+      "client_loop_lag_max_ms": 3.245,
+      "provider_loop_lag_max_ms": 10.458
+    },
+    {
+      "elapsed_seconds": 120.0,
+      "completed": 600,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 9
+        }
+      ],
+      "client_loop_lag_max_ms": 3.642,
+      "provider_loop_lag_max_ms": 10.458
+    },
+    {
+      "elapsed_seconds": 180.0,
+      "completed": 900,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 10
+        },
+        {
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "count": 1
+        }
+      ],
+      "client_loop_lag_max_ms": 3.706,
+      "provider_loop_lag_max_ms": 10.458
+    },
+    {
+      "elapsed_seconds": 240.0,
+      "completed": 1200,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 10
+        }
+      ],
+      "client_loop_lag_max_ms": 3.806,
+      "provider_loop_lag_max_ms": 10.458
+    },
+    {
+      "elapsed_seconds": 300.0,
+      "completed": 1500,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 10
+        }
+      ],
+      "client_loop_lag_max_ms": 3.806,
+      "provider_loop_lag_max_ms": 10.458
+    },
+    {
+      "elapsed_seconds": 360.0,
+      "completed": 1800,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 10
+        },
+        {
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "count": 1
+        }
+      ],
+      "client_loop_lag_max_ms": 4.07,
+      "provider_loop_lag_max_ms": 10.458
+    },
+    {
+      "elapsed_seconds": 420.0,
+      "completed": 2100,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 11
+        }
+      ],
+      "client_loop_lag_max_ms": 4.07,
+      "provider_loop_lag_max_ms": 10.458
+    },
+    {
+      "elapsed_seconds": 480.0,
+      "completed": 2400,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 10
+        }
+      ],
+      "client_loop_lag_max_ms": 4.07,
+      "provider_loop_lag_max_ms": 10.458
+    },
+    {
+      "elapsed_seconds": 540.0,
+      "completed": 2700,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 10
+        }
+      ],
+      "client_loop_lag_max_ms": 4.07,
+      "provider_loop_lag_max_ms": 10.458
+    },
+    {
+      "elapsed_seconds": 600.0,
+      "completed": 2999,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 10
+        }
+      ],
+      "client_loop_lag_max_ms": 4.07,
+      "provider_loop_lag_max_ms": 10.458
+    },
+    {
+      "elapsed_seconds": 660.0,
+      "completed": 3300,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 9
+        }
+      ],
+      "client_loop_lag_max_ms": 4.07,
+      "provider_loop_lag_max_ms": 10.458
+    },
+    {
+      "elapsed_seconds": 720.0,
+      "completed": 3600,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 9
+        }
+      ],
+      "client_loop_lag_max_ms": 4.264,
+      "provider_loop_lag_max_ms": 10.458
+    },
+    {
+      "elapsed_seconds": 780.0,
+      "completed": 3900,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 9
+        },
+        {
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "count": 1
+        }
+      ],
+      "client_loop_lag_max_ms": 4.264,
+      "provider_loop_lag_max_ms": 10.458
+    },
+    {
+      "elapsed_seconds": 840.0,
+      "completed": 4199,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 9
+        }
+      ],
+      "client_loop_lag_max_ms": 4.264,
+      "provider_loop_lag_max_ms": 10.458
+    },
+    {
+      "elapsed_seconds": 900.0,
+      "completed": 4500,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 9
+        }
+      ],
+      "client_loop_lag_max_ms": 4.264,
+      "provider_loop_lag_max_ms": 10.458
+    },
+    {
+      "elapsed_seconds": 960.0,
+      "completed": 4800,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 9
+        }
+      ],
+      "client_loop_lag_max_ms": 4.264,
+      "provider_loop_lag_max_ms": 10.458
+    },
+    {
+      "elapsed_seconds": 1020.0,
+      "completed": 5100,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 9
+        }
+      ],
+      "client_loop_lag_max_ms": 4.264,
+      "provider_loop_lag_max_ms": 10.458
+    },
+    {
+      "elapsed_seconds": 1080.0,
+      "completed": 5400,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 10
+        }
+      ],
+      "client_loop_lag_max_ms": 4.264,
+      "provider_loop_lag_max_ms": 10.512
+    },
+    {
+      "elapsed_seconds": 1140.0,
+      "completed": 5700,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 9
+        },
+        {
+          "state": "idle in transaction",
+          "wait_event_type": "IO",
+          "count": 1
+        }
+      ],
+      "client_loop_lag_max_ms": 4.264,
+      "provider_loop_lag_max_ms": 10.512
+    },
+    {
+      "elapsed_seconds": 1200.0,
+      "completed": 6000,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 9
+        }
+      ],
+      "client_loop_lag_max_ms": 4.264,
+      "provider_loop_lag_max_ms": 10.512
+    },
+    {
+      "elapsed_seconds": 1260.0,
+      "completed": 6300,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 9
+        }
+      ],
+      "client_loop_lag_max_ms": 4.264,
+      "provider_loop_lag_max_ms": 10.512
+    },
+    {
+      "elapsed_seconds": 1320.0,
+      "completed": 6599,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 2
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 9
+        }
+      ],
+      "client_loop_lag_max_ms": 4.264,
+      "provider_loop_lag_max_ms": 10.512
+    },
+    {
+      "elapsed_seconds": 1380.0,
+      "completed": 6900,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 9
+        }
+      ],
+      "client_loop_lag_max_ms": 5.036,
+      "provider_loop_lag_max_ms": 10.512
+    },
+    {
+      "elapsed_seconds": 1440.0,
+      "completed": 7200,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 9
+        },
+        {
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "count": 1
+        }
+      ],
+      "client_loop_lag_max_ms": 5.036,
+      "provider_loop_lag_max_ms": 10.512
+    },
+    {
+      "elapsed_seconds": 1500.0,
+      "completed": 7500,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 9
+        }
+      ],
+      "client_loop_lag_max_ms": 5.036,
+      "provider_loop_lag_max_ms": 10.512
+    },
+    {
+      "elapsed_seconds": 1560.0,
+      "completed": 7800,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 9
+        }
+      ],
+      "client_loop_lag_max_ms": 5.036,
+      "provider_loop_lag_max_ms": 10.512
+    },
+    {
+      "elapsed_seconds": 1620.0,
+      "completed": 8099,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 9
+        }
+      ],
+      "client_loop_lag_max_ms": 5.036,
+      "provider_loop_lag_max_ms": 10.582
+    },
+    {
+      "elapsed_seconds": 1680.0,
+      "completed": 8399,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 9
+        }
+      ],
+      "client_loop_lag_max_ms": 5.036,
+      "provider_loop_lag_max_ms": 10.582
+    },
+    {
+      "elapsed_seconds": 1740.0,
+      "completed": 8699,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 9
+        }
+      ],
+      "client_loop_lag_max_ms": 6.929,
+      "provider_loop_lag_max_ms": 10.582
+    },
+    {
+      "elapsed_seconds": 1800.0,
+      "completed": 9000,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 9
+        },
+        {
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "count": 1
+        }
+      ],
+      "client_loop_lag_max_ms": 6.929,
+      "provider_loop_lag_max_ms": 10.582
+    },
+    {
+      "elapsed_seconds": 1860.0,
+      "completed": 9299,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 9
+        }
+      ],
+      "client_loop_lag_max_ms": 6.929,
+      "provider_loop_lag_max_ms": 10.582
+    },
+    {
+      "elapsed_seconds": 1920.0,
+      "completed": 9600,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 9
+        }
+      ],
+      "client_loop_lag_max_ms": 6.929,
+      "provider_loop_lag_max_ms": 10.582
+    },
+    {
+      "elapsed_seconds": 1980.0,
+      "completed": 9900,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 9
+        }
+      ],
+      "client_loop_lag_max_ms": 6.929,
+      "provider_loop_lag_max_ms": 10.582
+    },
+    {
+      "elapsed_seconds": 2040.0,
+      "completed": 10200,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 9
+        }
+      ],
+      "client_loop_lag_max_ms": 12.926,
+      "provider_loop_lag_max_ms": 10.593
+    },
+    {
+      "elapsed_seconds": 2100.0,
+      "completed": 10500,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 9
+        }
+      ],
+      "client_loop_lag_max_ms": 12.926,
+      "provider_loop_lag_max_ms": 10.593
+    },
+    {
+      "elapsed_seconds": 2160.0,
+      "completed": 10799,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 9
+        }
+      ],
+      "client_loop_lag_max_ms": 12.926,
+      "provider_loop_lag_max_ms": 10.593
+    },
+    {
+      "elapsed_seconds": 2220.0,
+      "completed": 11099,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 10
+        }
+      ],
+      "client_loop_lag_max_ms": 12.926,
+      "provider_loop_lag_max_ms": 10.659
+    },
+    {
+      "elapsed_seconds": 2280.0,
+      "completed": 11400,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 9
+        }
+      ],
+      "client_loop_lag_max_ms": 12.926,
+      "provider_loop_lag_max_ms": 10.659
+    },
+    {
+      "elapsed_seconds": 2340.0,
+      "completed": 11700,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 9
+        }
+      ],
+      "client_loop_lag_max_ms": 12.926,
+      "provider_loop_lag_max_ms": 10.659
+    },
+    {
+      "elapsed_seconds": 2400.0,
+      "completed": 12000,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 9
+        }
+      ],
+      "client_loop_lag_max_ms": 12.926,
+      "provider_loop_lag_max_ms": 10.659
+    },
+    {
+      "elapsed_seconds": 2460.0,
+      "completed": 12299,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 9
+        }
+      ],
+      "client_loop_lag_max_ms": 12.926,
+      "provider_loop_lag_max_ms": 10.659
+    },
+    {
+      "elapsed_seconds": 2520.0,
+      "completed": 12599,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 9
+        }
+      ],
+      "client_loop_lag_max_ms": 12.926,
+      "provider_loop_lag_max_ms": 10.659
+    },
+    {
+      "elapsed_seconds": 2580.0,
+      "completed": 12900,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 9
+        }
+      ],
+      "client_loop_lag_max_ms": 12.926,
+      "provider_loop_lag_max_ms": 10.659
+    },
+    {
+      "elapsed_seconds": 2640.0,
+      "completed": 13200,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 9
+        }
+      ],
+      "client_loop_lag_max_ms": 12.926,
+      "provider_loop_lag_max_ms": 10.659
+    },
+    {
+      "elapsed_seconds": 2700.0,
+      "completed": 13500,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 10
+        }
+      ],
+      "client_loop_lag_max_ms": 12.926,
+      "provider_loop_lag_max_ms": 10.659
+    },
+    {
+      "elapsed_seconds": 2760.0,
+      "completed": 13800,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 9
+        }
+      ],
+      "client_loop_lag_max_ms": 12.926,
+      "provider_loop_lag_max_ms": 10.659
+    },
+    {
+      "elapsed_seconds": 2820.0,
+      "completed": 14099,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 9
+        }
+      ],
+      "client_loop_lag_max_ms": 12.926,
+      "provider_loop_lag_max_ms": 10.659
+    },
+    {
+      "elapsed_seconds": 2880.0,
+      "completed": 14399,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 1,
+        "oldest_pending_seconds": 0.008519,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 9
+        }
+      ],
+      "client_loop_lag_max_ms": 12.926,
+      "provider_loop_lag_max_ms": 10.659
+    },
+    {
+      "elapsed_seconds": 2940.0,
+      "completed": 14700,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 9
+        }
+      ],
+      "client_loop_lag_max_ms": 14.169,
+      "provider_loop_lag_max_ms": 10.659
+    },
+    {
+      "elapsed_seconds": 3000.0,
+      "completed": 15000,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 9
+        }
+      ],
+      "client_loop_lag_max_ms": 14.169,
+      "provider_loop_lag_max_ms": 10.659
+    },
+    {
+      "elapsed_seconds": 3060.0,
+      "completed": 15299,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 9
+        },
+        {
+          "state": "idle in transaction",
+          "wait_event_type": null,
+          "count": 1
+        }
+      ],
+      "client_loop_lag_max_ms": 14.169,
+      "provider_loop_lag_max_ms": 10.659
+    },
+    {
+      "elapsed_seconds": 3120.0,
+      "completed": 15600,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 9
+        },
+        {
+          "state": "idle in transaction",
+          "wait_event_type": "IO",
+          "count": 1
+        }
+      ],
+      "client_loop_lag_max_ms": 14.169,
+      "provider_loop_lag_max_ms": 10.659
+    },
+    {
+      "elapsed_seconds": 3180.0,
+      "completed": 15900,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 9
+        },
+        {
+          "state": "idle in transaction",
+          "wait_event_type": "IO",
+          "count": 1
+        }
+      ],
+      "client_loop_lag_max_ms": 21.643,
+      "provider_loop_lag_max_ms": 10.659
+    },
+    {
+      "elapsed_seconds": 3240.0,
+      "completed": 16200,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 10
+        }
+      ],
+      "client_loop_lag_max_ms": 21.643,
+      "provider_loop_lag_max_ms": 10.659
+    },
+    {
+      "elapsed_seconds": 3300.0,
+      "completed": 16500,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 10
+        }
+      ],
+      "client_loop_lag_max_ms": 21.643,
+      "provider_loop_lag_max_ms": 10.659
+    },
+    {
+      "elapsed_seconds": 3360.0,
+      "completed": 16800,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 10
+        }
+      ],
+      "client_loop_lag_max_ms": 21.643,
+      "provider_loop_lag_max_ms": 10.659
+    },
+    {
+      "elapsed_seconds": 3420.0,
+      "completed": 17100,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 10
+        }
+      ],
+      "client_loop_lag_max_ms": 21.643,
+      "provider_loop_lag_max_ms": 10.659
+    },
+    {
+      "elapsed_seconds": 3480.0,
+      "completed": 17400,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 10
+        }
+      ],
+      "client_loop_lag_max_ms": 21.643,
+      "provider_loop_lag_max_ms": 10.659
+    },
+    {
+      "elapsed_seconds": 3540.0,
+      "completed": 17700,
+      "errors": 0,
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      },
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 10
+        }
+      ],
+      "client_loop_lag_max_ms": 21.643,
+      "provider_loop_lag_max_ms": 10.659
+    }
+  ]
+}

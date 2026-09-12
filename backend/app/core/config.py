@@ -38,4 +38,4 @@ if JWT_ALGORITHM != "HS256":
     raise RuntimeError("JWT_ALGORITHM must be HS256 during legacy/Spring coexistence")
 
 ACCESS_TOKEN_EXPIRE_MINUTES = positive_int_env("ACCESS_TOKEN_EXPIRE_MINUTES", "30")
-REQUIRE_NODE_VERSION = bool_env("REQUIRE_NODE_VERSION")
+REQUIRE_NODE_VERSION = bool_env("REQUIRE_NODE_VERSION", "true")

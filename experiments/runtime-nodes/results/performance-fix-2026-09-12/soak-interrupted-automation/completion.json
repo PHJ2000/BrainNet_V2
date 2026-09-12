@@ -1,0 +1,7 @@
+{
+  "cleanup_succeeded": true,
+  "state": "FAILED",
+  "error": "Soak process ended without a completion marker",
+  "finished_at": "2026-09-12T10:32:58.5201500Z",
+  "gates_passed": false
+}

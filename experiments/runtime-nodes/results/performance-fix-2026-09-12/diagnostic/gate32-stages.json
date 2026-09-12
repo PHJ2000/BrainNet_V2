@@ -1,0 +1,93 @@
+{
+  "event_loop_lag": {
+    "count": 721,
+    "mean_ms": 4.067,
+    "p50_ms": 1.285,
+    "p95_ms": 11.412,
+    "max_ms": 296.141
+  },
+  "db.execute": {
+    "count": 15056,
+    "mean_ms": 17.339,
+    "p50_ms": 9.936,
+    "p95_ms": 42.014,
+    "max_ms": 701.614
+  },
+  "_m": {
+    "count": 3764,
+    "mean_ms": 19.615,
+    "p50_ms": 9.818,
+    "p95_ms": 58.848,
+    "max_ms": 701.724
+  },
+  "db.commit": {
+    "count": 3764,
+    "mean_ms": 11.326,
+    "p50_ms": 9.384,
+    "p95_ms": 24.422,
+    "max_ms": 368.119
+  },
+  "claim_request": {
+    "count": 1882,
+    "mean_ms": 21.628,
+    "p50_ms": 18.503,
+    "p95_ms": 45.208,
+    "max_ms": 386.617
+  },
+  "_validate_parent": {
+    "count": 3764,
+    "mean_ms": 11.833,
+    "p50_ms": 9.046,
+    "p95_ms": 25.22,
+    "max_ms": 367.493
+  },
+  "db.rollback": {
+    "count": 1882,
+    "mean_ms": 7.068,
+    "p50_ms": 5.8,
+    "p95_ms": 16.274,
+    "max_ms": 95.12
+  },
+  "provider": {
+    "count": 1882,
+    "mean_ms": 243.404,
+    "p50_ms": 231.79,
+    "p95_ms": 315.755,
+    "max_ms": 605.378
+  },
+  "lock_claim": {
+    "count": 1882,
+    "mean_ms": 31.209,
+    "p50_ms": 14.304,
+    "p95_ms": 196.767,
+    "max_ms": 474.217
+  },
+  "db.flush": {
+    "count": 1882,
+    "mean_ms": 12.409,
+    "p50_ms": 8.636,
+    "p95_ms": 37.515,
+    "max_ms": 223.261
+  },
+  "_inherit_parent_tags": {
+    "count": 1882,
+    "mean_ms": 7.882,
+    "p50_ms": 6.449,
+    "p95_ms": 17.712,
+    "max_ms": 153.976
+  },
+  "_finish_creation": {
+    "count": 1882,
+    "mean_ms": 39.011,
+    "p50_ms": 34.454,
+    "p95_ms": 88.163,
+    "max_ms": 239.349
+  },
+  "create_nodes": {
+    "count": 1882,
+    "mean_ms": 3369.472,
+    "p50_ms": 3801.197,
+    "p95_ms": 4336.267,
+    "max_ms": 4704.116
+  }
+}

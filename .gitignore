@@ -1,5 +1,6 @@
 node_modules
 .env
+.env.local
 __pycache__
 *.py[cod]
 *.sqlite3
@@ -13,3 +14,8 @@ coverage
 .python-version
 venv
 spring/vertical-slice/target
+frontend/.test-dist/
+frontend/test-results/
+frontend/playwright-report/
+experiments/runtime-nodes/results/**/soak-progress.json
+experiments/runtime-nodes/results/**/completed

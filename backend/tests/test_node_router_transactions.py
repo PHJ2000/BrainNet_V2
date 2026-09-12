@@ -9,7 +9,8 @@ from sqlalchemy.dialects import postgresql
 
 from app.core.errors import error_detail
 from app.models.node import NodeCreate
-from app.routers import nodes
+from app.services import node_service as nodes
+from app.services import ai_provider
 
 
 class FakeSession:
@@ -161,11 +162,12 @@ async def test_ai_releases_read_transaction_then_rechecks_in_write_transaction(m
 
     async def inherit_tags(parent_id, node_id, _db):
         events.append(f"inherit:{parent_id}:{node_id}")
+        return [5]
 
     monkeypatch.setattr(nodes, "_m", ensure_member)
     monkeypatch.setattr(nodes, "_validate_parent", validate_parent)
     monkeypatch.setattr(nodes, "_inherit_parent_tags", inherit_tags)
-    monkeypatch.setattr(nodes, "_get_ai_client", lambda: fake_ai_client(events))
+    monkeypatch.setattr(ai_provider, "_get_ai_client", lambda: fake_ai_client(events))
 
     result = await nodes.create_nodes(
         NodeCreate(ai_prompt="idea", parent_id=7),
@@ -184,11 +186,15 @@ async def test_ai_releases_read_transaction_then_rechecks_in_write_transaction(m
         "add",
         "flush",
         "inherit:7:99",
+        "add",
         "commit",
     ]
     assert result[0].id == 99
     assert result[0].state == "GHOST"
     assert result[0].version == 0
+    assert result[0].tags == [5]
+    assert db.added[-1].event_type == "node.created"
+    assert db.added[-1].payload["node"]["tags"] == [5]
 
 
 @pytest.mark.asyncio
@@ -207,7 +213,7 @@ async def test_ai_timeout_has_no_write_after_read_transaction_release(monkeypatc
     )
     monkeypatch.setattr(nodes, "_m", ensure_member)
     monkeypatch.setattr(nodes, "_validate_parent", validate_parent)
-    monkeypatch.setattr(nodes, "_get_ai_client", lambda: client)
+    monkeypatch.setattr(ai_provider, "_get_ai_client", lambda: client)
 
     with pytest.raises(HTTPException) as raised:
         await nodes.create_nodes(
@@ -244,7 +250,7 @@ async def test_ai_parent_deleted_during_provider_returns_stable_404_without_writ
 
     monkeypatch.setattr(nodes, "_m", ensure_member)
     monkeypatch.setattr(nodes, "_validate_parent", validate_parent)
-    monkeypatch.setattr(nodes, "_get_ai_client", lambda: fake_ai_client(events))
+    monkeypatch.setattr(ai_provider, "_get_ai_client", lambda: fake_ai_client(events))
 
     with pytest.raises(HTTPException) as raised:
         await nodes.create_nodes(
@@ -289,7 +295,7 @@ async def test_ai_node_and_inherited_tags_rollback_together(monkeypatch):
     monkeypatch.setattr(nodes, "_m", ensure_member)
     monkeypatch.setattr(nodes, "_validate_parent", validate_parent)
     monkeypatch.setattr(nodes, "_inherit_parent_tags", fail_inherit)
-    monkeypatch.setattr(nodes, "_get_ai_client", lambda: fake_ai_client(events))
+    monkeypatch.setattr(ai_provider, "_get_ai_client", lambda: fake_ai_client(events))
 
     with pytest.raises(RuntimeError, match="forced tag failure"):
         await nodes.create_nodes(
@@ -332,7 +338,7 @@ async def test_ai_rechecks_membership_after_provider_before_writing(monkeypatch)
 
     monkeypatch.setattr(nodes, "_m", ensure_member)
     monkeypatch.setattr(nodes, "_validate_parent", validate_parent)
-    monkeypatch.setattr(nodes, "_get_ai_client", lambda: fake_ai_client(events))
+    monkeypatch.setattr(ai_provider, "_get_ai_client", lambda: fake_ai_client(events))
 
     with pytest.raises(HTTPException) as raised:
         await nodes.create_nodes(

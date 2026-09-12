@@ -16,8 +16,10 @@ services:
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set}
       JWT_ALGORITHM: ${JWT_ALGORITHM:-HS256}
       ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-30}
-      REQUIRE_NODE_VERSION: ${REQUIRE_NODE_VERSION:-false}
+      REQUIRE_NODE_VERSION: ${REQUIRE_NODE_VERSION:-true}
       SQLALCHEMY_ECHO: ${SQLALCHEMY_ECHO:-false}
+      NODE_EVENTS_ENABLED: ${NODE_EVENTS_ENABLED:-true}
+      OUTBOX_RETENTION_DAYS: ${OUTBOX_RETENTION_DAYS:-7}
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       OPENAI_MODEL: ${OPENAI_MODEL:-gpt-3.5-turbo}
       OPENAI_TIMEOUT_SECONDS: ${OPENAI_TIMEOUT_SECONDS:-30}
@@ -38,3 +40,4 @@ services:
     - /app/node_modules  # 중요: node_modules는 호스트와 충돌 방지용으로 제외
     environment:
       - CHOKIDAR_USEPOLLING=true  # Vite, Next 등 핫 리로드 문제 해결
+      - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL:-http://localhost:8000}

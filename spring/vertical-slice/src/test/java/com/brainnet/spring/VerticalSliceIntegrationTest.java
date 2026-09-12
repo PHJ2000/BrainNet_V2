@@ -95,6 +95,12 @@ class VerticalSliceIntegrationTest {
     @Autowired
     JdbcTemplate jdbc;
 
+    @Autowired
+    NodeIdempotencyService idempotency;
+
+    @Autowired
+    org.springframework.transaction.PlatformTransactionManager transactionManager;
+
     private final HttpClient http = HttpClient.newHttpClient();
 
     @BeforeEach
@@ -177,6 +183,69 @@ class VerticalSliceIntegrationTest {
         assertThat(jdbc.queryForObject("SELECT count(*) FROM node WHERE content='after-expiry'", Long.class)).isEqualTo(1);
         assertThat(jdbc.queryForObject("SELECT response_status FROM idempotency_request WHERE idempotency_key='expired-idem'", Integer.class))
                 .isEqualTo(201);
+    }
+
+    @Test
+    void sameKeyCannotReplayAnotherProjectsResponse() throws Exception {
+        jdbc.update("INSERT INTO project(id,owner_id,name) VALUES (3,7,'other')");
+        jdbc.update("INSERT INTO project_user_role(project_id,user_id,role) VALUES (3,7,'OWNER')");
+        String body = "{\"content\":\"scoped\",\"parent_id\":11}";
+        assertThat(requestWithIdempotency("POST", "/projects/1/nodes", bearer(7), body, "scoped").statusCode())
+                .isEqualTo(201);
+        var reused = requestWithIdempotency("POST", "/projects/3/nodes", bearer(7), body, "scoped");
+        assertThat(reused.statusCode()).isEqualTo(409);
+        assertThat(reused.body()).contains("IDEMPOTENCY_KEY_REUSED");
+    }
+
+    @Test
+    void concurrentSameKeyCreatesOneNodeAndOneEvent() throws Exception {
+        String token = bearer(7);
+        try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+            List<Future<HttpResponse<String>>> requests = new ArrayList<>();
+            for (int index = 0; index < 30; index++) {
+                requests.add(executor.submit(() -> requestWithIdempotency("POST", "/projects/1/nodes", token,
+                        "{\"content\":\"same-key-concurrent\",\"parent_id\":11}", "concurrent-key")));
+            }
+            int successes = 0;
+            for (var request : requests) {
+                var response = request.get();
+                assertThat(response.statusCode()).isIn(201, 409);
+                if (response.statusCode() == 201) successes++;
+                else assertThat(response.body()).contains("IDEMPOTENCY_IN_PROGRESS");
+            }
+            assertThat(successes).isPositive();
+        }
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM node WHERE content='same-key-concurrent'", Long.class)).isEqualTo(1);
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM outbox_event", Long.class)).isEqualTo(1);
+    }
+
+    @Test
+    void staleOwnerCannotReleaseOrFinishReclaimedRequest() {
+        var body = new ApiModels.NodeCreate("lease", null, 11L, null, null, null, null, null);
+        var old = idempotency.claim(1, 7, "lease", body);
+        jdbc.update("UPDATE idempotency_request SET expires_at=now()-interval '1 second' WHERE id=?", old.id());
+        var replacement = idempotency.claim(1, 7, "lease", body);
+        assertThat(replacement.id()).isNotEqualTo(old.id());
+        var transaction = new org.springframework.transaction.support.TransactionTemplate(transactionManager);
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> transaction.executeWithoutResult(status -> idempotency.lock(old)))
+                .isInstanceOf(ApiExceptionHandler.ApiException.class);
+        idempotency.release(old);
+        transaction.executeWithoutResult(status -> idempotency.lock(replacement));
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM idempotency_request WHERE id=?", Long.class, replacement.id())).isEqualTo(1);
+    }
+
+    @Test
+    void outboxFailureRollsBackNodeAndReleasesClaim() throws Exception {
+        jdbc.execute("ALTER TABLE outbox_event ADD CONSTRAINT reject_test_event CHECK (event_type <> 'node.created')");
+        try {
+            var response = requestWithIdempotency("POST", "/projects/1/nodes", bearer(7),
+                    "{\"content\":\"atomic-failure\",\"parent_id\":11}", "atomic-failure");
+            assertThat(response.statusCode()).isEqualTo(500);
+            assertThat(jdbc.queryForObject("SELECT count(*) FROM node WHERE content='atomic-failure'", Long.class)).isZero();
+            assertThat(jdbc.queryForObject("SELECT count(*) FROM idempotency_request", Long.class)).isZero();
+        } finally {
+            jdbc.execute("ALTER TABLE outbox_event DROP CONSTRAINT reject_test_event");
+        }
     }
 
     @Test

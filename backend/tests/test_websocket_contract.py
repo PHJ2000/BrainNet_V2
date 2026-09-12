@@ -41,6 +41,9 @@ class FakeWebSocket:
     async def close(self, code):
         self.closed_with = code
 
+    async def send_json(self, _message):
+        pass
+
     async def receive_text(self):
         self.keys_while_connected = list(WS_CONNECTIONS)
         raise WebSocketDisconnect(code=1000)
