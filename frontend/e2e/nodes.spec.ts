@@ -1,7 +1,6 @@
 import { test, expect } from "@playwright/test";
-import path from "node:path";
 
-test("lost creation response, two browsers, mutation events and offline recovery", async ({ browser, request }) => {
+test("lost creation response, two browsers, mutation events and offline recovery", async ({ browser, request }, testInfo) => {
   const token = process.env.JWT_TOKEN;
   if (!token) throw new Error("JWT_TOKEN from the disposable contract seed is required");
   const contexts = await Promise.all([browser.newContext(), browser.newContext()]);
@@ -52,7 +51,7 @@ test("lost creation response, two browsers, mutation events and offline recovery
     await contexts[1].setOffline(false);
     for (const list of lists) await expect(list.locator(`[data-node-id="${offlineId}"]`)).toHaveText("재접속 복구 완료", { timeout: 45000 });
     expect(pageErrors).toEqual([]);
-    await pages[1].screenshot({ path: path.resolve("../experiments/runtime-nodes/results/final-2026-09-12/browser-verified.png"), fullPage: true });
+    await pages[1].screenshot({ path: testInfo.outputPath("browser-verified.png"), fullPage: true });
   } finally {
     await Promise.all(contexts.map((context) => context.close()));
   }
