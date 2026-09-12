@@ -24,8 +24,6 @@ export const useAuth = () => {
     return;
   }
 
-  console.log("📦 register payload:", { email, password, name }); // ← 여기
-
     try {
       await register(email, password, name);
       await handleLogin(email, password); // 자동 로그인

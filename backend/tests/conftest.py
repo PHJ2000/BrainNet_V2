@@ -14,3 +14,4 @@ os.environ.setdefault("JWT_SECRET", "brainnet-ci-test-secret-not-for-production"
 os.environ.setdefault("JWT_ALGORITHM", "HS256")
 os.environ.setdefault("ACCESS_TOKEN_EXPIRE_MINUTES", "30")
 os.environ.setdefault("DATABASE_URL", "postgresql+asyncpg://brainnet:brainnet@localhost:5432/brainnet")
+os.environ.setdefault("NODE_EVENTS_ENABLED", "false")

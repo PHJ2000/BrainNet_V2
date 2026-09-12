@@ -1,0 +1,18 @@
+groups:
+  - name: brainnet-events
+    rules:
+      - alert: BrainNetEventBridgeUnavailable
+        expr: brainnet_event_bridge_ready == 0
+        for: 1m
+        labels: {severity: critical}
+        annotations: {summary: "BrainNet event publisher or listener unavailable"}
+      - alert: BrainNetOutboxDelayed
+        expr: brainnet_outbox_oldest_seconds > 30
+        for: 2m
+        labels: {severity: warning}
+        annotations: {summary: "BrainNet unpublished events older than 30 seconds"}
+      - alert: BrainNetEventScrapeDown
+        expr: up{job="brainnet-events"} == 0
+        for: 1m
+        labels: {severity: critical}
+        annotations: {summary: "BrainNet metrics unavailable"}

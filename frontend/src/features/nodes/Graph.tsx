@@ -1,7 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, memo } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, memo } from "react";
 import cytoscape, { Core, ElementDefinition } from "cytoscape";
+import { childCreationPlan, runChildCreationPlan, type ChildCreationPlan } from "./childCreationPlan";
+import { useNodeEvents } from "./useNodeEvents";
 import {
   createAINodes as apiCreateAINodes,
   NodeOut,
@@ -171,7 +173,7 @@ export default function Graph({ projectId }: GraphProps) {
   const [nodes, setNodes] = useState<NodeMeta[]>([]);
   const nodesRef = useRef(nodes);
   const projectIdRef = useRef(projectId);
-  projectIdRef.current = projectId;
+  useLayoutEffect(() => { projectIdRef.current = projectId; }, [projectId]);
   useEffect(() => {
     nodesRef.current = nodes;
   }, [nodes]);
@@ -183,7 +185,7 @@ export default function Graph({ projectId }: GraphProps) {
       // 이미 width, height가 있으므로 재계산 필요 없음
       return [
         {
-          data: { id: n.id, label: n.label, width: n.width, height: n.height, tag: (n.tags ?? []).map(String) },
+          data: { id: n.id, label: n.label, status: n.status, width: n.width, height: n.height, tag: (n.tags ?? []).map(String) },
           position: { x: n.pos_x, y: n.pos_y },
           style: { opacity: n.opacity ?? 1 },
         },
@@ -222,9 +224,11 @@ export default function Graph({ projectId }: GraphProps) {
     return next.find((node) => node.id === nodeId);
   };
 
+  const refreshSequence = useRef(0);
   const refreshNodes = useCallback(async (targetProjectId = projectIdRef.current) => {
+    const sequence = ++refreshSequence.current;
     const list = await fetchNodes(targetProjectId);
-    if (targetProjectId !== projectIdRef.current) {
+    if (targetProjectId !== projectIdRef.current || sequence !== refreshSequence.current) {
       return undefined;
     }
     const previousById = new Map(
@@ -242,6 +246,7 @@ export default function Graph({ projectId }: GraphProps) {
     }
     return metas;
   }, [addToCy]);
+  useNodeEvents(projectId, refreshNodes);
 
   const resyncNodes = async (fallback?: () => void) => {
     try {
@@ -403,113 +408,52 @@ export default function Graph({ projectId }: GraphProps) {
   };
 
   /* ----- AI·빈 노드 생성 로직 ----- */
+  const spawning = useRef(new Set<string>());
+  const spawnPlans = useRef(new Map<string, ChildCreationPlan>());
   const spawnChildren = async (parent: NodeMeta) => {
     if (parent.generated) return;
     const targetProjectId = projectIdRef.current;
-
-    const isRoot = !parent.parentId;
-    const childCnt = isRoot ? 3 : 2;
-    const aiCnt = isRoot ? 2 : 1;
-    const angles: number[] = [];
-
-    if (isRoot) {
-      const base = -Math.PI / 2;
-      for (let i = 0; i < 3; i++) angles.push(base + (i * 2 * Math.PI) / 3);
-    } else {
-      const gp = nodesRef.current.find((x) => x.id === parent.parentId);
-      const dir = gp ? Math.atan2(parent.pos_y - gp.pos_y, parent.pos_x - gp.pos_x) : 0;
-      angles.push(dir - Math.PI / 6, dir + Math.PI / 6);
-    }
-
-    /* ── AI 제안 호출 ── */
-    const aiGhosts: NodeMeta[] = [];
+    const operation = `${targetProjectId}:${parent.id}`;
+    if (spawning.current.has(operation)) return;
+    spawning.current.add(operation);
     try {
-      // AI 노드가 필요한 개수(aiCnt)만큼 반복
-      for (let i = 0; i < aiCnt; i++) {
-        const { x, y } = polarToXY(parent.pos_x, parent.pos_y, radius, angles[i]);
-        // 서버에 AI 노드 1개 생성 요청 (각각의 위치/순서/parent_id로)
-        const srvNodes: NodeOut[] = await apiCreateAINodes(targetProjectId, parent.label, {
-          pos_x: x,
-          pos_y: y,
-          depth: parent.depth + 1,
-          order: i,
-          parent_id: /^\d+$/.test(parent.id) ? Number(parent.id) : undefined,
-        });
-        if (targetProjectId !== projectIdRef.current) return;
-        // 응답값이 항상 1개라고 가정(혹시라도 여러 개면 0번째만 사용)
-        const parentTags = parent.tags ?? [];
-        const srv = srvNodes[0];
-        aiGhosts.push({
-          id: String(srv.id),
-          label: srv.content,
-          pos_x: x, // 혹은 srv.pos_x
-          pos_y: y, // 혹은 srv.pos_y
-          parentId: parent.id,
-          depth: srv.depth,
-          order: srv.order_index,
-          opacity: 0.3,
-          status: "GHOST",
-          frozen: false,
-          version: srv.version,
-          ...measureNodeSize(srv.content),
-          tags: parentTags
-        });
+      let plan = spawnPlans.current.get(operation);
+      if (!plan) {
+        const isRoot = !parent.parentId;
+        const grandparent = nodesRef.current.find((node) => node.id === parent.parentId);
+        const direction = grandparent
+          ? Math.atan2(parent.pos_y - grandparent.pos_y, parent.pos_x - grandparent.pos_x) : 0;
+        const angles = isRoot
+          ? Array.from({ length: 3 }, (_, index) => -Math.PI / 2 + index * 2 * Math.PI / 3)
+          : [direction - Math.PI / 6, direction + Math.PI / 6];
+        plan = childCreationPlan(parent.label, isRoot ? 2 : 1, angles.map((angle, index) => {
+          const { x, y } = polarToXY(parent.pos_x, parent.pos_y, radius, angle);
+          return {
+            content: "?", parent_id: Number(parent.id), pos_x: x, pos_y: y,
+            depth: parent.depth + 1, order: index, state: "GHOST",
+          };
+        }));
+        spawnPlans.current.set(operation, plan);
       }
-    } catch (e) {
-      console.error(e);
-    }
-    if (targetProjectId !== projectIdRef.current) return;
-
-
-    /* ── 빈(GHOST) 노드 ── */
-    const blanks: NodeMeta[] = [];
-    const blankCnt = childCnt - aiGhosts.length;
-    for (let i = 0; i < blankCnt; i++) {
-      const idx = aiGhosts.length + i;
-      const { x, y } = polarToXY(parent.pos_x, parent.pos_y, radius, angles[idx]);
-
-      /* 🌟 ❷ 서버에 빈 노드 저장 (content = "") */
-      const blank = await createNode(targetProjectId, {
-        content: "?",
-        pos_x: x,
-        pos_y: y,
-        depth: parent.depth + 1,
-        order: idx,
-        parent_id: Number(parent.id),
-        state: "GHOST", // 👈 추가!
-      });
+      const complete = await runChildCreationPlan(plan, {
+        ai: (prompt, payload, key) => apiCreateAINodes(targetProjectId, prompt, payload, key),
+        regular: (payload, key) => createNode(targetProjectId, payload, key),
+      }, () => targetProjectId === projectIdRef.current);
+      if (!complete) return;
+      await refreshNodes(targetProjectId);
       if (targetProjectId !== projectIdRef.current) return;
-      const parentTags = parent.tags ?? [];
-      blanks.push({
-        id: String(blank.id),
-        label: "?",          // UI 표시만 ?
-        pos_x: x,
-        pos_y: y,
-        parentId: parent.id,
-        depth: blank.depth,
-        order: blank.order_index,
-        opacity: 0.3,
-        status: "GHOST",     // 프론트에서 GHOST 표현
-        frozen: false,
-        version: blank.version,
-        ...measureNodeSize("?"),
-        tags: [...parentTags],
-      });
+      updateLocalNode(parent.id, (node) => ({ ...node, frozen: true, generated: true }));
+      spawnPlans.current.delete(operation);
+    } catch (error) {
+      console.error(error);
+      try {
+        await refreshNodes(targetProjectId);
+      } catch (refreshError) {
+        console.error(refreshError);
+      }
+    } finally {
+      spawning.current.delete(operation);
     }
-
-
-    const children = [...aiGhosts, ...blanks];
-    setNodes((p) => {
-      const next = [...p, ...children];
-      nodesRef.current = next;
-      return next;
-    });
-    addToCy(children);
-
-
-
-    parent.frozen = true;
-    parent.generated = true;
   };
 
   /* ----- 노드 활성화 ----- */
@@ -624,11 +568,11 @@ export default function Graph({ projectId }: GraphProps) {
           selector: "node",
           style: {
             "shape": "roundrectangle",
-            "background-color": "mapData(status, 'ACTIVE', '#eef2ff', 'GHOST', '#f8fafc')",
+            "background-color": "#eef2ff",
             "border-width": 1,
             "border-color": "#d1d5db", // 테두리 흐리게
             "label": "data(label)",
-            "color": "mapData(status, 'ACTIVE', '#1e293b', 'GHOST', '#64748b')",
+            "color": "#1e293b",
             "font-weight": 600,
             "font-size": 16,
             "text-valign": "center",
@@ -651,6 +595,10 @@ export default function Graph({ projectId }: GraphProps) {
           },
         }
 ,
+        {
+          selector: "node[status = 'GHOST']",
+          style: { "background-color": "#f8fafc", color: "#64748b" },
+        },
         {
           selector: "node:selected",
           style: {
@@ -771,12 +719,16 @@ export default function Graph({ projectId }: GraphProps) {
     <>
       <div
         ref={cyRef}
+        data-testid="idea-graph"
         style={{
           width: "100%",
           height: "100%",
           background: "linear-gradient(135deg, #f0f4ff 0%, #f9fafe 100%)",
         }}
       />
+      <ul className="sr-only" aria-label="그래프 노드">
+        {nodes.map((node) => <li key={node.id} data-node-id={node.id}>{node.label}</li>)}
+      </ul>
       {/* 플로팅 버튼 */}
       <button
         style={{
@@ -859,7 +811,7 @@ export default function Graph({ projectId }: GraphProps) {
         tags={tags}
         nodeTags={
           ctxNodeId
-            ? nodesRef.current.find((n) => n.id === ctxNodeId)?.tags ?? []
+            ? nodes.find((n) => n.id === ctxNodeId)?.tags ?? []
             : []
         }
         onAdd={handleAddTag}

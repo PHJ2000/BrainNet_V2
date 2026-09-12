@@ -47,6 +47,7 @@ async def project_ws(
 
     await connect(project_id, websocket)
     try:
+        await websocket.send_json({"type": "resync.required"})
         while True:
             await websocket.receive_text()
     except WebSocketDisconnect:

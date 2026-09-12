@@ -3,7 +3,7 @@ package com.brainnet.spring;
 import static com.brainnet.spring.ApiModels.*;
 
 import java.util.Map;
-import java.util.List;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -39,13 +39,13 @@ class VerticalController {
     }
 
     @PostMapping("/projects/{projectId}/nodes")
-    ResponseEntity<List<NodeView>> createNodes(
+    ResponseEntity<String> createNodes(
             @PathVariable long projectId,
             @RequestBody NodeCreate body,
             @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey,
             @RequestAttribute(JwtAuthFilter.USER_ID) long userId) {
         VerticalService.CreateResult result = service.createNodes(projectId, body, userId, idempotencyKey);
-        return ResponseEntity.status(result.status()).body(result.nodes());
+        return ResponseEntity.status(result.status()).contentType(MediaType.APPLICATION_JSON).body(result.body());
     }
 
     @PatchMapping("/projects/{projectId}/nodes/{nodeId}")

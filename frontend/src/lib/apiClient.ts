@@ -2,7 +2,7 @@
 import axios from "axios";
 
 export const apiClient = axios.create({
-  baseURL: "http://localhost:8000", // 환경변수 처리 가능
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000",
   headers: {
     "Content-Type": "application/json",
   },

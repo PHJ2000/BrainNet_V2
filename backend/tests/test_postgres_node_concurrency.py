@@ -9,7 +9,8 @@ from sqlalchemy import text
 
 from app.db.session import AsyncSessionLocal
 from app.models.node import NodeCreate, NodeUpdate
-from app.routers import nodes
+from app.services import node_service as nodes
+from app.services import ai_provider
 
 
 pytestmark = [
@@ -29,7 +30,7 @@ POSTGRES_URL = os.getenv(
 async def _reset_database() -> tuple[int, int]:
     connection = await asyncpg.connect(POSTGRES_URL)
     try:
-        await connection.execute("TRUNCATE TABLE project, app_user RESTART IDENTITY CASCADE")
+        await connection.execute("TRUNCATE TABLE project, app_user, idempotency_request, outbox_event RESTART IDENTITY CASCADE")
         user_id = await connection.fetchval(
             """
             INSERT INTO app_user (name, email, pw_hash, created_at)

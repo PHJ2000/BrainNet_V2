@@ -1,6 +1,7 @@
 // features/projects/nodeApi.ts
 import { apiClient } from "@/lib/apiClient";
-import { NodeMeta } from "./Graph";
+import type { NodeMeta } from "./Graph";
+import { createRequest } from "./createRequest";
 /* ─────────────────────────────
    공통 타입
    ────────────────────────────*/
@@ -51,12 +52,14 @@ export async function fetchNodes(
 /* ────────── POST: 일반 노드 생성 ──────────*/
 export async function createNode(
   projectId: number | string,
-  payload: NodePayload
+  payload: NodePayload,
+  idempotencyKey?: string,
 ): Promise<NodeOut> {
-  const { data } = await apiClient.post(
+  const { data } = await createRequest((key) => apiClient.post(
     `/projects/${projectId}/nodes`,
-    payload
-  );
+    payload,
+    { headers: { "Idempotency-Key": key }, timeout: 45000 },
+  ), idempotencyKey);
   // 백엔드가 [NodeOut] 배열을 돌려주므로 첫 원소만 반환
   return Array.isArray(data) ? data[0] : data;
 }
@@ -71,13 +74,15 @@ export async function createAINodes(
     depth?: number;
     order?: number;
     parent_id?: number | string | null;
-  } = {}
+  } = {},
+  idempotencyKey?: string,
 ): Promise<NodeOut[]> {
   const payload = { ai_prompt: aiPrompt, ...opts };
-  const { data } = await apiClient.post(
+  const { data } = await createRequest((key) => apiClient.post(
     `/projects/${projectId}/nodes`,
-    payload
-  );
+    payload,
+    { headers: { "Idempotency-Key": key }, timeout: 45000 },
+  ), idempotencyKey);
   return data;
 }
 

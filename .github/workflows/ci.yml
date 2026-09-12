@@ -31,7 +31,7 @@ jobs:
       JWT_SECRET: brainnet-ci-test-secret-not-for-production
       JWT_ALGORITHM: HS256
       ACCESS_TOKEN_EXPIRE_MINUTES: "30"
-      REQUIRE_NODE_VERSION: "false"
+      REQUIRE_NODE_VERSION: "true"
       PYTHONPATH: backend
     steps:
       - uses: actions/checkout@v4
@@ -59,7 +59,7 @@ jobs:
       - name: Run real PostgreSQL concurrency regressions
         env:
           RUN_POSTGRES_CONCURRENCY_TESTS: "1"
-        run: python -m pytest -q backend/tests/test_postgres_node_concurrency.py
+        run: python -m pytest -q backend/tests/test_postgres_node_concurrency.py backend/tests/test_postgres_node_idempotency.py backend/tests/test_postgres_node_events.py backend/tests/test_postgres_event_operations.py
       - name: Verify empty-DB schema round-trip for expand migration
         working-directory: backend
         env:
@@ -136,6 +136,12 @@ jobs:
       - name: Build frontend
         working-directory: frontend
         run: npm run build
+      - name: Lint frontend
+        working-directory: frontend
+        run: npm run lint
+      - name: Test node creation retries
+        working-directory: frontend
+        run: npm test
 
   spring-vertical-slice:
     name: Spring vertical slice
@@ -174,14 +180,15 @@ jobs:
           JWT_SECRET: brainnet-ci-spring-secret-not-for-production
           JWT_ALGORITHM: HS256
           ACCESS_TOKEN_EXPIRE_MINUTES: "30"
-          REQUIRE_NODE_VERSION: "false"
+          REQUIRE_NODE_VERSION: "true"
           SPRING_DATASOURCE_URL: jdbc:postgresql://127.0.0.1:5432/brainnet_ci
           SPRING_DATASOURCE_USERNAME: brainnet_ci
           SPRING_DATASOURCE_PASSWORD: brainnet_ci
         run: |
           spring_container="brainnet-spring-vertical-slice-ci"
           backend_container="brainnet-backend-spring-contract-ci"
-          trap 'exit_code=$?; if [ "$exit_code" -ne 0 ]; then docker logs "$spring_container" || true; docker logs "$backend_container" || true; fi; docker rm --force "$spring_container" "$backend_container" >/dev/null 2>&1 || true; docker image rm brainnet-spring-vertical-slice-ci brainnet-backend-spring-contract-ci >/dev/null 2>&1 || true; exit "$exit_code"' EXIT
+          secondary_container="brainnet-backend-events-secondary-ci"
+          trap 'exit_code=$?; if [ "$exit_code" -ne 0 ]; then docker logs "$spring_container" || true; docker logs "$backend_container" || true; docker logs "$secondary_container" || true; fi; docker rm --force "$spring_container" "$backend_container" "$secondary_container" >/dev/null 2>&1 || true; docker image rm brainnet-spring-vertical-slice-ci brainnet-backend-spring-contract-ci >/dev/null 2>&1 || true; exit "$exit_code"' EXIT
 
           docker run --detach --network host --name "$spring_container" \
             -e JWT_SECRET \
@@ -227,7 +234,7 @@ jobs:
           jwt_token="$(docker exec --workdir /app --env PYTHONPATH=/app "$backend_container" python /tmp/contract_seed.py)"
           JWT_TOKEN="$jwt_token" FASTAPI_BASE_URL=http://127.0.0.1:8000 SPRING_BASE_URL=http://127.0.0.1:8080 \
             python3 spring/vertical-slice/contract_probe.py
-          docker exec --workdir /app --env PYTHONPATH=/app "$backend_container" python - <<'PY'
+          docker exec -i --workdir /app --env PYTHONPATH=/app "$backend_container" python - <<'PY'
           import os
           import psycopg
 
@@ -237,15 +244,79 @@ jobs:
                   if cursor.fetchone()[0] != 1:
                       raise SystemExit("expected exactly one idempotent node")
                   cursor.execute("SELECT count(*) FROM outbox_event WHERE event_type='node.created'")
-                  if cursor.fetchone()[0] != 1:
-                      raise SystemExit("expected exactly one node.created outbox event")
+                  if cursor.fetchone()[0] != 4:
+                      raise SystemExit("expected four node.created outbox events across creation probes")
                   cursor.execute("SELECT response_status FROM idempotency_request WHERE idempotency_key='contract-node-idempotency'")
                   row = cursor.fetchone()
                   if row is None or row[0] != 201:
                       raise SystemExit(f"unexpected idempotency response row: {row}")
-          print("Spring node create DB proof passed: one node, one outbox event, cached 201 response")
+                  cursor.execute("SELECT count(*) FROM node WHERE content='mixed-writer'")
+                  if cursor.fetchone()[0] != 1:
+                      raise SystemExit("mixed-runtime concurrent retry created duplicate nodes")
+          print("Node create DB proof passed: four outbox events, one mixed-writer node, cached 201 response")
           PY
-          docker logs "$spring_container" | grep -q "request_error status=404 code=NODE_NOT_FOUND trace_id=contract-missing-node"
-          docker logs "$spring_container" | grep -q "request_complete trace_id=contract-missing-node"
-          docker logs "$spring_container" | grep -q "request_error status=409 code=NODE_VERSION_CONFLICT trace_id=contract-version-conflict"
-          docker logs "$spring_container" | grep -q "request_complete trace_id=contract-version-conflict"
+          docker logs "$spring_container" > "$RUNNER_TEMP/spring-runtime.log" 2>&1
+          grep -q "request_error status=404 code=NODE_NOT_FOUND trace_id=contract-missing-node" "$RUNNER_TEMP/spring-runtime.log"
+          grep -q "request_complete trace_id=contract-missing-node" "$RUNNER_TEMP/spring-runtime.log"
+          grep -q "request_error status=409 code=NODE_VERSION_CONFLICT trace_id=contract-version-conflict" "$RUNNER_TEMP/spring-runtime.log"
+          grep -q "request_complete trace_id=contract-version-conflict" "$RUNNER_TEMP/spring-runtime.log"
+
+          docker run --detach --network host --name "$secondary_container" \
+            -e DATABASE_URL -e JWT_SECRET -e JWT_ALGORITHM -e ACCESS_TOKEN_EXPIRE_MINUTES \
+            brainnet-backend-spring-contract-ci \
+            python -m uvicorn app.main:app --host 0.0.0.0 --port 8001
+          docker cp spring/vertical-slice/event_probe.py "$backend_container:/tmp/event_probe.py"
+          docker exec --workdir /app --env PYTHONPATH=/app \
+            --env JWT_TOKEN="$jwt_token" \
+            --env POSTGRES_URL=postgresql://brainnet_ci:brainnet_ci@127.0.0.1:5432/brainnet_ci \
+            --env FASTAPI_BASE_URL=http://127.0.0.1:8000 \
+            --env FASTAPI_SECONDARY_URL=http://127.0.0.1:8001 \
+            --env SPRING_BASE_URL=http://127.0.0.1:8080 \
+            "$backend_container" python /tmp/event_probe.py
+
+  local-rollout:
+    name: Browser, provider faults, and rollout
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install browser test dependencies
+        working-directory: frontend
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+      - name: Build and start disposable validation stack
+        run: |
+          docker compose -f deploy/local-validation.compose.yml build
+          docker compose -f deploy/local-validation.compose.yml up -d
+          for _ in $(seq 1 180); do
+            if curl --fail --silent http://localhost:18080/login >/dev/null \
+              && curl --fail --silent http://localhost:18080/health/events | grep -q '"ready":true'; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo 'Validation stack did not become ready' >&2
+          exit 1
+      - name: Verify provider faults, two-instance events, cutover, rollback, and browser retries
+        shell: pwsh
+        run: ./deploy/verify-local.ps1
+      - name: Save browser and rollout evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: local-rollout-evidence
+          path: |
+            frontend/test-results/
+            experiments/runtime-nodes/results/final-2026-09-12/browser-verified.png
+            experiments/runtime-nodes/results/final-2026-09-12/routing-state.json
+      - name: Stop disposable validation stack
+        if: always()
+        run: |
+          docker compose -f deploy/local-validation.compose.yml logs --no-color --tail 80
+          docker compose -f deploy/local-validation.compose.yml down --volumes

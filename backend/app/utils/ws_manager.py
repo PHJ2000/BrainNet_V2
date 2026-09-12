@@ -1,4 +1,5 @@
 import logging
+import asyncio
 from fastapi import WebSocket
 from fastapi.websockets import WebSocketDisconnect
 from collections import defaultdict
@@ -20,14 +21,16 @@ def disconnect(project_id: int, ws: WebSocket):
 
 
 async def broadcast(project_id: int, msg: Dict[str, Any]):
-    dead: List[WebSocket] = []
-    for ws in tuple(WS_CONNECTIONS.get(project_id, ())):
+    async def send(ws: WebSocket):
         try:
-            await ws.send_json(msg)
+            await asyncio.wait_for(ws.send_json(msg), timeout=2)
         except (WebSocketDisconnect, RuntimeError):
-            dead.append(ws)
+            disconnect(project_id, ws)
         except Exception:
             logger.exception("WebSocket broadcast failed project_id=%s", project_id)
-            dead.append(ws)
-    for ws in dead:
-        disconnect(project_id, ws)
+            disconnect(project_id, ws)
+            try:
+                await asyncio.wait_for(ws.close(code=1013), timeout=1)
+            except Exception:
+                pass
+    await asyncio.gather(*(send(ws) for ws in tuple(WS_CONNECTIONS.get(project_id, ()))))
