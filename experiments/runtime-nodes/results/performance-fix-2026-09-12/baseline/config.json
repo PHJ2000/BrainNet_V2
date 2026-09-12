@@ -1,0 +1,9 @@
+{
+  "purpose": "Same application image; admission effectively disabled at this load; same four-process generator",
+  "node_create_concurrency": 1000000,
+  "node_ai_create_concurrency": 1000000,
+  "concurrency": 300,
+  "duration_seconds": 60,
+  "repetitions": 3,
+  "image": "sha256:e7bc2472804ed0a3bab8db7ebc1fb0a3771a6648e6292c39852ed1170ce8890e"
+}

@@ -1,4 +1,24 @@
-# 전용 Docker에서 전환·롤백 검증
+# 로컬 실행과 Docker 검증
+
+## 평소 사용할 로컬 앱
+
+외부 서버나 도메인 없이 이 PC의 Docker에서 실행한다. PowerShell 7에서 저장소 루트 기준:
+
+```powershell
+./deploy/start-local.ps1
+# 이후 이미지를 다시 빌드하지 않고 켜기
+./deploy/start-local.ps1 -NoBuild
+# 끄기: DB 데이터 유지
+./deploy/stop-local.ps1
+```
+
+앱은 `http://localhost:3000`, API 문서는 `http://localhost:18000/docs`다. 8000번을 쓰는 다른 프로그램과 충돌하지 않도록 API 포트를 분리했다. 처음 실행할 때 무작위 비밀값을 `.env.local`에 저장한다. Git에는 포함되지 않으며 기존 `.env`를 바꾸지 않는다. 프론트는 production build를 사용하고, 백엔드가 DB 준비·마이그레이션을 마친 뒤 시작한다.
+
+이 구성은 `brainnet-local` 프로젝트와 `brainnet-local_local-db` 영속 볼륨을 사용한다. 기존 `brainnet` 컨테이너의 데이터나 아래 검증용 DB를 수정하지 않는다. 초기 DB는 비어 있으므로 웹에서 회원가입하고 프로젝트를 만든다. `.env.local`은 볼륨의 DB 비밀번호와 짝이므로 보관한다. 3000/18000은 이 PC에서만 열고 DB 포트는 호스트에 공개하지 않는다.
+
+이 로컬 프로필은 AI API 키를 비워 둔다. 일반 기능은 사용할 수 있고 실제 AI 생성은 비활성 상태다. 유료 AI API 검증은 수행하지 않았다. Spring은 별도 비교·전환 검증 대상으로, 평소 로컬 앱은 Next.js + FastAPI + PostgreSQL 구성이다.
+
+## 전용 Docker에서 전환·롤백 검증
 
 이 스택은 공개 배포 설정이 아닌 로컬 검증 환경이다. 테스트 계정과 DB를 사용하고, 호스트에는 `127.0.0.1:18080`(앱)과 `127.0.0.1:19090`(Prometheus)만 연다. 실제 AI 요금이 발생하지 않도록 200ms HTTP provider fixture를 사용한다. 기존 루트 Compose와 DB volume은 사용하지 않는다.
 

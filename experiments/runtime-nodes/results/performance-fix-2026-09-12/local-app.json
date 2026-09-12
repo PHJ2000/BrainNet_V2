@@ -1,0 +1,59 @@
+{
+  "checkedAtUtc": "2026-09-12T14:20:15.8194521Z",
+  "passed": true,
+  "appUrl": "http://localhost:3000",
+  "apiDocsUrl": "http://localhost:18000/docs",
+  "checks": [
+    "Chromium registration",
+    "Dashboard create-project button",
+    "Project graph and live node event",
+    "Idempotent node replay",
+    "Compose down and container recreation without volume deletion",
+    "Login and persisted project and node after recreation",
+    "No browser JavaScript errors"
+  ],
+  "realAiCalls": 0,
+  "aiApiKeyConfigured": false,
+  "containers": [
+    {
+      "name": "brainnet-local-db-1",
+      "healthy": "healthy",
+      "restartCount": 0,
+      "oomKilled": false,
+      "ports": {},
+      "volumes": [
+        "brainnet-local_local-db"
+      ]
+    },
+    {
+      "name": "brainnet-local-backend-1",
+      "healthy": "healthy",
+      "restartCount": 0,
+      "oomKilled": false,
+      "ports": {
+        "8000/tcp": [
+          {
+            "HostIp": "127.0.0.1",
+            "HostPort": "18000"
+          }
+        ]
+      },
+      "volumes": []
+    },
+    {
+      "name": "brainnet-local-frontend-1",
+      "healthy": "healthy",
+      "restartCount": 0,
+      "oomKilled": false,
+      "ports": {
+        "3000/tcp": [
+          {
+            "HostIp": "127.0.0.1",
+            "HostPort": "3000"
+          }
+        ]
+      },
+      "volumes": []
+    }
+  ]
+}

@@ -5,6 +5,7 @@ param(
     [int]$MaximumSeconds = 4000
 )
 $ErrorActionPreference = 'Stop'
+$ContainerNames = @($ContainerNames | ForEach-Object { $_ -split ',' })
 $elapsed = [Diagnostics.Stopwatch]::StartNew()
 while ($elapsed.Elapsed.TotalSeconds -lt $MaximumSeconds -and -not (Test-Path -LiteralPath $CompletionPath)) {
     $samples = @(docker stats --no-stream --format '{{json .}}' @ContainerNames | ForEach-Object { $_ | ConvertFrom-Json })

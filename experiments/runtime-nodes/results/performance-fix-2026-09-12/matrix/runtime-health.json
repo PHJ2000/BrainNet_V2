@@ -1,0 +1,44 @@
+[
+  {
+    "name": "brainnet-validation-fastapi-1",
+    "id": "493a8d598f15c086415fedb131e2ec54fdd81b93613a2d08f54f46670ef8668f",
+    "running": true,
+    "oom_killed": false,
+    "restart_count": 0
+  },
+  {
+    "name": "brainnet-validation-fastapi-secondary-1",
+    "id": "ce2790c6a9e606c323d8e9c3ad182401bd87ec4d0d2ba9c28e35a054c6f327f4",
+    "running": true,
+    "oom_killed": false,
+    "restart_count": 0
+  },
+  {
+    "name": "brainnet-validation-spring-1",
+    "id": "59e2f0351c6f1e1043b416ec65705f52b3fc09a9c2c78bd1685327feb793a1b6",
+    "running": true,
+    "oom_killed": false,
+    "restart_count": 0
+  },
+  {
+    "name": "brainnet-validation-tools-1",
+    "id": "38cd43965c861af1df59eced6b8a0c223381228a4b78c220fa4ba42f75c667c4",
+    "running": true,
+    "oom_killed": false,
+    "restart_count": 0
+  },
+  {
+    "name": "brainnet-validation-provider-1",
+    "id": "0e12bc01b938ded688f208e674384ef5fe70976f08603f667db8207e1d0c87fb",
+    "running": true,
+    "oom_killed": false,
+    "restart_count": 0
+  },
+  {
+    "name": "brainnet-validation-db-1",
+    "id": "0758c3f55ac0ad1baeecbfec05bbb6d06e9824e073cd3e7c67c010f4f16d603e",
+    "running": true,
+    "oom_killed": false,
+    "restart_count": 0
+  }
+]

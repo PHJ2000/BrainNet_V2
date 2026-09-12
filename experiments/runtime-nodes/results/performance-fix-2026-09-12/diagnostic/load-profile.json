@@ -1,0 +1,156 @@
+{
+  "total_calls": 66760561,
+  "profiled_seconds": 35.48630468600005,
+  "top_functions": [
+    {
+      "file": "~",
+      "function": "<method 'poll' of 'select.epoll' objects>",
+      "calls": 4808,
+      "self_cpu_seconds": 13.340081
+    },
+    {
+      "file": "connection.py",
+      "function": "is_idle",
+      "calls": 25550603,
+      "self_cpu_seconds": 4.746117
+    },
+    {
+      "file": "connection_pool.py",
+      "function": "_assign_requests_to_connections",
+      "calls": 4066,
+      "self_cpu_seconds": 4.49553
+    },
+    {
+      "file": "http11.py",
+      "function": "is_idle",
+      "calls": 25399667,
+      "self_cpu_seconds": 2.384364
+    },
+    {
+      "file": "~",
+      "function": "<method 'read' of '_io.TextIOWrapper' objects>",
+      "calls": 1,
+      "self_cpu_seconds": 1.26786
+    },
+    {
+      "file": "_sockets.py",
+      "function": "extra_attributes",
+      "calls": 114266,
+      "self_cpu_seconds": 0.572372
+    },
+    {
+      "file": "~",
+      "function": "<built-in method posix.stat>",
+      "calls": 1796,
+      "self_cpu_seconds": 0.481884
+    },
+    {
+      "file": "~",
+      "function": "<method 'getpeername' of '_socket.socket' objects>",
+      "calls": 114857,
+      "self_cpu_seconds": 0.308749
+    },
+    {
+      "file": "http11.py",
+      "function": "has_expired",
+      "calls": 733125,
+      "self_cpu_seconds": 0.280138
+    },
+    {
+      "file": "connection.py",
+      "function": "is_closed",
+      "calls": 801164,
+      "self_cpu_seconds": 0.194461
+    },
+    {
+      "file": "_models.py",
+      "function": "__eq__",
+      "calls": 487679,
+      "self_cpu_seconds": 0.190538
+    },
+    {
+      "file": "_utils.py",
+      "function": "is_socket_readable",
+      "calls": 113676,
+      "self_cpu_seconds": 0.183871
+    },
+    {
+      "file": "connection.py",
+      "function": "has_expired",
+      "calls": 801122,
+      "self_cpu_seconds": 0.170506
+    },
+    {
+      "file": "anyio.py",
+      "function": "get_extra_info",
+      "calls": 114266,
+      "self_cpu_seconds": 0.16851
+    },
+    {
+      "file": "~",
+      "function": "<method 'poll' of 'select.poll' objects>",
+      "calls": 113676,
+      "self_cpu_seconds": 0.13895
+    },
+    {
+      "file": "_asyncio.py",
+      "function": "_raw_socket",
+      "calls": 342208,
+      "self_cpu_seconds": 0.136853
+    },
+    {
+      "file": "connection.py",
+      "function": "can_handle_request",
+      "calls": 484980,
+      "self_cpu_seconds": 0.132769
+    },
+    {
+      "file": "_typedattr.py",
+      "function": "extra",
+      "calls": 114266,
+      "self_cpu_seconds": 0.131251
+    },
+    {
+      "file": "~",
+      "function": "<built-in method builtins.isinstance>",
+      "calls": 1000559,
+      "self_cpu_seconds": 0.127206
+    },
+    {
+      "file": "transports.py",
+      "function": "get_extra_info",
+      "calls": 342209,
+      "self_cpu_seconds": 0.113521
+    },
+    {
+      "file": "~",
+      "function": "<method 'get' of 'dict' objects>",
+      "calls": 424239,
+      "self_cpu_seconds": 0.109755
+    },
+    {
+      "file": "~",
+      "function": "<method 'send' of '_socket.socket' objects>",
+      "calls": 3333,
+      "self_cpu_seconds": 0.104731
+    },
+    {
+      "file": "~",
+      "function": "<built-in method time.monotonic>",
+      "calls": 752806,
+      "self_cpu_seconds": 0.103616
+    },
+    {
+      "file": "socket.py",
+      "function": "family",
+      "calls": 116040,
+      "self_cpu_seconds": 0.100977
+    },
+    {
+      "file": "socket.py",
+      "function": "__init__",
+      "calls": 593,
+      "self_cpu_seconds": 0.096755
+    }
+  ]
+}
