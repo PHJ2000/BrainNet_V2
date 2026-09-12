@@ -1,0 +1,1837 @@
+{
+  "duration_seconds": 60.222,
+  "requests": 17151,
+  "success": 17151,
+  "success_rps": 284.796,
+  "total_rps": 284.796,
+  "failure_rate": 0.0,
+  "statuses": {
+    "201": 17151
+  },
+  "p50_ms": 211.653,
+  "p95_ms": 1123.494,
+  "p99_ms": 2061.974,
+  "successful_p95_ms": 1123.494,
+  "runtime": "spring",
+  "concurrency": 100,
+  "repetition": 2,
+  "mode": "regular",
+  "started_at": "2026-09-12T05:59:25.739281+00:00",
+  "monitoring": [
+    {
+      "at": "2026-09-12T05:59:25.850348+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 39
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 8,
+        "oldest_pending_seconds": 0.012741,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T05:59:26.989202+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 40
+        },
+        {
+          "state": "idle in transaction",
+          "wait_event_type": null,
+          "count": 1
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 1,
+        "oldest_pending_seconds": 0.006501,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T05:59:28.193291+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "Client",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 40
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T05:59:28.921028+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 41
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 1,
+        "oldest_pending_seconds": 0.008288,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T05:59:30.142429+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 41
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 1,
+        "oldest_pending_seconds": 0.007158,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T05:59:31.170320+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": "LWLock",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 38
+        },
+        {
+          "state": "idle",
+          "wait_event_type": null,
+          "count": 1
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 3,
+        "oldest_pending_seconds": 0.010746,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T05:59:32.213493+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 4
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 37
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 2,
+        "oldest_pending_seconds": 0.012406,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T05:59:33.248482+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 3
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 38
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 1,
+        "oldest_pending_seconds": 0.008826,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T05:59:33.798279+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": "LWLock",
+          "count": 2
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 38
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 4,
+        "oldest_pending_seconds": 0.016486,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T05:59:34.837563+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": "LWLock",
+          "count": 3
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 37
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 1,
+        "oldest_pending_seconds": 0.008671,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T05:59:35.871009+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": "LWLock",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 39
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 2,
+        "oldest_pending_seconds": 0.005508,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T05:59:36.922579+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 40
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 22,
+        "oldest_pending_seconds": 0.037704,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T05:59:37.972872+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": "LWLock",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 2
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 37
+        },
+        {
+          "state": "idle in transaction",
+          "wait_event_type": "LWLock",
+          "count": 1
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T05:59:38.539993+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": "LWLock",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 38
+        },
+        {
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "count": 1
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T05:59:39.577848+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": "LWLock",
+          "count": 3
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 37
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 1,
+        "oldest_pending_seconds": 0.01385,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T05:59:40.607840+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": "LWLock",
+          "count": 2
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 38
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 24,
+        "oldest_pending_seconds": 0.052836,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T05:59:41.640674+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": "LWLock",
+          "count": 2
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 36
+        },
+        {
+          "state": "idle in transaction",
+          "wait_event_type": "LWLock",
+          "count": 1
+        },
+        {
+          "state": "idle in transaction",
+          "wait_event_type": null,
+          "count": 1
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 3,
+        "oldest_pending_seconds": 0.010189,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T05:59:42.675451+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 2
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 40
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 1,
+        "oldest_pending_seconds": 0.00791,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T05:59:48.993801+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 41
+        },
+        {
+          "state": "idle",
+          "wait_event_type": null,
+          "count": 1
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 25,
+        "oldest_pending_seconds": 0.072785,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T05:59:41.479123+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "Client",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 41
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 2,
+        "oldest_pending_seconds": 0.008383,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T05:59:42.554318+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": "LWLock",
+          "count": 2
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 39
+        },
+        {
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "count": 1
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T05:59:43.621736+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 42
+        },
+        {
+          "state": "idle in transaction",
+          "wait_event_type": null,
+          "count": 1
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 1,
+        "oldest_pending_seconds": 0.006594,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T05:59:44.724674+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 41
+        },
+        {
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "count": 1
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 28,
+        "oldest_pending_seconds": 0.24731,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T05:59:45.775732+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 3
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 40
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 2,
+        "oldest_pending_seconds": 0.01116,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T05:59:49.173232+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 2
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 41
+        },
+        {
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "count": 1
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 2,
+        "oldest_pending_seconds": 0.009804,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T05:59:50.201268+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": "LWLock",
+          "count": 3
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 39
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 4,
+        "oldest_pending_seconds": 0.008254,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T05:59:51.235306+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "Client",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": "LWLock",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 2
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 39
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 2,
+        "oldest_pending_seconds": 0.012185,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T05:59:52.291256+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "LWLock",
+          "count": 2
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 2
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 41
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T05:59:53.361745+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": "LWLock",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 41
+        },
+        {
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "count": 1
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 3,
+        "oldest_pending_seconds": 0.010163,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T05:59:53.942270+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 3
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 39
+        },
+        {
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "count": 2
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T05:59:55.000282+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": "LWLock",
+          "count": 2
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 2
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 40
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 2,
+        "oldest_pending_seconds": 0.009216,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T05:59:56.036719+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 44
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 6,
+        "oldest_pending_seconds": 0.012543,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T05:59:57.110555+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": "LWLock",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 41
+        },
+        {
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "count": 1
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 3,
+        "oldest_pending_seconds": 0.013738,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T05:59:58.149521+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": "LWLock",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 40
+        },
+        {
+          "state": "idle in transaction",
+          "wait_event_type": null,
+          "count": 2
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T05:59:58.716202+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 2
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 42
+        },
+        {
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "count": 1
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 3,
+        "oldest_pending_seconds": 0.009836,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T05:59:59.748338+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": "LWLock",
+          "count": 2
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 41
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 1,
+        "oldest_pending_seconds": 0.007598,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T06:00:00.793834+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "Client",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 41
+        },
+        {
+          "state": "idle",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle in transaction",
+          "wait_event_type": null,
+          "count": 1
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 25,
+        "oldest_pending_seconds": 0.046436,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T06:00:01.814199+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "Client",
+          "count": 2
+        },
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 4
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 38
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 19,
+        "oldest_pending_seconds": 0.045611,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T06:00:02.855163+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": "LWLock",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 41
+        },
+        {
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "count": 1
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 2,
+        "oldest_pending_seconds": 0.010551,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T06:00:09.134080+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": "LWLock",
+          "count": 2
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 40
+        },
+        {
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "count": 1
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T06:00:04.427353+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": "LWLock",
+          "count": 3
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 38
+        },
+        {
+          "state": "idle in transaction",
+          "wait_event_type": "LWLock",
+          "count": 1
+        },
+        {
+          "state": "idle in transaction",
+          "wait_event_type": null,
+          "count": 1
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 2,
+        "oldest_pending_seconds": 0.00982,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T06:00:05.541296+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 45
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 1,
+        "oldest_pending_seconds": 0.008173,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T06:00:06.700106+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 45
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T06:00:07.882184+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 45
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T06:00:14.282324+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 44
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T06:00:09.619617+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 2
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 43
+        },
+        {
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "count": 1
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 2,
+        "oldest_pending_seconds": 0.007955,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T06:00:10.700666+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": "LWLock",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 43
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 50,
+        "oldest_pending_seconds": 0.256862,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T06:00:11.772704+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 43
+        },
+        {
+          "state": "idle in transaction",
+          "wait_event_type": null,
+          "count": 1
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 1,
+        "oldest_pending_seconds": 0.007896,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T06:00:12.850081+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 44
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 43,
+        "oldest_pending_seconds": 0.25643,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T06:00:19.158580+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 44
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 3,
+        "oldest_pending_seconds": 0.012189,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T06:00:08.745752+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 44
+        },
+        {
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "count": 1
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T06:00:09.795624+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 44
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T06:00:16.339668+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "Client",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": "LWLock",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 42
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 3,
+        "oldest_pending_seconds": 0.01498,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T06:00:17.427616+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 44
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T06:00:18.479384+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "Client",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": "LWLock",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 2
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 41
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 2,
+        "oldest_pending_seconds": 0.009939,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T06:00:13.526702+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 1
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 43
+        },
+        {
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "count": 1
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    },
+    {
+      "at": "2026-09-12T06:00:14.563526+00:00",
+      "db_connections": [
+        {
+          "state": "active",
+          "wait_event_type": "IO",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": "LWLock",
+          "count": 1
+        },
+        {
+          "state": "active",
+          "wait_event_type": null,
+          "count": 2
+        },
+        {
+          "state": "idle",
+          "wait_event_type": "Client",
+          "count": 41
+        },
+        {
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "count": 1
+        }
+      ],
+      "event_health": {
+        "ready": true,
+        "pending": 0,
+        "oldest_pending_seconds": 0.0,
+        "publish_failures": 0,
+        "pruned_events": 0,
+        "pruned_claims": 0
+      }
+    }
+  ],
+  "provider": null,
+  "runtime_cpus": 2,
+  "runtime_memory_limit": "1 GiB",
+  "background": "5 logical operations/s and 100 WebSockets on separate soak DB",
+  "finished_at": "2026-09-12T06:00:14.860192+00:00",
+  "verified_created_nodes": 17151,
+  "unpublished_events": 75,
+  "outbox_drain_seconds": 0.107,
+  "unpublished_events_after_drain": 0
+}

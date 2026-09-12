@@ -1,0 +1,4 @@
+{
+  "status": "aborted",
+  "reason": "Java HTTP/2 cleartext upgrade incompatible with local provider fixture; switching to HTTP/1.1 and restarting"
+}

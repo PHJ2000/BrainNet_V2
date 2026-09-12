@@ -1,0 +1,82 @@
+{
+  "rollout-normal": [
+    {
+      "id": 14,
+      "project_id": 1,
+      "author_id": 7,
+      "content": "rollout",
+      "state": "GHOST",
+      "pos_x": 0.0,
+      "pos_y": 0.0,
+      "depth": 0,
+      "order_index": 0,
+      "parent_id": 12,
+      "created_at": "2026-09-12T07:26:00.155339Z",
+      "updated_at": "2026-09-12T07:26:00.155343Z",
+      "tags": [
+        101
+      ],
+      "version": 0
+    }
+  ],
+  "rollout-ai": [
+    {
+      "id": 15,
+      "project_id": 1,
+      "author_id": 7,
+      "content": "검증용 아이디어",
+      "state": "GHOST",
+      "pos_x": 0.0,
+      "pos_y": 0.0,
+      "depth": 0,
+      "order_index": 0,
+      "parent_id": 12,
+      "created_at": "2026-09-12T07:26:00.418628Z",
+      "updated_at": "2026-09-12T07:26:00.418631Z",
+      "tags": [
+        101
+      ],
+      "version": 0
+    }
+  ],
+  "canary-normal": [
+    {
+      "id": 17,
+      "tags": [
+        101
+      ],
+      "depth": 0,
+      "pos_x": 0.0,
+      "pos_y": 0.0,
+      "state": "GHOST",
+      "content": "canary",
+      "version": 0,
+      "author_id": 7,
+      "parent_id": 12,
+      "created_at": "2026-09-12T07:26:02.745136Z",
+      "project_id": 1,
+      "updated_at": "2026-09-12T07:26:02.745136Z",
+      "order_index": 0
+    }
+  ],
+  "canary-ai": [
+    {
+      "id": 18,
+      "tags": [
+        101
+      ],
+      "depth": 0,
+      "pos_x": 0.0,
+      "pos_y": 0.0,
+      "state": "GHOST",
+      "content": "검증용 아이디어",
+      "version": 0,
+      "author_id": 7,
+      "parent_id": 12,
+      "created_at": "2026-09-12T07:26:02.963171Z",
+      "project_id": 1,
+      "updated_at": "2026-09-12T07:26:02.963171Z",
+      "order_index": 0
+    }
+  ]
+}

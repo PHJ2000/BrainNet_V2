@@ -1,0 +1,22 @@
+{
+  "duration_seconds": 60.432,
+  "requests": 9111,
+  "success": 9111,
+  "success_rps": 150.765,
+  "total_rps": 150.765,
+  "failure_rate": 0.0,
+  "statuses": {
+    "201": 9111
+  },
+  "p50_ms": 427.353,
+  "p95_ms": 1768.11,
+  "p99_ms": 2716.538,
+  "successful_p95_ms": 1768.11,
+  "runtime": "fastapi",
+  "concurrency": 100,
+  "repetition": 1,
+  "mode": "regular",
+  "finished_at": "2026-09-12T05:02:52.930175+00:00",
+  "verified_created_nodes": 9111,
+  "unpublished_events": 14
+}

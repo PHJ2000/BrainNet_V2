@@ -41,6 +41,7 @@ def percentile(values, fraction):
 async def measure(base_url, token, concurrency, duration, mode):
     timings = []
     statuses = Counter()
+    uncertain_keys = []
     started = time.perf_counter()
     deadline = started + duration
     async with httpx.AsyncClient(
@@ -52,9 +53,10 @@ async def measure(base_url, token, concurrency, duration, mode):
                 before = time.perf_counter()
                 body = {"parent_id": 12, "depth": 2, "order": 1, "pos_x": 4.5, "pos_y": 5.5}
                 body.update({"ai_prompt": "runtime measurement"} if mode == "ai" else {"content": "runtime measurement"})
+                key = str(uuid4())
                 try:
                     response = await client.post("/projects/1/nodes", json=body,
-                                                 headers={"Idempotency-Key": str(uuid4())})
+                                                 headers={"Idempotency-Key": key})
                     status = str(response.status_code)
                     if response.status_code == 201:
                         node = response.json()[0]
@@ -62,6 +64,7 @@ async def measure(base_url, token, concurrency, duration, mode):
                             status = "contract_error"
                 except httpx.HTTPError as error:
                     status = type(error).__name__
+                    uncertain_keys.append(key)
                 statuses[status] += 1
                 timings.append((1000 * (time.perf_counter() - before), status == "201"))
         await asyncio.gather(*(worker() for _ in range(concurrency)))
@@ -69,6 +72,7 @@ async def measure(base_url, token, concurrency, duration, mode):
     successes = statuses["201"]
     all_latency = [latency for latency, _ in timings]
     return {"duration_seconds": round(elapsed, 3), "requests": len(timings), "success": successes,
+            "uncertain_keys": uncertain_keys,
             "success_rps": round(successes / elapsed, 3), "total_rps": round(len(timings) / elapsed, 3),
             "failure_rate": round(1 - successes / len(timings), 6), "statuses": dict(statuses),
             "p50_ms": percentile(all_latency, .5), "p95_ms": percentile(all_latency, .95),
@@ -88,6 +92,11 @@ async def main():
     result_dir = Path(os.environ.get("RESULTS_DIR", str(ROOT / "experiments/runtime-nodes/results")))
     result_dir.mkdir(parents=True, exist_ok=True)
     runtimes = [("fastapi", os.environ["FASTAPI_BASE_URL"]), ("spring", os.environ["SPRING_BASE_URL"])]
+    selected = os.getenv("RUNTIMES", "fastapi spring").split()
+    runtimes = [(name, url) for name, url in runtimes if name in selected]
+    if not runtimes:
+        raise SystemExit("RUNTIMES must include fastapi or spring")
+    failed_runs = []
     for level in levels:
         for repetition in range(1, repetitions + 1):
             for name, url in (runtimes if repetition % 2 else list(reversed(runtimes))):
@@ -107,23 +116,41 @@ async def main():
                               started_at=started_at, monitoring=samples,
                               provider="local HTTP fixture, 200 ms response" if mode == "ai" else None,
                               runtime_cpus=2, runtime_memory_limit="1 GiB",
-                              background="5 logical operations/s and 100 WebSockets on separate soak DB",
+                              background=os.getenv("BACKGROUND_LOAD", "none; no concurrent soak or builds"),
                               finished_at=datetime.now(timezone.utc).isoformat())
+                uncertain = result.pop("uncertain_keys")
+                if uncertain:
+                    # A transport timeout does not imply a rolled-back write. Wait for
+                    # claims to settle before auditing or resetting the next run's DB.
+                    async with asyncio.timeout(150):
+                        while await db.fetchval("""SELECT count(*) FROM idempotency_request
+                            WHERE idempotency_key=ANY($1::text[]) AND response_status IS NULL
+                            AND expires_at > now()""", uncertain):
+                            await asyncio.sleep(.25)
+                committed_uncertain = await db.fetchval("""SELECT count(*) FROM idempotency_request
+                    WHERE idempotency_key=ANY($1::text[]) AND response_status=201""", uncertain)
                 stored = await db.fetchval("SELECT count(*) FROM node") - start_count
-                assert stored == result["success"], ("stored node count disagrees with successful responses", stored, result)
                 result["verified_created_nodes"] = stored
+                result["committed_after_client_timeout"] = committed_uncertain
+                result["stored_count_matches_outcomes"] = stored == result["success"] + committed_uncertain
                 result["unpublished_events"] = await db.fetchval("SELECT count(*) FROM outbox_event WHERE published_at IS NULL")
                 drain_started = time.perf_counter()
                 while await db.fetchval("SELECT count(*) FROM outbox_event WHERE published_at IS NULL"):
                     if time.perf_counter() - drain_started > 30:
-                        raise AssertionError("Outbox did not drain within 30 seconds")
+                        break
                     await asyncio.sleep(.1)
                 result["outbox_drain_seconds"] = round(time.perf_counter() - drain_started, 3)
-                result["unpublished_events_after_drain"] = 0
+                result["unpublished_events_after_drain"] = await db.fetchval("SELECT count(*) FROM outbox_event WHERE published_at IS NULL")
+                result["validation_passed"] = (result["failure_rate"] < .01 and
+                    result["stored_count_matches_outcomes"] and result["unpublished_events_after_drain"] == 0)
                 await db.close()
                 path = result_dir / f"{name}-{mode}-c{level}-run{repetition}.json"
                 path.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
+                if not result["validation_passed"]:
+                    failed_runs.append(path.name)
                 print(json.dumps({key: value for key, value in result.items() if key != "monitoring"}, ensure_ascii=False), flush=True)
+    if failed_runs:
+        raise SystemExit("Load gate failed; all runs preserved: " + ", ".join(failed_runs))
 
 
 if __name__ == "__main__":

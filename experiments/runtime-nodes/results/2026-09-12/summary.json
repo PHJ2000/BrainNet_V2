@@ -1,0 +1,81 @@
+{
+  "date": "2026-09-12",
+  "base_commit": "be75d7a99c827dd225bee3e12d49cb5be1062bd3",
+  "branch": "fix/node-request-contracts",
+  "source_state": "local uncommitted implementation",
+  "scenario": "real runtime regular node create; one unique idempotency key per request",
+  "concurrency": 100,
+  "nominal_seconds_per_run": 60,
+  "repetitions_per_runtime": 3,
+  "warmup_seconds": 5,
+  "order": [
+    "fastapi",
+    "spring",
+    "spring",
+    "fastapi",
+    "fastapi",
+    "spring"
+  ],
+  "app_resources": {
+    "cpu": 2,
+    "memory_bytes": 1073741824,
+    "spring_heap_mb": 512,
+    "db_pool_max": 30,
+    "fastapi_event_connections_per_worker": 2,
+    "fastapi_instances": 2
+  },
+  "postgres": "15-alpine",
+  "images": {
+    "fastapi": "sha256:d3509f7225c0a8cf9a291ec352328bd4f25ea9801f8b39ab5ec98cbc86ae7e75",
+    "spring": "sha256:c818d1da1ec34c14b740f284c90362292f5bf0d575c743deb7ca902a73662525"
+  },
+  "median_per_run": {
+    "fastapi": {
+      "success_rps": 139.497,
+      "p50_ms": 468.625,
+      "p95_ms": 1915.249,
+      "p99_ms": 2964.701,
+      "failure_rate": 0.0
+    },
+    "spring": {
+      "success_rps": 266.257,
+      "p50_ms": 225.759,
+      "p95_ms": 1229.016,
+      "p99_ms": 2020.906,
+      "failure_rate": 0.0
+    }
+  },
+  "spring_throughput_change_pct": 90.869,
+  "spring_p95_reduction_pct": 35.83,
+  "measured_requests": 73639,
+  "measured_success": 73639,
+  "all_db_counts_match": true,
+  "all_runs_error_free": true,
+  "app_oom_count": 0,
+  "app_restart_count": 0,
+  "tests": {
+    "python": 48,
+    "java": 19,
+    "frontend": 7,
+    "total": 74,
+    "frontend_production_build": "passed",
+    "final_image_contract_probe": "passed",
+    "final_image_two_instance_event_probe": "passed"
+  },
+  "limitations": [
+    "Not a before/after comparison of this patch",
+    "No real AI provider or websocket-client load",
+    "Shared Docker Desktop host; database and load generator not resource-capped",
+    "No CPU/RSS time series, database wait, or backlog drain-time measurements",
+    "No long soak, canary, production rollout, or browser E2E",
+    "Raw timestamps are finish times, not start times"
+  ],
+  "raw_sha256": {
+    "fastapi-regular-c100-run1.json": "f086b30b3e4674de022f443f8761534a9c5d125adc144816e0e8b1f4415de959",
+    "fastapi-regular-c100-run2.json": "973a148fba40903a23cfd5d57710efdd41f89b50f6a2ab94823cf6a94adc90a0",
+    "fastapi-regular-c100-run3.json": "22e0a7b88036bb9734a42bcad1fe953a6132d9211c21f0ec45de073e0265868e",
+    "spring-regular-c100-run1.json": "875dbb13f4f2572394e26c9971c420794b5ebef0f535b6da8c5364c028380cb2",
+    "spring-regular-c100-run2.json": "4cdd2ecaf69fadb04073a7e45c2b08475cb8d6d0cc556f8e8ded6bdbb6260fcb",
+    "spring-regular-c100-run3.json": "09829a6700256a5cd1958200bd14d807ed950c2c824c369ebb048124bb7247e9"
+  }
+}

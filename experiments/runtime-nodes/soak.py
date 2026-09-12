@@ -29,6 +29,7 @@ async def main():
     path.mkdir(parents=True,exist_ok=True)
     counters=[Counter() for _ in range(clients)]
     errors=Counter()
+    error_details=[]
     latency=[]
     lag=[]
     event_times={}
@@ -60,22 +61,29 @@ async def main():
             before=time.perf_counter()
             writer=apis[index%2]
             rollback=apis[1-index%2]
+            phase='create'
             try:
                 created=await http.post(writer+'/projects/1/nodes',json=body,headers={'Idempotency-Key':key})
                 assert created.status_code==201,('create',created.status_code,created.text)
                 node=created.json()[0]
                 assert node['tags']==[101]
+                phase='replay'
                 replay=await http.post(rollback+'/projects/1/nodes',json=body,headers={'Idempotency-Key':key})
                 assert replay.status_code==201 and replay.json()==created.json(),('replay',replay.status_code)
+                phase='delete'
                 deleted=await http.delete(apis[0]+f'/projects/1/nodes/{node["id"]}')
                 assert deleted.status_code==204,('delete',deleted.status_code)
                 latency.append((time.perf_counter()-before)*1000)
+                phase='event'
                 async with asyncio.timeout(10):
                     while node['id'] not in event_times: await asyncio.sleep(.01)
                 lag.append((event_times.pop(node['id'])-before)*1000)
                 completed+=1
             except Exception as error:
                 errors[type(error).__name__+':'+str(error)[:140]]+=1
+                error_details.append({'elapsed_seconds':round(time.perf_counter()-started,3),
+                    'operation':index,'phase':phase,'writer':writer,'key':key,'body':body,
+                    'error':type(error).__name__+':'+str(error)[:300]})
 
         active=set()
         index=0
@@ -105,12 +113,14 @@ async def main():
             def p95(values): return sorted(values)[int((len(values)-1)*.95)] if values else None
             result={'duration_seconds':round(time.perf_counter()-started,3),'target_seconds':duration,'websocket_clients':clients,
                     'target_operations_per_second':rate,'attempted_operations':index,'completed_operations':completed,
-                    'errors':dict(errors),'operation_p95_ms':p95(latency),'creation_to_event_p95_ms':p95(lag),
+                    'errors':dict(errors),'error_details':error_details,
+                    'client_event_counts':[dict(counter) for counter in counters],
+                    'operation_p95_ms':p95(latency),'creation_to_event_p95_ms':p95(lag),
                     'delivered_events':sum(sum(c.values()) for c in counters),'expected_delivered_events':completed*clients*2,
                     'every_client_complete':all(c['node.created']==completed and c['node.deleted']==completed for c in counters),
                     'remaining_nodes':remaining,'pending_events':pending,'samples':samples}
             (path/'soak.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
-            assert not errors and result['every_client_complete'] and remaining==3 and pending==0,result
+            assert not errors and result['every_client_complete'] and remaining==3 and pending==0, 'Soak gate failed; complete evidence saved in ' + str(path/'soak.json')
             print('SOAK PASSED '+json.dumps({k:v for k,v in result.items() if k!='samples'}),flush=True)
         finally:
             for reader in readers: reader.cancel()
