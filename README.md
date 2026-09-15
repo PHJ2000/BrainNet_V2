@@ -1,225 +1,152 @@
----
+# BrainNet
 
-## A. 프로젝트 명
-BRAINNET  |  AI 기반 싱글-유저 브레인스토밍·마인드맵 웹 애플리케이션
+떠오른 아이디어를 AI로 확장하고, 마인드맵으로 연결해 정리하는 브레인스토밍 웹 애플리케이션입니다.
 
----
+키워드에서 관련 아이디어를 생성하고, 노드와 태그로 생각을 구조화합니다. 개인 브레인스토밍을 위한 3인 팀 프로젝트로 시작했으며, 이후 백엔드의 동시성·데이터 정합성을 보완하고 Spring 전환을 실험했습니다.
 
-## B. 팀 구성 및 담당 파트
+[서비스](#서비스) · [개발팀](#개발팀) · [실행 구조](#실행-구조) · [백엔드 개선](#백엔드-개선) · [로컬 실행](#로컬-실행)
 
-| 이름(학번) | 역할 | 주요 담당 |
-|-----------|------|-----------|
-| **김동건 (201624420)** | 팀 리더 · 프론트엔드 · AI | 웹 UI작성 • GPT 3.5 Turbo 배포 |
-| **박재홍(201924475)** | 벡엔드 | 아키텍처 설계, FastAPI · PostgreSQL 개발 |
-| **이승재(202029145)** | 벡엔드 · 프론트엔드 | API 설계 • 3티어 환경 구축, Next.js UI, Cytoscape.js 그래프 |
+## 서비스
 
----
+| 사용자 흐름 | 기능 |
+| --- | --- |
+| 주제 만들기 | 회원가입·로그인, 프로젝트 생성과 관리 |
+| 아이디어 확장 | 직접 노드 작성, AI로 연관 아이디어 생성 |
+| 생각 구조화 | Cytoscape.js 마인드맵에서 노드·연결 탐색, 태그 분류 |
+| 기록 돌아보기 | 프로젝트의 아이디어와 히스토리 조회 |
 
-## C. 프로젝트 소개
+협업·WebSocket 코드도 포함되어 있지만, 동시 다중 사용자 편집 기능은 아직 완성되지 않았습니다.
 
-**BRAINNET**은 GPT-3.5 Turbo 기반 **AI 마인드맵 엔진**으로 아이디어 발상을 ✨가속화✨하는 **싱글-유저 웹 애플리케이션**입니다.
+## 개발팀
 
+| 이름 | 초기 팀 프로젝트 기여 |
+| --- | --- |
+| 김동건 | 팀 리더, 웹 UI, AI 연동 |
+| 박재홍 · [PHJ2000](https://github.com/PHJ2000) | 백엔드 아키텍처, FastAPI·PostgreSQL, 데이터 모델·라우터와 API 연동 |
+| 이승재 | API 설계, 3티어 환경, Next.js UI·Cytoscape.js 그래프 |
 
-| 핵심 기능        | 요약                                 |
-| ------------ | ---------------------------------- |
-| **AI 자동 확장** | 키워드 → GPT-3.5 Turbo가 1~2개의 관련 아이디어를 즉시 제안 |
-| **그래프 시각화**  | Cytoscape.js로 노드·엣지를 드래그&드롭·확대/축소  |
-| **태그 & 필터**  | 태그로 주제를 분류하고 조건별 하이라이트             |
-| **히스토리 스냅샷** | 언제든 이전 상태로 되돌아갈 수 있는 변경 이력 저장      |
+팀 개발 이후 박재홍이 비동기 AI 호출, 노드 동시 수정·API 계약, CI 검증을 보완하고, 비교 실험·ADR과 Spring의 프로젝트·노드 API 구현을 진행했습니다.
 
-> ℹ️ 최종 버전에서는 **멀티테넌시**와 **동시 다중 사용자 편집** 기능을 제외했습니다.
+[개발 단계별 기여와 구현 근거](./docs/TEAM_CONTRIBUTIONS.md)
 
----
+## 실행 구조
 
-## D. 프로젝트 필요성
+기본 애플리케이션은 Next.js·TypeScript·Cytoscape.js와 Python 3.12·FastAPI로 구성됩니다. PostgreSQL 15를 사용하며 SQLAlchemy와 Alembic으로 데이터 모델과 스키마를 관리합니다.
 
-
-원격 근무 시대에도 브레인스토밍은 **화면 공유 + 메모**나 **오프라인 포스트잇**에 의존하는 경우가 많습니다. 이 방식은
-
-* **회의 후 별도 정리**가 필요해 생산성이 떨어지고
-* **아이디어가 개인 경험에 편향**되는 한계가 있습니다.
-
-**BRAINNET**은 다음 흐름을 **한 화면**에서 해결합니다.
-
-```text
-아이디어 작성 → AI 연관 아이디어 확장 → 그래프 구조화 → 히스토리 저장
+```mermaid
+flowchart TB
+    UI["Next.js 마인드맵"] --> F["FastAPI"]
+    F --> DB[("PostgreSQL")]
+    F --> AI["AI provider"]
+    J["Spring · 별도 실행"] -.-> DB
+    J -.-> AI
 ```
 
-AI 추천으로 **창의적 사고의 폭**을 넓히고, 노드 색상·두께로 **중요도와 연관성**을 한눈에 파악하도록 도와줍니다.
+루트 `docker compose`는 Next.js·FastAPI·PostgreSQL을 실행합니다. 점선의 Java 25·Spring 서비스는 별도로 실행하는 전환 구현이며, 기본 요청 경로로 연결되어 있지 않습니다.
 
+[기본 Compose](./docker-compose.yml) · [Spring 실행과 구현 API](./spring/vertical-slice/README.md)
 
----
+<details>
+<summary>초기 아키텍처 설계안 보기</summary>
 
-## E. 선행 기술·논문·특허 조사
-| 툴 이름     | 설명                                                                                         |
-|------------|----------------------------------------------------------------------------------------------|
-| LucidPark  | 무한 캔버스 기반의 온라인 협업 화이트보드. 아이디어를 트리 형태로 시각화. AI로 아이디어 트리 생성        |
-| Miro       | 가상 화이트보드에서 아이디어 시각화, 노드 확장, 팀원 간 코멘트 및 채팅                              |
-| Boardmix   | 온라인 협업 화이트보드, 브레인스토밍, 마인드맵, 플로우 차트와 AI 기반 아이디어 생성                    |
+아래 설계안의 Nginx·Kubernetes·사용자별 Pod는 현재 루트 Compose 구성에 포함되지 않습니다.
 
----
+![BrainNet 초기 아키텍처 설계안](./images/diagram.png)
 
-## F. 프로젝트 개발 결과물 소개 (+ 다이어그램)
-![로고](./images/diagram.png)
+</details>
 
-프로젝트는 크게 프론트엔드와 백엔드로 구성되어 있으며, 각 서비스는 Docker 컨테이너 환경에서 구동됩니다.
+<details>
+<summary>초기 ERD 보기</summary>
 
-프론트엔드: Next.js와 Cytoscape.js 기반으로 구현되어 아이디어를 노드 및 그래프 형태로 시각화합니다. 로그인, 회원가입, 대시보드, 프로젝트 관리 기능을 제공합니다.
+사용자·프로젝트·노드·태그·히스토리의 초기 관계도입니다. 후속 노드 버전·멱등성·Outbox 변경을 포함한 현재 스키마는 [Alembic 마이그레이션](./backend/alembic/versions)에서 관리합니다.
 
-백엔드: FastAPI와 PostgreSQL을 기반으로 RESTful API를를 지원하며, 사용자 관리, 아이디어 데이터 관리, 프로젝트 히스토리 관리를 수행합니다.
+![BrainNet 초기 ERD](./images/ERD.png)
 
+</details>
 
-## 📑 API 요약
+## 백엔드 개선
 
-> Swagger UI: <http://localhost:8000/docs>  
-> 모든 엔드포인트는 `application/json` 을 사용하며 JWT 헤더(`Authorization: Bearer <token>`)가 필요합니다.  
-> **싱글-유저 버전**이라 WebSocket 브로드캐스트는 비활성화되어 있지만, REST 스펙은 유지됩니다.
+### 같은 노드의 동시 수정 처리
 
-### 🔐 Auth
-| Method | Endpoint | 설명 |
-| ------ | -------- | ---- |
-| `POST` | `/auth/register` | 이메일·비밀번호 회원가입 |
-| `POST` | `/auth/login` | 로그인 & JWT 발급 |
+마인드맵의 텍스트·위치를 수정할 때 이전 응답이 늦게 도착하거나 같은 버전의 수정이 겹치면 최신 상태를 잃을 수 있습니다. 프론트엔드가 `expected_version`을 보내고, 백엔드는 해당 버전이 일치하는 행만 갱신합니다. 충돌한 요청은 `409`로 구분하고 프론트엔드는 서버 상태를 다시 가져옵니다.
 
-### 👤 Users
-| Method | Endpoint | 설명 |
-| ------ | -------- | ---- |
-| `GET` | `/users/me` | 내 프로필 조회 |
-| `GET` | `/users/me/tag-summaries` | 내가 사용한 태그별 노드 수 통계 |
+루트 노드는 프로젝트당 하나만 활성화되도록 DB 제약을 추가했습니다. 하위 노드를 생성하는 동안 상위 트리가 삭제·비활성화되는 경우도 잠금과 트랜잭션으로 다룹니다.
 
-### 📂 Projects
-| Method | Endpoint | 설명 |
-| ------ | -------- | ---- |
-| `GET` | `/projects` | 프로젝트 목록 |
-| `POST` | `/projects` | 새 프로젝트 생성 |
-| `GET` | `/projects/{project_id}` | 프로젝트 상세 + 노드 트리 |
-| `PUT` / `PATCH` | `/projects/{project_id}` | 이름·옵션 수정 |
-| `DELETE` | `/projects/{project_id}` | 프로젝트 삭제 |
-| `POST` | `/projects/{project_id}/invite` | (협업 버전) 초대 링크 발행 |
-| `POST` | `/projects/join` | 초대 코드로 참여 |
-| `GET` | `/projects/{project_id}/summary` | 노드·태그·투표 요약 통계 |
+[실제 PostgreSQL 회귀 테스트](./backend/tests/test_postgres_node_concurrency.py)는 동일 버전 수정 100건에서 성공 1건·충돌 99건·버전 증가 1회를 확인합니다. 루트 동시 생성과 하위 노드 생성·트리 변경의 잠금도 검증합니다.
 
-### 🌳 Nodes
-| Method | Endpoint | 설명 |
-| ------ | -------- | ---- |
-| `GET` | `/projects/{project_id}/nodes` | 노드 리스트 |
-| `GET` | `/projects/{project_id}/nodes/{node_id}` | 노드 상세와 `version` 조회 |
-| `POST` | `/projects/{project_id}/nodes` | 노드 대량 생성(AI 추천 결과 포함) |
-| `PATCH` | `/projects/{project_id}/nodes/{node_id}` | `expected_version` 기반 텍스트·위치·메타 수정 |
-| `DELETE` | `/projects/{project_id}/nodes/{node_id}` | 노드 삭제 |
-| `POST` | `/projects/{project_id}/nodes/{node_id}/activate` | 노드 활성화 |
-| `POST` | `/projects/{project_id}/nodes/{node_id}/deactivate` | 노드 비활성화 |
+### 실험으로 정한 Spring 전환 범위
 
-### 🏷️ Tags
-| Method | Endpoint | 설명 |
-| ------ | -------- | ---- |
-| `GET` | `/projects/{project_id}/tags` | 태그 목록 |
-| `POST` | `/projects/{project_id}/tags` | 태그 생성 |
-| `GET` | `/projects/{project_id}/tags/{tag_id}` | 태그 상세 |
-| `PATCH` | `/projects/{project_id}/tags/{tag_id}` | 태그 수정 |
-| `DELETE` | `/projects/{project_id}/tags/{tag_id}` | 태그 삭제 |
-| `POST` | `/projects/{project_id}/tags/{tag_id}/nodes/{node_id}` | 노드에 태그 부착 |
-| `DELETE` | `/projects/{project_id}/tags/{tag_id}/nodes/{node_id}` | 노드에서 태그 제거 |
+초기 AI 생성 경로의 동기 SDK 호출을 비동기 호출로 보완했습니다. 프레임워크를 바꾸는 효과와 blocking I/O를 수정하는 효과를 구분하기 위해, 개선한 FastAPI와 Spring 후보를 같은 조건에서 비교했습니다.
 
-### 👍 Votes
-| Method | Endpoint | 설명 |
-| ------ | -------- | ---- |
-| `POST` | `/projects/{project_id}/tags/{tag_id}/vote` | 태그 단위 투표 |
-| `POST` | `/projects/{project_id}/votes/confirm` | 투표 결과 확정 |
+아래는 2026년 8월 20일 기록된 축소 구현의 동시 요청 300건 결과입니다. 200ms mock provider, 동일 PostgreSQL, 앱별 2 CPU·1 GiB, DB pool 총 30 조건에서 AI 호출부터 노드 저장·응답까지 측정했습니다. 처리량·p95·오류율은 10초 측정 3회의 중앙값입니다.
 
-### 🕑 History
-| Method | Endpoint | 설명 |
-| ------ | -------- | ---- |
-| `GET` | `/projects/{project_id}/history` | 스냅샷 타임라인 |
-| `GET` | `/projects/{project_id}/history/{entry_id}` | 특정 스냅샷 내용 |
+| 지표 | FastAPI safe | Spring 후보 |
+| --- | ---: | ---: |
+| 처리량 | 161.12 RPS | 550.47 RPS |
+| p95 응답시간 | 4,060.74ms | 881.59ms |
+| 오류율 | 1.6% | 0% |
+| 부하 직후 메모리(RSS) | 168.7MiB | 317.7MiB |
 
-> **스키마** – Swagger UI 상단의 `Schemas` 탭에서  
-> `ProjectOut`, `NodeOut`, `TagOut`, `VoteOut` 등 응답 구조를 확인할 수 있습니다.
+Spring 후보의 처리량과 지연은 개선됐지만 메모리는 더 사용했습니다. 실제 OpenAI의 네트워크·호출 제한·비용을 재현한 실험은 아닙니다.
 
-## ERD 다이어그램
+[전체 부하별 결과와 실험 한계](./experiments/ownership-split/results/final-report.md) · [측정값 CSV](./experiments/ownership-split/results/measurements.csv)
 
-![로고](./images/ERD.png)
+별도 WebSocket 실험에서는 500개 연결의 echo p95가 FastAPI safe 58.42ms, Spring 152.46ms로 나와 묶음 전환 기준을 통과하지 못했습니다. 따라서 전환 범위를 다음과 같이 나눴습니다.
 
-### 디렉터리 구조
+- 일반·AI 노드 생성: 둘 다 `POST /projects/{project_id}/nodes`를 사용하므로 요청 본문으로 서비스를 나누지 않고, 경로 전체를 Spring 전환 단위로 선택했습니다.
+- WebSocket: 독립된 통신 경로이므로 FastAPI에 유지합니다.
+- SSE: 현재 제품에 없는 기능이어서 전환 대상에서 제외했습니다.
 
-```text
-BRAINNET
-├─ backend
-│  ├─ alembic/           # DB 마이그레이션
-│  ├─ app/
-│  │  ├─ core/           # 설정·보안·의존성
-│  │  ├─ db/             # 세션·CRUD 헬퍼
-│  │  ├─ models/         # SQLAlchemy + Pydantic
-│  │  ├─ routers/        # REST & WebSocket
-│  │  └─ utils/
-│  └─ envexample
-└─ frontend
-│   ├─ public/           # 정적 리소스
-│   └─ src/
-│       ├─ app/          # Next.js 라우트(dashboard, login, register)
-│       ├─ features/     # Zustand 상태·API 모듈
-│       ├─ lib/          # axios 래퍼, 헬퍼
-│       └─ types/        # 공용 TS 타입
-└─ images       # README 이미지 플더
+[실시간 통신 비교](./docs/adr/ADR-003-ai-streaming-websocket-migration.md) · [노드 생성의 단일 쓰기 책임](./docs/adr/ADR-004-ai-node-ownership-split.md)
 
-```
+### Spring 노드 생성 구현
 
----
+실험 이후 Spring에 프로젝트·노드 조회, 일반·AI 노드 생성, 버전 기반 수정을 구현했습니다. 기존 JWT와 프로젝트 멤버십을 확인하고, Alembic이 관리하는 스키마와 프론트엔드의 응답 형식을 유지합니다.
 
-## G. 사용 방법
+- 요청 재시도: 멱등성 키로 기존 응답을 재사용해 같은 요청이 노드와 이벤트를 중복 생성하지 않게 합니다.
+- 원자적 저장: 노드·상속 태그·멱등성 응답·Outbox 이벤트를 한 DB 트랜잭션에 저장합니다.
+- 외부 호출 분리: AI provider 응답은 DB 저장 트랜잭션을 열기 전에 기다립니다.
 
-### 요구 사항
-- **Docker** ≥ 24  
-- **Docker Compose** ≥ v2  
+[Spring 통합 테스트](./spring/vertical-slice/src/test/java/com/brainnet/spring/VerticalSliceIntegrationTest.java)는 생성·재시도·동시 수정·권한·응답 형식을 검증합니다. Outbox 기록 이후 외부 pub/sub와 FastAPI WebSocket으로 이벤트를 전달하는 구간은 남아 있습니다.
 
-### 설치 & 실행
+## 검증과 전환 현황
+
+[GitHub Actions CI](./.github/workflows/ci.yml)에 다음 검증을 구성했습니다.
+
+- FastAPI의 인증·오류·요청 추적 계약과 실제 PostgreSQL 동시성 테스트
+- Alembic 스키마 변경과 되돌리기, 프론트엔드 빌드
+- FastAPI·Spring 컨테이너의 시작·health 확인, 동일 DB 스키마에서의 API 계약 비교
+
+Spring 구현은 병합됐지만 운영 전환은 완료되지 않았습니다. 실제 AI provider 계약, shadow·canary, 장시간 부하와 rollback 검증을 거친 뒤 요청 경로를 전환하도록 [전환 절차](./docs/migration/adr-rollout-runbook.txt)를 정리했습니다.
+
+## 로컬 실행
+
+Git, Docker Engine 24 이상, Docker Compose v2가 필요합니다.
+
 ```bash
 git clone https://github.com/PHJ2000/BrainNet_V2.git
 cd BrainNet_V2
+```
 
-# 환경 변수 설정
-cp .env.example .env
-JWT_SECRET_VALUE="$(openssl rand -hex 32)"
-sed -i "s/^JWT_SECRET=.*/JWT_SECRET=${JWT_SECRET_VALUE}/" .env
-# AI 노드 기능을 쓰려면 .env의 OPENAI_API_KEY도 설정
+[환경변수 준비 안내](./docs/LOCAL_DEVELOPMENT.md)에 따라 `.env`를 만들고 최소 32바이트의 `JWT_SECRET`을 설정합니다. AI 생성 기능에는 `OPENAI_API_KEY`가 필요합니다.
 
-# 빌드 & 기동
+```bash
 docker compose up --build -d
 ```
 
-`JWT_SECRET`은 32바이트 미만이면 백엔드가 시작되지 않습니다. 운영 서비스 rollback은 proxy를
-legacy FastAPI로 되돌리고 expand된 DB schema는 유지합니다. 데이터가 생긴 환경에서 Alembic
-downgrade를 실행하면 version, idempotency, outbox 데이터가 삭제되므로 사용하지 않습니다.
+[웹 앱](http://localhost:3000) · [API 문서](http://localhost:8000/docs) · [상태 확인](http://localhost:8000/health)
 
-| 서비스 | 주소 |
-| ------- | ----------------------------- |
-| **Frontend** | <http://localhost:3000> |
-| **Backend docs** | <http://localhost:8000/docs> |
+기본 Compose에는 DB 영속 볼륨이 없습니다. DB 컨테이너를 제거·재생성하기 전에 필요한 데이터를 백업하세요.
 
-### 컨테이너 제어
+Python 3.12 환경의 일반 계약 테스트:
+
 ```bash
-docker compose stop                       # 중지
-docker compose start                      # 재시작
-docker compose down -v --remove-orphans   # 완전 제거
+python -m pip install -r requirements.txt
+python -m pytest -q backend/tests
 ```
 
----
+PostgreSQL 동시성 테스트는 별도 opt-in이며 데이터를 비우므로 전용 테스트 DB가 필요합니다. [CI 실행 순서](./.github/workflows/ci.yml)와 [Spring 테스트 안내](./spring/vertical-slice/README.md)를 참고하세요.
 
-## H. 활용 방안
+## 더 알아보기
 
-| 사용 시나리오 | 기대 효과 |
-| ------------- | ---------- |
-| **개인 기획·논문 주제 구상** | 키워드 → AI 확장 → 빠른 구조화 |
-| **강의·워크숍 과제** | 학생 개인 브레인맵 작성 → 스냅샷으로 과정 평가 |
-| **팀 회의 전 사전 브레인스토밍** | 정제된 아이디어 공유 → 회의 시간 단축 |
-
-> 향후 SaaS 버전에서 **실시간 협업 · 템플릿 · 자동 클러스터링**을 추가해  
-> 원격 팀 아이디어 회의 플랫폼으로 확장할 예정입니다.
-
----
-
-### 라이선스
-MIT License
-
-### 문의
-[koreaworldclass@gmail.com](mailto:koreaworldclass@gmail.com) · GitHub Issues
+[설계 결정(ADR)](./docs/adr) · [실험 재현](./experiments) · [기존 프로젝트 보고서](./docs/archive/original-project-report.md)
