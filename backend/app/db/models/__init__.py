@@ -14,6 +14,8 @@ from .invite_token import InviteToken
 from .activity_log import ActivityLog
 from .idempotency_request import IdempotencyRequest
 from .outbox_event import OutboxEvent
+from .node_operation import NodeOperation
+from .project_import import ProjectImport
 from .base import Base
 
 __all__ = [
@@ -23,10 +25,12 @@ __all__ = [
     "InviteToken",
     "Node",
     "NodeMetrics",
+    "NodeOperation",
     "NodeVersion",
     "OutboxEvent",
     "Project",
     "ProjectHistory",
+    "ProjectImport",
     "ProjectUserRole",
     "Tag",
     "TagNode",

@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "exported_at": "2026-09-13T00:00:00Z",
+  "project": {
+    "name": "나의 아이디어",
+    "description": "로컬 백업 예제"
+  },
+  "nodes": [
+    {
+      "ref": "n1",
+      "parent_ref": null,
+      "content": "여행 계획",
+      "state": "ACTIVE",
+      "depth": 0,
+      "order_index": 0,
+      "pos_x": 400,
+      "pos_y": 300
+    },
+    {
+      "ref": "n2",
+      "parent_ref": "n1",
+      "content": "준비할 것\n지도와 충전기",
+      "state": "GHOST",
+      "depth": 1,
+      "order_index": 0,
+      "pos_x": 600,
+      "pos_y": 450
+    }
+  ],
+  "tags": [
+    {
+      "ref": "t1",
+      "name": "준비",
+      "color": "#6366f1"
+    }
+  ],
+  "node_tags": [
+    {
+      "node_ref": "n2",
+      "tag_ref": "t1"
+    }
+  ],
+  "depth_adjustments": []
+}

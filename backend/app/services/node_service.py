@@ -15,6 +15,8 @@ from app.db.models.node import Node as NodeORM, NodeStateEnum
 from app.db.models.tag_node import TagNode
 from app.services.outbox import append_event
 from app.services import ai_provider
+from app.services import node_operations as operations
+from app.db.models.tag import Tag
 from app.models.node import NodeCreate, NodeOut, NodeUpdate
 from app.utils.helpers import ensure_member as _m
 from app.services.node_idempotency import Claim, claim_request, lock_claim, complete_claim, release_claim
@@ -109,9 +111,11 @@ async def _inherit_parent_tags(parent_id: int | None, node_id: int, db: AsyncSes
     return tag_ids
 
 
-async def _finish_creation(db: AsyncSession, node: NodeORM, tags: list[int], claim: Claim | None):
+async def _finish_creation(db: AsyncSession, node: NodeORM, tags: list[int], claim: Claim | None, *, record_history=True):
     out = NodeOut.model_validate(node)
     out.tags = tags
+    if record_history:
+        operations.created(db, node, tags)
     append_event(db, node.project_id, node.id, "node.created", {"node": out.model_dump(mode="json")})
     await complete_claim(db, claim, [out.model_dump(mode="json")])
     await db.commit()
@@ -163,7 +167,7 @@ async def _gen_ai_nodes(
         db.add(new_node)
         await db.flush()
         tags = await _inherit_parent_tags(parent_id, new_node.id, db)
-        return await _finish_creation(db, new_node, tags, claim)
+        return await _finish_creation(db, new_node, tags, claim, record_history=False)
     except Exception:
         await db.rollback()
         raise
@@ -173,8 +177,11 @@ async def list_nodes(project_id: int, tag_ids: Optional[str], uid: str, db: Asyn
 
     query = select(NodeORM).where(NodeORM.project_id == project_id)
     if tag_ids:
-        wanted = [int(tid) for tid in tag_ids.split(",")]
-        query = query.join(TagNode, NodeORM.id == TagNode.node_id).where(TagNode.tag_id.in_(wanted))
+        try:
+            wanted = list({int(tid) for tid in tag_ids.split(",")})
+        except ValueError:
+            _raise(422, "TAG_FILTER_INVALID", "tag_ids must contain numeric IDs")
+        query = query.where(NodeORM.id.in_(select(TagNode.node_id).where(TagNode.tag_id.in_(wanted))))
 
     result = await db.execute(query)
     nodes = result.scalars().all()
@@ -280,19 +287,26 @@ async def get_node(project_id: int, node_id: int, uid: str, db: AsyncSession):
     return out
 
 
-async def update_node(body: NodeUpdate, project_id: int, node_id: int, uid: str, db: AsyncSession):
+async def update_node(body: NodeUpdate, project_id: int, node_id: int, uid: str, db: AsyncSession,
+                      idempotency_key: str | None = None):
     await _m(int(uid), project_id, db)
+    request = ["update", node_id, body.model_dump(mode="json", exclude_unset=True)]
+    prior = await operations.replay(db, project_id, uid, idempotency_key, request)
+    if prior:
+        return NodeOut.model_validate(prior.response)
 
     result = await db.execute(
-        select(NodeORM.version).where(NodeORM.id == node_id, NodeORM.project_id == project_id)
+        _mutation_target_query(project_id, node_id)
     )
-    current_version = result.scalar_one_or_none()
-    if current_version is None:
+    current = result.scalar_one_or_none()
+    if current is None:
         _raise(404, "NODE_NOT_FOUND", "Node not found")
+    current_version = current.version
     if body.expected_version is None and REQUIRE_NODE_VERSION:
         _raise(428, "NODE_VERSION_REQUIRED", "expected_version is required")
 
     expected_version = body.expected_version if body.expected_version is not None else current_version
+    before = await operations.snapshot(db, project_id, [node_id])
     changes = body.model_dump(exclude_unset=True, exclude_none=True)
     changes.pop("expected_version", None)
     if "order" in changes:
@@ -315,13 +329,24 @@ async def update_node(body: NodeUpdate, project_id: int, node_id: int, uid: str,
         await db.rollback()
         _raise(409, "NODE_VERSION_CONFLICT", "Node version does not match expected_version")
 
+    after = await operations.snapshot(db, project_id, [node_id])
+    out = NodeOut.model_validate(node)
+    # Preserve the existing PATCH response contract; history stores full tags.
+    operations.record(db, project_id, uid, node_id, "update", before, after,
+                      key=idempotency_key, request=request, response=out.model_dump(mode="json"))
     append_event(db, project_id, node_id, "node.updated")
     await db.commit()
-    return NodeOut.model_validate(node)
+    return out
 
 
-async def delete_node(project_id: int, node_id: int, uid: str, db: AsyncSession):
+async def delete_node(project_id: int, node_id: int, uid: str, db: AsyncSession,
+                      expected_version: int | None = None, scope_hash: str | None = None,
+                      idempotency_key: str | None = None):
     await _m(int(uid), project_id, db)
+    request = ["delete", node_id, expected_version, scope_hash]
+    prior = await operations.replay(db, project_id, uid, idempotency_key, request)
+    if prior:
+        return
 
     # Lock before scanning descendants so a concurrent child creator either
     # finishes first and is included, or observes the committed deletion.
@@ -330,10 +355,26 @@ async def delete_node(project_id: int, node_id: int, uid: str, db: AsyncSession)
         _raise(404, "NODE_NOT_FOUND", "Node not found")
 
     node_ids = await _project_descendant_node_ids(project_id, node_id, db)
+    before = await operations.snapshot(db, project_id, node_ids)
+    target = next(n for n in before["nodes"] if n["id"] == node_id)
+    if expected_version is not None and target["version"] != expected_version:
+        _raise(409, "NODE_VERSION_CONFLICT", "Node changed after the deletion preview")
+    if scope_hash is not None and operations.digest(before) != scope_hash:
+        _raise(409, "OPERATION_CONFLICT", "Descendants or attachments changed after the deletion preview")
+    parent_ids = {n["parent_id"] for n in before["nodes"] if n["parent_id"] is not None} - set(node_ids)
+    parents = (await db.execute(select(NodeORM).where(NodeORM.project_id == project_id,
+                                NodeORM.id.in_(parent_ids)))).scalars().all() if parent_ids else []
+    before["parent_versions"] = {str(n.id): n.version for n in parents}
+    tag_ids = {r["tag_id"] for r in before["tag_nodes"]}
+    tag_rows = (await db.execute(select(Tag).where(Tag.project_id == project_id, Tag.id.in_(tag_ids))
+                                .order_by(Tag.id))).scalars().all() if tag_ids else []
+    before["tags"] = [operations.row_json(t) for t in tag_rows]
     await db.execute(delete(TagNode).where(TagNode.node_id.in_(node_ids)))
     await db.execute(
         delete(NodeORM).where(NodeORM.project_id == project_id, NodeORM.id.in_(node_ids))
     )
+    operations.record(db, project_id, uid, node_id, "delete", before, {},
+                      key=idempotency_key, request=request, response={})
     append_event(db, project_id, node_id, "node.deleted")
     await db.commit()
 

@@ -55,8 +55,10 @@ async def update_node(
     node_id: int = Path(...),
     uid: str = Depends(_uid),
     db: AsyncSession = Depends(get_db),
+    idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
 ):
-    return await node_service.update_node(body=body, project_id=project_id, node_id=node_id, uid=uid, db=db)
+    return await node_service.update_node(body=body, project_id=project_id, node_id=node_id, uid=uid, db=db,
+                                         idempotency_key=idempotency_key)
 
 
 @router.delete("/{node_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -65,8 +67,12 @@ async def delete_node(
     node_id: int = Path(...),
     uid: str = Depends(_uid),
     db: AsyncSession = Depends(get_db),
+    expected_version: int | None = Query(None, ge=0),
+    scope_hash: str | None = Query(None, min_length=64, max_length=64),
+    idempotency_key: Annotated[str | None, Header(alias="Idempotency-Key")] = None,
 ):
-    return await node_service.delete_node(project_id=project_id, node_id=node_id, uid=uid, db=db)
+    return await node_service.delete_node(project_id=project_id, node_id=node_id, uid=uid, db=db,
+        expected_version=expected_version, scope_hash=scope_hash, idempotency_key=idempotency_key)
 
 
 @router.post("/{node_id}/activate", response_model=NodeOut)

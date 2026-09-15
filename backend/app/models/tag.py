@@ -16,6 +16,7 @@ class TagOut(BaseModel):
     name: str
     color: Optional[str]
     node_count: Optional[int] = None
+    nodes: Optional[list[int]] = None
 
     class Config:
         from_attributes = True

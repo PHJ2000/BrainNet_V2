@@ -1,9 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, memo } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, memo } from "react";
 import cytoscape, { Core, ElementDefinition } from "cytoscape";
 import { childCreationPlan, runChildCreationPlan, type ChildCreationPlan } from "./childCreationPlan";
 import { useNodeEvents } from "./useNodeEvents";
+import OperationPanel from "./OperationPanel";
+import GraphExplorer from "./GraphExplorer";
+import { useGraphView } from "./useGraphView";
+import ProjectFiles from "@/features/projects/ProjectFiles";
 import {
   createAINodes as apiCreateAINodes,
   NodeOut,
@@ -47,7 +51,7 @@ export type NodeMeta = {
   order: number;
   opacity?: number;
   frozen?: boolean;
-  status?: "ACTIVE" | "GHOST";
+  status?: "ACTIVE" | "GHOST" | "ARCHIVED";
   generated?: boolean;
   tags?: string[];
   version: number;
@@ -68,6 +72,9 @@ interface CtxProps {
   nodeTags: string[];
   onAdd: (tid: string) => void;
   onRemove: (tid: string) => void;
+  onDelete: () => void;
+  onCreate: () => void;
+  onCollapse: () => void;
 }
 
 const NodeContextMenu = memo(function NodeContextMenu({
@@ -75,9 +82,15 @@ const NodeContextMenu = memo(function NodeContextMenu({
   nodeTags,
   onAdd,
   onRemove,
+  onDelete,
+  onCreate,
+  onCollapse,
 }: CtxProps) {
   return (
     <Menu id={NODE_MENU_ID} animation="fade">
+      <Item onClick={onCreate}>자식 노드 추가…</Item>
+      <Item onClick={onCollapse}>가지 접기 / 펼치기</Item>
+      <Item onClick={onDelete}>가지 삭제…</Item>
       <Submenu label="태그 달기…">
         {tags.map((t) => (
           <Item
@@ -145,8 +158,8 @@ function toNodeMeta(n: NodeOut, previous?: NodeMeta): NodeMeta {
   return {
     id: String(n.id),
     label: n.content,
-    pos_x: n.pos_x,
-    pos_y: n.pos_y,
+    pos_x: n.pos_x ?? 400 + Math.min(n.depth, 5) * 120,
+    pos_y: n.pos_y ?? 300 + Math.min(n.order_index, 8) * 80,
     parentId: n.parent_id ? String(n.parent_id) : undefined,
     depth: n.depth,
     order: n.order_index,
@@ -171,6 +184,12 @@ export default function Graph({ projectId }: GraphProps) {
 
   /* ----- 상태 ----- */
   const [nodes, setNodes] = useState<NodeMeta[]>([]);
+  const [loaded, setLoaded] = useState(false);
+  const tagIds = useMemo(() => tags.map(t => t.id), [tags]);
+  const explorer = useGraphView(projectId, nodes, tagIds, loaded);
+  const view = explorer.view;
+  const visibleRef = useRef(view.visible);
+  useLayoutEffect(() => { visibleRef.current = view.visible; }, [view.visible]);
   const nodesRef = useRef(nodes);
   const projectIdRef = useRef(projectId);
   useLayoutEffect(() => { projectIdRef.current = projectId; }, [projectId]);
@@ -206,7 +225,6 @@ export default function Graph({ projectId }: GraphProps) {
   const updateNodesAndCy = (updater: (nodes: NodeMeta[]) => NodeMeta[]) => {
     setNodes((prev) => {
       const next = updater(prev);
-      addToCy(next);
       nodesRef.current = next;
       return next;
     });
@@ -227,7 +245,7 @@ export default function Graph({ projectId }: GraphProps) {
   const refreshSequence = useRef(0);
   const refreshNodes = useCallback(async (targetProjectId = projectIdRef.current) => {
     const sequence = ++refreshSequence.current;
-    const list = await fetchNodes(targetProjectId);
+    const [list, tagList] = await Promise.all([fetchNodes(targetProjectId), listTags(targetProjectId)]);
     if (targetProjectId !== projectIdRef.current || sequence !== refreshSequence.current) {
       return undefined;
     }
@@ -240,12 +258,10 @@ export default function Graph({ projectId }: GraphProps) {
 
     nodesRef.current = metas;
     setNodes(metas);
-    if (cyInstance.current) {
-      cyInstance.current.elements().remove();
-      addToCy(metas);
-    }
+    setTags(tagList.map(t => ({ ...t, id: String(t.id) })));
+    setLoaded(true);
     return metas;
-  }, [addToCy]);
+  }, []);
   useNodeEvents(projectId, refreshNodes);
 
   const resyncNodes = async (fallback?: () => void) => {
@@ -285,23 +301,6 @@ export default function Graph({ projectId }: GraphProps) {
   };
 
 
-  /* ----- 태그 초기 로드 ----- */
-  useEffect(() => {
-    let cancelled = false;
-    listTags(projectId)
-      .then((tagList) => {
-        if (cancelled) return;
-        // id를 string으로 변환해서 저장
-        setTags(tagList.map(tag => ({ ...tag, id: String(tag.id) })));
-      })
-      .catch((e) => {
-        if (!cancelled) console.error("listTags", e);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [projectId]);
-
   useEffect(() => {
     refreshNodes(projectId)
       .catch(console.error);
@@ -309,6 +308,7 @@ export default function Graph({ projectId }: GraphProps) {
 
 
   const [ctxNodeId, setCtxNodeId] = useState<string | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
   const showMenu = useNodeMenu();
 
 
@@ -340,7 +340,7 @@ export default function Graph({ projectId }: GraphProps) {
 
   /* ----- 태그 attach / detach ----- */
   const handleAddTag = async (tagId: string) => {
-    if (!ctxNodeId) return;
+    if (!ctxNodeId || !visibleRef.current.has(ctxNodeId)) return;
     const targetProjectId = projectIdRef.current;
     const targetNodeId = ctxNodeId;
     const allNodeIds = [
@@ -383,7 +383,7 @@ export default function Graph({ projectId }: GraphProps) {
   };
 
   const handleRemoveTag = async (tagId: string) => {
-    if (!ctxNodeId) return;
+    if (!ctxNodeId || !visibleRef.current.has(ctxNodeId)) return;
     const targetProjectId = projectIdRef.current;
     const targetNodeId = ctxNodeId;
     const allNodeIds = [
@@ -478,7 +478,7 @@ export default function Graph({ projectId }: GraphProps) {
   const handleTap = async (e: cytoscape.EventObject) => {
     const oldId = e.target.id();
     const cur = nodesRef.current.find((n) => n.id === oldId);
-    if (!cur) return;
+    if (!cur || !visibleRef.current.has(oldId)) return;
     const targetProjectId = projectIdRef.current;
 
     /* 1) AI GHOST (서버에 이미 있음) → 바로 activate */
@@ -646,7 +646,7 @@ export default function Graph({ projectId }: GraphProps) {
       const id = node.id();
       const pos = node.position();
       const current = nodesRef.current.find((n) => n.id === String(id));
-      if (!current) return;
+      if (!current || !visibleRef.current.has(String(id))) return;
       const targetProjectId = projectIdRef.current;
       const previousPosition = {
         x: current.pos_x,
@@ -700,6 +700,42 @@ export default function Graph({ projectId }: GraphProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Update the canvas in one batch; searching only changes visibility, never positions.
+  useEffect(() => {
+    const cy = cyInstance.current;
+    if (!cy) return;
+    cy.batch(() => {
+      cy.elements().remove();
+      addToCy(nodes);
+    });
+  }, [nodes, addToCy]);
+  useEffect(() => {
+    const cy = cyInstance.current;
+    if (!cy) return;
+    const byId = new Map(nodes.map(n => [n.id, n]));
+    cy.batch(() => {
+      cy.nodes().forEach(n => {
+        const visible = view.visible.has(n.id());
+        if (n.style("display") !== (visible ? "element" : "none")) n.style("display", visible ? "element" : "none");
+        if (!visible && n.selected()) n.unselect();
+        const opacity = view.filtering && !view.matches.has(n.id()) ? 0.22 : n.data("status") === "GHOST" ? 0.3 : 1;
+        if (Number(n.style("opacity")) !== opacity) n.style("opacity", opacity);
+        const source = byId.get(n.id());
+        const count = view.hiddenCounts.get(n.id()) ?? 0;
+        const label = `${source?.label ?? ""}${view.collapsed.has(n.id()) && !view.expanded.has(n.id()) && count ? ` (+${count})` : ""}`;
+        if (n.data("label") !== label) n.data("label", label);
+      });
+      // Cytoscape automatically hides incident edges when either endpoint has display:none.
+      if (explorer.focus && view.visible.has(explorer.focus)) cy.$id(explorer.focus).select();
+    });
+  }, [view, nodes, explorer.focus]);
+  useEffect(() => {
+    const cy = cyInstance.current;
+    if (cy && explorer.focus && view.visible.has(explorer.focus)) {
+      cy.center(cy.$id(explorer.focus));
+    }
+  }, [explorer.focus, view.visible]);
+
   const handleSaveImage = () => {
   if (!cyInstance.current) return;
   const blob = cyInstance.current.png({ output: "blob", bg: "white", scale: 2 });
@@ -716,7 +752,11 @@ export default function Graph({ projectId }: GraphProps) {
 
   /* ----- 렌더 ----- */
   return (
-    <>
+    <div className="relative h-full w-full">
+      <GraphExplorer explorer={explorer} tags={tags} loaded={loaded} onFocus={() => undefined} />
+      <ProjectFiles projectId={projectId} nodes={nodes} />
+      <OperationPanel key={`${projectId}:${deleteId ?? ""}`} projectId={projectId} deleteId={deleteId}
+        closeDelete={() => setDeleteId(null)} refresh={() => refreshNodes(projectId)} />
       <div
         ref={cyRef}
         data-testid="idea-graph"
@@ -727,7 +767,7 @@ export default function Graph({ projectId }: GraphProps) {
         }}
       />
       <ul className="sr-only" aria-label="그래프 노드">
-        {nodes.map((node) => <li key={node.id} data-node-id={node.id}>{node.label}</li>)}
+        {nodes.filter(n => view.visible.has(n.id)).map((node) => <li key={node.id} data-node-id={node.id}>{node.label}</li>)}
       </ul>
       {/* 플로팅 버튼 */}
       <button
@@ -816,8 +856,21 @@ export default function Graph({ projectId }: GraphProps) {
         }
         onAdd={handleAddTag}
         onRemove={handleRemoveTag}
+        onDelete={() => { if (ctxNodeId && view.visible.has(ctxNodeId)) setDeleteId(ctxNodeId); }}
+        onCollapse={() => { if (ctxNodeId) explorer.toggle(ctxNodeId); }}
+        onCreate={async () => {
+          const parent = nodesRef.current.find(n => n.id === ctxNodeId);
+          if (!parent || !view.visible.has(parent.id)) return;
+          const content = window.prompt("새 자식 노드의 내용을 입력하세요");
+          if (!content?.trim()) return;
+          try {
+            await createNode(projectId, { content, parent_id: Number(parent.id), depth: parent.depth + 1,
+              pos_x: parent.pos_x + 180, pos_y: parent.pos_y + 120 });
+            await refreshNodes(projectId);
+          } catch { window.alert("노드를 만들지 못했어요. 변경 기록과 연결 상태를 확인해 주세요."); }
+        }}
       />
-    </>
+    </div>
   );
 
 }

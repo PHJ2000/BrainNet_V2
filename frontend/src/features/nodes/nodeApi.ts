@@ -10,7 +10,7 @@ export interface NodeOut {
   project_id: number;
   author_id: number;
   content: string;
-  state: "ACTIVE" | "GHOST";
+  state: "ACTIVE" | "GHOST" | "ARCHIVED";
   pos_x: number;
   pos_y: number;
   depth: number;
@@ -92,10 +92,10 @@ export async function updateNode(
   nodeId: number | string,
   payload: NodeUpdatePayload
 ): Promise<NodeOut> {
-  const { data } = await apiClient.patch(
+  const { data } = await createRequest((key) => apiClient.patch(
     `/projects/${projectId}/nodes/${nodeId}`,
-    payload
-  );
+    payload, { headers: { "Idempotency-Key": key } }
+  ));
   return data;
 }
 

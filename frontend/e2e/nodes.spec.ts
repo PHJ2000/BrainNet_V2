@@ -38,10 +38,10 @@ test("lost creation response, two browsers, mutation events and offline recovery
     expect(created.status()).toBe(201);
     const node = (await created.json())[0];
     for (const list of lists) await expect(list.locator(`[data-node-id="${node.id}"]`)).toHaveText("다른 접속자의 노드");
-    const updated = await request.patch(`/projects/1/nodes/${node.id}`, { headers, data: { content: "수정 이벤트 검증", expected_version: node.version } });
+    const updated = await request.patch(`/projects/1/nodes/${node.id}`, { headers: { ...headers, "Idempotency-Key": "browser-remote-edit" }, data: { content: "수정 이벤트 검증", expected_version: node.version } });
     expect(updated.status()).toBe(200);
     for (const list of lists) await expect(list.locator(`[data-node-id="${node.id}"]`)).toHaveText("수정 이벤트 검증");
-    expect((await request.delete(`/projects/1/nodes/${node.id}`, { headers })).status()).toBe(204);
+    expect((await request.delete(`/projects/1/nodes/${node.id}`, { headers: { ...headers, "Idempotency-Key": "browser-remote-delete" } })).status()).toBe(204);
     for (const list of lists) await expect(list.locator(`[data-node-id="${node.id}"]`)).toHaveCount(0);
 
     await contexts[1].setOffline(true);

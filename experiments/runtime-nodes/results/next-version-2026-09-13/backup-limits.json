@@ -1,0 +1,11 @@
+{
+  "nodes": 5000,
+  "tags": 5000,
+  "links": 50000,
+  "depth": 100,
+  "input_bytes": 3091721,
+  "validation_ms": 1924.5,
+  "validation_peak_mib": 53.4,
+  "import_ms": 12216.3,
+  "round_trip_counts_match": true
+}

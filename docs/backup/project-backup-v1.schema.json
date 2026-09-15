@@ -1,0 +1,261 @@
+{
+  "$defs": {
+    "BackupLink": {
+      "additionalProperties": false,
+      "properties": {
+        "node_ref": {
+          "maxLength": 80,
+          "minLength": 1,
+          "title": "Node Ref",
+          "type": "string"
+        },
+        "tag_ref": {
+          "maxLength": 80,
+          "minLength": 1,
+          "title": "Tag Ref",
+          "type": "string"
+        }
+      },
+      "required": [
+        "node_ref",
+        "tag_ref"
+      ],
+      "title": "BackupLink",
+      "type": "object"
+    },
+    "BackupNode": {
+      "additionalProperties": false,
+      "properties": {
+        "ref": {
+          "maxLength": 80,
+          "minLength": 1,
+          "title": "Ref",
+          "type": "string"
+        },
+        "parent_ref": {
+          "anyOf": [
+            {
+              "maxLength": 80,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Parent Ref"
+        },
+        "content": {
+          "title": "Content",
+          "type": "string"
+        },
+        "state": {
+          "enum": [
+            "ACTIVE",
+            "GHOST",
+            "ARCHIVED"
+          ],
+          "title": "State",
+          "type": "string"
+        },
+        "depth": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Depth",
+          "type": "integer"
+        },
+        "order_index": {
+          "maximum": 2147483647,
+          "minimum": 0,
+          "title": "Order Index",
+          "type": "integer"
+        },
+        "pos_x": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Pos X"
+        },
+        "pos_y": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Pos Y"
+        }
+      },
+      "required": [
+        "ref",
+        "parent_ref",
+        "content",
+        "state",
+        "depth",
+        "order_index",
+        "pos_x",
+        "pos_y"
+      ],
+      "title": "BackupNode",
+      "type": "object"
+    },
+    "BackupProject": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "maxLength": 120,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "BackupProject",
+      "type": "object"
+    },
+    "BackupTag": {
+      "additionalProperties": false,
+      "properties": {
+        "ref": {
+          "maxLength": 80,
+          "minLength": 1,
+          "title": "Ref",
+          "type": "string"
+        },
+        "name": {
+          "maxLength": 80,
+          "title": "Name",
+          "type": "string"
+        },
+        "color": {
+          "anyOf": [
+            {
+              "maxLength": 7,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Color"
+        }
+      },
+      "required": [
+        "ref",
+        "name"
+      ],
+      "title": "BackupTag",
+      "type": "object"
+    },
+    "DepthAdjustment": {
+      "additionalProperties": false,
+      "properties": {
+        "node_ref": {
+          "maxLength": 80,
+          "minLength": 1,
+          "title": "Node Ref",
+          "type": "string"
+        },
+        "stored_depth": {
+          "title": "Stored Depth",
+          "type": "integer"
+        },
+        "depth": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Depth",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "node_ref",
+        "stored_depth",
+        "depth"
+      ],
+      "title": "DepthAdjustment",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "exported_at": {
+      "format": "date-time",
+      "title": "Exported At",
+      "type": "string"
+    },
+    "project": {
+      "$ref": "#/$defs/BackupProject"
+    },
+    "nodes": {
+      "items": {
+        "$ref": "#/$defs/BackupNode"
+      },
+      "maxItems": 5000,
+      "title": "Nodes",
+      "type": "array"
+    },
+    "tags": {
+      "items": {
+        "$ref": "#/$defs/BackupTag"
+      },
+      "maxItems": 5000,
+      "title": "Tags",
+      "type": "array"
+    },
+    "node_tags": {
+      "items": {
+        "$ref": "#/$defs/BackupLink"
+      },
+      "maxItems": 50000,
+      "title": "Node Tags",
+      "type": "array"
+    },
+    "depth_adjustments": {
+      "items": {
+        "$ref": "#/$defs/DepthAdjustment"
+      },
+      "maxItems": 5000,
+      "title": "Depth Adjustments",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "exported_at",
+    "project",
+    "nodes",
+    "tags",
+    "node_tags"
+  ],
+  "title": "BrainNet project backup v1",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Project data only. Maximum UTF-8 file size: 10 MiB. No accounts, credentials, memberships, votes, metrics or operation history."
+}

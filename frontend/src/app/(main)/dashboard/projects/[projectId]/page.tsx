@@ -40,7 +40,7 @@ export default function ProjectDetailPage() {
         {project.description}
       </p> */}
       <div className="flex-1 min-h-0">  {/* ⬅️ 여기서 그래프가 flex-1로 꽉 차도록! */}
-        <Graph projectId={Number(project.id)} />
+        <Graph key={project.id} projectId={Number(project.id)} />
       </div>
     </div>
   );

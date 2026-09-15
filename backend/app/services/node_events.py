@@ -18,7 +18,7 @@ from app.utils.ws_manager import WS_CONNECTIONS, broadcast
 
 logger = logging.getLogger(__name__)
 CHANNEL = "brainnet_node_created"
-EVENT_TYPES = ("node.created", "node.updated", "node.deleted", "vote:cast", "vote:confirmed")
+EVENT_TYPES = ("node.created", "node.updated", "node.deleted", "tags.updated", "vote:cast", "vote:confirmed")
 
 
 async def publish_batch(connection: asyncpg.Connection) -> int:
@@ -56,6 +56,15 @@ async def prune_retained(connection, retention_days=7):
                          ORDER BY id LIMIT 1000 FOR UPDATE SKIP LOCKED)
             DELETE FROM idempotency_request USING old WHERE idempotency_request.id=old.id
             RETURNING idempotency_request.id
+        """)
+        # Keep expired metadata for the UI, but erase recovery/replay payloads.
+        # SKIP LOCKED cannot race a command currently validating/restoring a row.
+        await connection.execute("""
+            WITH old AS (SELECT id FROM node_operation
+                WHERE expires_at <= now() AND ("before" <> '{}'::jsonb OR "after" <> '{}'::jsonb OR response IS NOT NULL)
+                ORDER BY expires_at LIMIT 1000 FOR UPDATE SKIP LOCKED)
+            UPDATE node_operation SET "before"='{}'::jsonb, "after"='{}'::jsonb, response=NULL
+            FROM old WHERE node_operation.id=old.id
         """)
         return len(events), len(claims)
 

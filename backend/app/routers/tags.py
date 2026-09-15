@@ -14,6 +14,7 @@ from app.db.models.tag import Tag as TagORM
 from app.db.models.tag_node import TagNode as TagNodeORM
 from app.db.models.node import Node as NodeORM
 from app.db.session import AsyncSessionLocal
+from app.services.outbox import append_event
 
 
 router = APIRouter(prefix="/projects/{project_id}/tags", tags=["Tags"])
@@ -96,6 +97,7 @@ async def create_tag(
         color=body.color,
     )
     db.add(new_tag)
+    append_event(db, project_id, project_id, "tags.updated")
     await db.commit()
     await db.refresh(new_tag)
 
@@ -137,7 +139,7 @@ async def get_tag(
     node_rows = await db.execute(
         select(TagNodeORM.node_id).where(TagNodeORM.tag_id == tag_id)
     )
-    node_ids = [row.node_id for (row,) in node_rows.all()]
+    node_ids = list(node_rows.scalars().all())
 
     # (3) node_count = len(node_ids)
     node_count = len(node_ids)
@@ -181,6 +183,7 @@ async def update_tag(
     if body.color is not None:
         tag.color = body.color
 
+    append_event(db, project_id, project_id, "tags.updated")
     await db.commit()
     await db.refresh(tag)
 
@@ -224,6 +227,7 @@ async def delete_tag(
         raise HTTPException(status_code=404, detail="Tag not found")
 
     await db.delete(tag)
+    append_event(db, project_id, project_id, "tags.updated")
     await db.commit()
     return
 
@@ -261,7 +265,7 @@ async def attach_tag(
 
     # (2) Node가 project_id에 속하는지 확인
     node_row = await db.execute(
-        select(NodeORM).where(NodeORM.id == node_id, NodeORM.project_id == project_id)
+        select(NodeORM).where(NodeORM.id == node_id, NodeORM.project_id == project_id).with_for_update()
     )
     node = node_row.scalar_one_or_none()
     if not node:
@@ -282,7 +286,7 @@ async def attach_tag(
     t4 = time.time()
     
     # (4) 모든 자손 노드 id 수집
-    node_ids = await get_descendant_node_ids(node_id,db)
+    node_ids = await get_descendant_node_ids(node_id, db, project_id)
     t5 = time.time()
 
     # (5) 이미 연결된 관계는 제외하고 bulk insert
@@ -301,6 +305,7 @@ async def attach_tag(
     # 연결
     to_attach = [nid for nid in node_ids if nid not in already_attached]
     db.add_all([TagNodeORM(tag_id=tag_id, node_id=nid) for nid in to_attach])
+    append_event(db, project_id, project_id, "tags.updated")
     await db.commit()
     t7 = time.time()
     
@@ -341,7 +346,7 @@ async def detach_tag(
 
     # (2) Node 존재 여부 검사
     node_row = await db.execute(
-        select(NodeORM).where(NodeORM.id == node_id, NodeORM.project_id == project_id)
+        select(NodeORM).where(NodeORM.id == node_id, NodeORM.project_id == project_id).with_for_update()
     )
     node = node_row.scalar_one_or_none()
     if not node:
@@ -360,7 +365,7 @@ async def detach_tag(
     t4 = time.time()
 
     # (4) 모든 자손 노드 id 수집 (자기 자신 포함)
-    node_ids = await get_descendant_node_ids(node_id,db)  # ← 앞서 정의한 함수 재사용
+    node_ids = await get_descendant_node_ids(node_id, db, project_id)
     t5 = time.time()
 
     # (5) 실제로 연결되어 있던 TagNodeORM 삭제 (bulk)
@@ -370,6 +375,7 @@ async def detach_tag(
             TagNodeORM.node_id.in_(node_ids)
         )
     )
+    append_event(db, project_id, project_id, "tags.updated")
     await db.commit()
     t6 = time.time()
 
@@ -378,18 +384,17 @@ async def detach_tag(
     return {"tag_id": tag_id, "node_id": node_id, "status": "detached"}
 
 # 자식노드 리스트를 전부 반환하는 메소드
-async def get_descendant_node_ids(node_id: int,db: AsyncSession = Depends(get_db)) -> list[int]:
+async def get_descendant_node_ids(node_id: int, db: AsyncSession, project_id: int) -> list[int]:
     """
     node_id를 루트로 하는 모든 자손 노드들의 id를 리스트로 반환 (자기 자신 포함)
     """
-    result = [node_id]
+    result = {node_id}
     queue = [node_id]
     while queue:
-        current_id = queue.pop()
         rows = await db.execute(
-            select(NodeORM.id).where(NodeORM.parent_id == current_id)
+            select(NodeORM.id).where(NodeORM.parent_id.in_(queue), NodeORM.project_id == project_id)
+            .order_by(NodeORM.id).with_for_update()
         )
-        children = [row[0] for row in rows.all()]
-        result.extend(children)
-        queue.extend(children)
-    return result
+        queue = [nid for nid in rows.scalars().all() if nid not in result]
+        result.update(queue)
+    return sorted(result)

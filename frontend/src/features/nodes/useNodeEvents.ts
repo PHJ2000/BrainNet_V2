@@ -40,7 +40,7 @@ export function useNodeEvents(projectId: number, reload: (projectId: number) => 
       currentSocket.onmessage = (event) => {
         try {
           const message = JSON.parse(event.data);
-          if (["node.created", "node.updated", "node.deleted", "resync.required"].includes(message.type)) invalidate();
+          if (["node.created", "node.updated", "node.deleted", "tags.updated", "resync.required"].includes(message.type)) invalidate();
         } catch { /* Ignore unrelated protocol messages. */ }
       };
       currentSocket.onclose = (event) => {

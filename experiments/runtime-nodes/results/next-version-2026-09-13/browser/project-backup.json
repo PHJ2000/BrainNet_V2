@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "exported_at": "2026-09-13T03:35:23.673321Z",
+  "project": {
+    "name": "백업:검증?",
+    "description": "원본 내용 보존"
+  },
+  "nodes": [
+    {
+      "ref": "n1",
+      "parent_ref": null,
+      "content": "원본 루트",
+      "state": "ACTIVE",
+      "depth": 0,
+      "order_index": 0,
+      "pos_x": 400.0,
+      "pos_y": 300.0
+    },
+    {
+      "ref": "n2",
+      "parent_ref": "n1",
+      "content": "제안 내용",
+      "state": "GHOST",
+      "depth": 1,
+      "order_index": 0,
+      "pos_x": 650.0,
+      "pos_y": 400.0
+    },
+    {
+      "ref": "n3",
+      "parent_ref": "n2",
+      "content": "여러 줄 한글 😀\n<script>alert('never run')</script>\n```js\nconsole.log('original')\n```",
+      "state": "ACTIVE",
+      "depth": 2,
+      "order_index": 0,
+      "pos_x": null,
+      "pos_y": null
+    },
+    {
+      "ref": "n4",
+      "parent_ref": "n1",
+      "content": "보관 내용",
+      "state": "ARCHIVED",
+      "depth": 1,
+      "order_index": 1,
+      "pos_x": 650.0,
+      "pos_y": 600.0
+    }
+  ],
+  "tags": [
+    {
+      "ref": "t1",
+      "name": "여행",
+      "color": "#6366f1"
+    }
+  ],
+  "node_tags": [
+    {
+      "node_ref": "n3",
+      "tag_ref": "t1"
+    }
+  ],
+  "depth_adjustments": []
+}
