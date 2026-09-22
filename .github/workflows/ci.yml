@@ -101,7 +101,7 @@ jobs:
           with psycopg.connect(os.environ["POSTGRES_URL"]) as connection:
               with connection.cursor() as cursor:
                   cursor.execute("SELECT version_num FROM alembic_version")
-                  assert cursor.fetchone()[0] == "b822001"
+                  assert cursor.fetchone()[0] == "b922002"
                   cursor.execute("SELECT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = %s AND column_name = %s)", ("node", "version"))
                   assert cursor.fetchone()[0] is True
                   cursor.execute("SELECT to_regclass(%s), to_regclass(%s)", ("public.idempotency_request", "public.outbox_event"))

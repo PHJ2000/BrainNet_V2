@@ -11,6 +11,17 @@ from app.db.dependencies import get_db
 router = APIRouter(prefix="/projects", tags=["Project files"])
 
 
+@router.get("/{project_id}/export/workspace")
+async def workspace_backup(project_id: int, uid=Depends(get_current_user_id)):
+    from app.services.workspace_backup import export_workspace
+    snapshot = await read_snapshot(project_id, uid, include_workspace=True)
+    content = export_workspace(snapshot)
+    filename = safe_filename(snapshot.project["name"] + "-workspace", "json")
+    return Response(content, media_type="application/json", headers={
+        "Content-Disposition": f"attachment; filename=workspace.json; filename*=UTF-8''{quote(filename)}",
+        "Access-Control-Expose-Headers": "Content-Disposition", "Cache-Control": "no-store"})
+
+
 async def read_backup(request):
     length = request.headers.get("content-length")
     if length:

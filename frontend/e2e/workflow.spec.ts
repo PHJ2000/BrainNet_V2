@@ -12,6 +12,7 @@ async function fixture(page: Page) {
     const path = new URL(route.request().url()).pathname, method = route.request().method();
     const fail = (status = 503, code = "UNAVAILABLE") => route.fulfill({ status, json: { code, message: "fixture" } });
     if (path === "/users/me") return route.fulfill({ json: { id: state.userId } });
+    if (path === "/workspace/assets") return route.fulfill({ json: [] });
     if (path === "/projects") return state.projectFail ? fail() : route.fulfill({ json: projects });
     if (path === "/projects/1") return state.detailFail ? fail() : route.fulfill({ json: { ...projects[0], my_role: state.readOnly ? "VIEWER" : "OWNER", ai_enabled: state.aiEnabled } });
     if (path === "/projects/2") return route.fulfill({ json: projects[1] });

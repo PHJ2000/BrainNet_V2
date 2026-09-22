@@ -12,6 +12,7 @@ test("a delayed project response cannot replace the project selected afterward",
   await page.route("**/*", async route => {
     const path = new URL(route.request().url()).pathname;
     if (path === "/projects") return route.fulfill({ json: projects });
+    if (path === "/workspace/assets") return route.fulfill({ json: [] });
     if (path === "/users/me") return route.fulfill({ json: { id: 1 } });
     if (path === "/projects/101") {
       requestedA();

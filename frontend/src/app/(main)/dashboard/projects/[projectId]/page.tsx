@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/lib/apiClient";
-import Graph from "@/features/nodes/Graph";
+import ProjectWorkspace from "@/features/workspace/ProjectWorkspace";
 import type { Project } from "@/types/api";
 import ProjectSettings from "@/features/projects/ProjectSettings";
 import { projectError } from "@/features/projects/projectError";
@@ -35,28 +35,12 @@ export default function ProjectDetailPage() {
   </div>;
   if (!project) return <div>로딩 중...</div>;
 
-  return (
-    <div className="h-full w-full flex flex-col"
-    style={{
-    backgroundImage: 'linear-gradient(135deg, #f0f4ff 0%, #f9fafe 100%)',
-  }}>
-      <header className="flex items-center justify-between gap-4 px-6">
-      <h1
-  className="text-4xl font-bold text-transparent text-center px-6 py-4 bg-clip-text drop-shadow-md"
-  style={{
-    backgroundImage: 'linear-gradient(135deg, #2563eb, #7c3aed)',
-  }}
->
-        {project.name}
-      </h1>
+  return <div className="flex h-full min-w-0 flex-col bg-white text-slate-900">
+    <header className="flex flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-6">
+      <div className="min-w-0"><h1 className="truncate text-2xl font-semibold">{project.name}</h1>
+      {project.description && <p className="mt-1 line-clamp-2 text-sm text-slate-500">{project.description}</p>}</div>
       <ProjectSettings key={project.id} project={project} />
-      </header>
-      {/* <p className="text-sm text-gray-600 mb-4 leading-relaxed">
-        {project.description}
-      </p> */}
-      <div className="flex-1 min-h-0">  {/* ⬅️ 여기서 그래프가 flex-1로 꽉 차도록! */}
-        <Graph key={project.id} projectId={Number(project.id)} readOnly={project.my_role === "VIEWER"} aiEnabled={project.ai_enabled} />
-      </div>
-    </div>
-  );
+    </header>
+    <ProjectWorkspace key={project.id} project={project} />
+  </div>;
 }

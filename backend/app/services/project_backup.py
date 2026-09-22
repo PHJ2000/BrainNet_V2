@@ -12,6 +12,7 @@ from app.db.models.tag import Tag
 from app.db.models.tag_node import TagNode
 from app.db.models.user import User
 from app.models.project_backup import ProjectBackup, EXCLUDED
+from app.models.workspace_backup import WorkspaceBackup
 from app.services.project_snapshot import MAX_BYTES, traversal
 from app.services.node_operations import digest, fail
 
@@ -57,9 +58,9 @@ def parse_backup(raw):
     try:
         value = json.loads(raw.decode("utf-8-sig"), object_pairs_hook=unique_keys,
                            parse_constant=lambda value: (_ for _ in ()).throw(ValueError(f"non-finite value: {value}")))
-        if not isinstance(value, dict) or type(value.get("schema_version")) is not int or value["schema_version"] != 1:
-            fail("BACKUP_VERSION", "schema_version: only version 1 is supported", 422)
-        return ProjectBackup.model_validate(value)
+        if not isinstance(value, dict) or type(value.get("schema_version")) is not int or value["schema_version"] not in (1, 2):
+            fail("BACKUP_VERSION", "schema_version: only versions 1 and 2 are supported", 422)
+        return (WorkspaceBackup if value["schema_version"] == 2 else ProjectBackup).model_validate(value)
     except ValidationError as error:
         validation_failure(error)
     except (ValueError, UnicodeError, RecursionError) as error:
@@ -67,6 +68,11 @@ def parse_backup(raw):
 
 
 def preview_backup(backup):
+    if isinstance(backup, WorkspaceBackup):
+        result = preview_backup(backup.graph)
+        result.update(schema_version=2, task_count=len(backup.tasks), discussion_count=len(backup.discussions),
+                      proposal_count=len(backup.proposals), bookmark_count=len(backup.bookmarks))
+        return result
     return {"name": backup.project.name, "description": backup.project.description,
             "node_count": len(backup.nodes), "tag_count": len(backup.tags), "link_count": len(backup.node_tags),
             "excluded": EXCLUDED, "depth_adjustments": [a.model_dump() for a in backup.depth_adjustments],
@@ -82,6 +88,7 @@ async def _reserve_ids(db, table, count):
 
 async def import_backup(db, actor_id, key, backup):
     actor_id = int(actor_id)
+    graph = backup.graph if isinstance(backup, WorkspaceBackup) else backup
     if not key.strip() or len(key) > 128:
         fail("IDEMPOTENCY_KEY_INVALID", "Idempotency-Key must contain 1 to 128 characters", 422)
     fingerprint = digest(backup.model_dump(mode="json"))
@@ -98,27 +105,30 @@ async def import_backup(db, actor_id, key, backup):
             if not project or project.is_deleted or project.owner_id != actor_id:
                 fail("IMPORT_RESULT_GONE", "The original imported project is no longer available", 410)
             return {"project_id": project.id, "name": project.name}
-        project = Project(owner_id=actor_id, name=backup.project.name,
-                          description=backup.project.description, is_deleted=False)
+        project = Project(owner_id=actor_id, name=graph.project.name,
+                          description=graph.project.description, is_deleted=False)
         db.add(project); await db.flush()
         db.add(ProjectUserRole(project_id=project.id, user_id=actor_id, role="OWNER"))
-        node_ids = await _reserve_ids(db, "node", len(backup.nodes))
-        tag_ids = await _reserve_ids(db, "tag", len(backup.tags))
-        node_map = dict(zip((n.ref for n in backup.nodes), node_ids))
-        tag_map = dict(zip((t.ref for t in backup.tags), tag_ids))
+        node_ids = await _reserve_ids(db, "node", len(graph.nodes))
+        tag_ids = await _reserve_ids(db, "tag", len(graph.tags))
+        node_map = dict(zip((n.ref for n in graph.nodes), node_ids))
+        tag_map = dict(zip((t.ref for t in graph.tags), tag_ids))
         # Parent-first batches, with fresh versions and actor ownership.
-        for depth in sorted({n.depth for n in backup.nodes}):
+        for depth in sorted({n.depth for n in graph.nodes}):
             values = [{"id": node_map[n.ref], "project_id": project.id, "author_id": actor_id,
                        "parent_id": node_map.get(n.parent_ref), "content": n.content, "state": n.state,
                        "depth": n.depth, "order_index": n.order_index, "pos_x": n.pos_x, "pos_y": n.pos_y,
-                       "version": 0} for n in backup.nodes if n.depth == depth]
+                       "version": 0} for n in graph.nodes if n.depth == depth]
             await db.execute(insert(Node), values)
-        if backup.tags:
+        if graph.tags:
             await db.execute(insert(Tag), [{"id": tag_map[t.ref], "project_id": project.id,
-                                          "name": t.name, "color": t.color} for t in backup.tags])
-        if backup.node_tags:
+                                          "name": t.name, "color": t.color} for t in graph.tags])
+        if graph.node_tags:
             await db.execute(insert(TagNode), [{"node_id": node_map[r.node_ref], "tag_id": tag_map[r.tag_ref]}
-                                              for r in backup.node_tags])
+                                              for r in graph.node_tags])
+        if isinstance(backup, WorkspaceBackup):
+            from app.services.workspace_backup import restore_workspace
+            await restore_workspace(db, backup, project.id, actor_id, node_map)
         db.add(ProjectImport(actor_id=actor_id, request_key=key, request_hash=fingerprint,
                              project_id=project.id, created_at=datetime.now(timezone.utc)))
         await db.commit()

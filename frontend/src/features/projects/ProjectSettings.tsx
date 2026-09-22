@@ -50,7 +50,7 @@ function SettingsForm({ project, onClose }: { project: Project; onClose: () => v
         void run(async () => {
           const saved = await updateProject(project.id, { name: name.trim(), description });
           await client.cancelQueries({ queryKey: ["project", Number(project.id)] });
-          client.setQueryData(["project", Number(project.id)], saved);
+          client.setQueryData(["project", Number(project.id)], { ...project, ...saved, my_role: project.my_role, ai_enabled: project.ai_enabled });
           await client.invalidateQueries({ queryKey: ["projects"] });
           setMessage("프로젝트 정보를 저장했습니다.");
         });

@@ -5,10 +5,14 @@ import { useState } from "react";
 import ProjectFormModal from "../../components/ProjectFormModal";
 import BackupImport from "@/features/projects/BackupImport";
 import ProjectList from "@/features/projects/ProjectList";
+import KnowledgeLibrary from "@/features/workspace/KnowledgeLibrary";
+import ProjectTrash from "@/features/workspace/ProjectTrash";
+import { AssetList } from "@/features/workspace/PersonalAssets";
 
 
 export default function DashboardPage() {
   const [modalOpen, setModalOpen] = useState(false);
+  const [view, setView] = useState("projects");
   return (
     <div className="h-full overflow-auto p-8">
       <div className="mx-auto max-w-4xl space-y-6">
@@ -18,14 +22,20 @@ export default function DashboardPage() {
       <button
         type="button"
         onClick={() => setModalOpen(true)}
-        className="px-6 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold shadow hover:brightness-110 transition"
+        className="px-6 py-2 rounded-md bg-indigo-700 text-white font-medium hover:bg-indigo-800"
       >
         + 새 프로젝트 만들기
       </button>
       </header>
-      <ProjectList />
+      <nav aria-label="대시보드 보기" className="flex gap-4 border-b border-slate-200">
+        <button className="px-2 py-3 text-sm" aria-current={view === "projects" ? "page" : undefined} onClick={() => setView("projects")}>프로젝트</button>
+        <button className="px-2 py-3 text-sm" aria-current={view === "knowledge" ? "page" : undefined} onClick={() => setView("knowledge")}>전체 지식 검색</button>
+      </nav>
+      {view === "projects" ? <ProjectList /> : <KnowledgeLibrary />}
       {modalOpen && <ProjectFormModal onClose={() => setModalOpen(false)} />}
       <div className="mt-4"><BackupImport /></div>
+      <AssetList kind="TEMPLATE" />
+      <ProjectTrash />
       </div>
     </div>
   );

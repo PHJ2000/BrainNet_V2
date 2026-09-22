@@ -23,6 +23,7 @@ class Snapshot:
     tags: list[dict]
     node_tags: list[dict]
     exported_at: str
+    workspace: dict | None = None
 
 
 def traversal(nodes):
@@ -52,7 +53,7 @@ def traversal(nodes):
     return ordered, depths
 
 
-async def read_snapshot(project_id, actor_id):
+async def read_snapshot(project_id, actor_id, include_workspace=False):
     async with AsyncSessionLocal() as db:
         await db.connection(execution_options={"isolation_level": "REPEATABLE READ"})
         await db.execute(text("SET TRANSACTION READ ONLY"))
@@ -76,4 +77,7 @@ async def read_snapshot(project_id, actor_id):
         tag_ids = {t["id"] for t in snapshot.tags}
         if any(link["tag_id"] not in tag_ids for link in snapshot.node_tags):
             fail("INVALID_GRAPH", "node_tags: tag belongs to another project", 422)
+        if include_workspace:
+            from app.services.workspace_backup import read_workspace
+            snapshot.workspace = await read_workspace(db, project_id, actor_id)
         return snapshot

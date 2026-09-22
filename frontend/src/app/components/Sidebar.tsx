@@ -16,7 +16,7 @@ export default function Sidebar() {
 
   return (
     <div className="flex flex-col h-full p-4">
-      <h2 className="text-lg font-bold mb-4">내 프로젝트</h2>
+      <Link href="/dashboard" className="mb-4 block text-lg font-semibold hover:text-indigo-700">내 프로젝트</Link>
 
       <div className="flex-1 space-y-2 overflow-y-auto">
         {/* 프로젝트 목록 */}
@@ -37,7 +37,7 @@ export default function Sidebar() {
         {/* + 버튼도 같은 목록 안에 배치 */}
         <button
           onClick={() => setModalOpen(true)}
-          className="flex items-center justify-center w-full text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-purple-500 py-2 mt-4 rounded-xl shadow hover:from-blue-700 hover:to-purple-700 transition-all"
+          className="flex items-center justify-center w-full text-sm font-medium text-white bg-indigo-700 py-2 mt-4 rounded-md hover:bg-indigo-800"
         >
           <Plus size={18} className="mr-2" />
           새 프로젝트

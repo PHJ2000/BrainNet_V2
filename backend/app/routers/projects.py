@@ -5,7 +5,7 @@ import os
 
 from fastapi import APIRouter, Depends, Path, Query, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func
+from sqlalchemy import select, func, delete
 from pydantic import EmailStr
 
 from app.db.models.tag_node import TagNode
@@ -20,6 +20,9 @@ from app.db.models.tag import Tag as TagORM
 from app.db.dependencies import get_db
 
 from app.services.project_invitations import create_invitation, accept_invitation
+from app.services.workspace import lock_project
+from app.services.outbox import append_event
+from app.db.models.invite_token import InviteToken
 router = APIRouter(prefix="/projects", tags=["Projects"])
 
 
@@ -158,7 +161,8 @@ async def update_project(
     - ensure_owner으로 권한 확인
     - name/description 중 일부만 업데이트 가능
     """
-    proj = await _o(int(uid), project_id, db)  # ensure_owner는 ORM 기반으로 수정했다고 가정
+    await lock_project(db, project_id, uid)
+    proj = await _o(int(uid), project_id, db)
     if body.name is not None:
         proj.name = body.name
     if body.description is not None:
@@ -166,7 +170,10 @@ async def update_project(
 
     await db.commit()
     await db.refresh(proj)
-    return ProjectOut.from_orm(proj)
+    result = ProjectOut.from_orm(proj)
+    result.my_role = "OWNER"
+    result.ai_enabled = bool(os.getenv("OPENAI_API_KEY", "").strip())
+    return result
 
 
 @router.delete("/{project_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -180,8 +187,10 @@ async def delete_project(
     - 실제로는 is_deleted=True 처리 (소프트 딜리트).  
       필요 시, 실제 레코드를 삭제하려면 delete(ProjectORM)... 호출
     """
+    await lock_project(db, project_id, uid)
     proj = await _o(int(uid), project_id, db)
-
+    await db.execute(delete(InviteToken).where(InviteToken.project_id == project_id, InviteToken.accepted_at.is_(None)))
+    append_event(db, project_id, project_id, "project.membership_updated")
     # 소프트 딜리트
     proj.is_deleted = True
     await db.commit()

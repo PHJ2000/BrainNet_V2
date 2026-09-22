@@ -44,7 +44,7 @@ export function useNodeEvents(projectId: number, reload: (projectId: number) => 
           const message = JSON.parse(event.data);
           if (message.type === "ping") { currentSocket.send("pong"); return; }
           if (message.type === "project.membership_updated") window.dispatchEvent(new Event("brainnet:membership"));
-          if (["project.membership_updated", "node.created", "node.updated", "node.deleted", "tags.updated", "resync.required"].includes(message.type)) invalidate();
+          if (["workspace.updated", "project.membership_updated", "node.created", "node.updated", "node.deleted", "tags.updated", "resync.required"].includes(message.type)) invalidate();
         } catch { /* Ignore unrelated protocol messages. */ }
       };
       currentSocket.onclose = (event) => {

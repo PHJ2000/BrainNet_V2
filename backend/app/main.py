@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from app.routers import (
-    auth, users, projects, nodes, tags, votes, history, websocket, node_operations, project_files, members
+    auth, users, projects, nodes, tags, votes, history, websocket, node_operations, project_files, members, workspace, proposals, personal_assets
 )
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.errors import install_error_handlers
@@ -84,5 +84,5 @@ app.add_middleware(
 )
 app.add_middleware(TraceIdMiddleware)
 
-for r in (auth, users, projects, nodes, tags, votes, history, websocket, node_operations, project_files, members):
+for r in (auth, users, projects, nodes, tags, votes, history, websocket, node_operations, project_files, members, workspace, proposals, personal_assets):
     app.include_router(r.router)

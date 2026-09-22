@@ -17,8 +17,12 @@ from .outbox_event import OutboxEvent
 from .node_operation import NodeOperation
 from .project_import import ProjectImport
 from .base import Base
+from .workspace import WorkItem, Discussion, NodeBookmark, AIProposal, WorkspaceActivity
+from .personal_asset import PersonalAsset
 
 __all__ = [
+    "PersonalAsset",
+    "WorkItem", "Discussion", "NodeBookmark", "AIProposal", "WorkspaceActivity",
     "ActivityLog",
     "Base",
     "IdempotencyRequest",
