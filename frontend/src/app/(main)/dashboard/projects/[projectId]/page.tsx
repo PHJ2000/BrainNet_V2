@@ -7,13 +7,14 @@ import { apiClient } from "@/lib/apiClient";
 import Graph from "@/features/nodes/Graph";
 import type { Project } from "@/types/api";
 import ProjectSettings from "@/features/projects/ProjectSettings";
+import { projectError } from "@/features/projects/projectError";
 
 export default function ProjectDetailPage() {
   // 👉 useParams() 값은 항상 **문자열**
   const { projectId } = useParams<{ projectId: string }>();
   const pid = Number(projectId);        // ← 숫자로 변환
   const validId = Number.isSafeInteger(pid) && pid > 0;
-  const { data: project, isError, refetch } = useQuery({
+  const { data: project, error, isError, refetch, isFetching } = useQuery({
     queryKey: ["project", pid],
     enabled: validId,
     queryFn: async ({ signal }) => {
@@ -23,8 +24,8 @@ export default function ProjectDetailPage() {
     retry: false,
   });
   if (!validId || isError) return <div role="alert" className="p-6">
-    <p>프로젝트를 불러올 수 없습니다. 삭제 여부와 접근 권한을 확인해 주세요.</p>
-    {validId && <button onClick={() => void refetch()} className="mt-3 rounded border px-3 py-2">다시 시도</button>}
+    <p>{validId ? projectError(error) : "올바르지 않은 프로젝트 주소입니다."}</p>
+    {validId && <button disabled={isFetching} onClick={() => void refetch()} className="mt-3 rounded border px-3 py-2">다시 시도</button>}
   </div>;
   if (!project) return <div>로딩 중...</div>;
 

@@ -9,13 +9,10 @@ from app.models.vote import HistoryOut   # Pydantic 스키마
 from app.core.security import get_current_user_id as _uid
 from app.utils.helpers import ensure_member as _m
 from app.db.models.history import ProjectHistory
-from app.db.session import AsyncSessionLocal
+from app.db.dependencies import get_db
 
 router = APIRouter(prefix="/projects/{project_id}/history", tags=["History"])
 
-async def get_db():
-    async with AsyncSessionLocal() as session:
-        yield session
 
 @router.get("", response_model=List[HistoryOut])
 async def list_history(

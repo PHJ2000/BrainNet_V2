@@ -1,20 +1,16 @@
 "use client";
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, memo } from "react";
-import cytoscape, { Core, ElementDefinition } from "cytoscape";
+import cytoscape, { Core, ElementDefinition, NodeSingular } from "cytoscape";
 import { useGraphActions } from "./useGraphActions";
 import { useGraphData } from "./useGraphData";
-import { measureNodeSize, type NodeMeta, type Tag } from "./graphModel";
+import { useGraphEditing } from "./useGraphEditing";
+import { type NodeMeta, type Tag } from "./graphModel";
 export type { NodeMeta, Tag } from "./graphModel";
 import OperationPanel from "./OperationPanel";
 import GraphExplorer from "./GraphExplorer";
 import { useGraphView } from "./useGraphView";
 import ProjectFiles from "@/features/projects/ProjectFiles";
-import {
-  NodeOut,
-  createNode,        // ✅ 추가
-  updateNode,        // ✅ 추가
-} from "./nodeApi";  // ← 변경
 import {
   Menu,
   Item,
@@ -93,8 +89,7 @@ export default function Graph({ projectId }: GraphProps) {
   const cyRef = useRef<HTMLDivElement>(null);
   const cyInstance = useRef<Core | null>(null);
   const data = useGraphData(projectId);
-  const { nodes, nodesRef, tags, loaded, projectIdRef, getScope, refreshNodes,
-    updateLocalNode, resyncNodes } = data;
+  const { nodes, nodesRef, tags, loaded, refreshNodes } = data;
   const [tagPopoverOpen, setTagPopoverOpen] = useState(false); // 태그 팝오버/모달
   const [highlightTag, setHighlightTag] = useState<string | null>(null); // 현재 하이라이팅할 태그 id
 
@@ -103,6 +98,8 @@ export default function Graph({ projectId }: GraphProps) {
   const explorer = useGraphView(projectId, nodes, tagIds, loaded);
   const view = explorer.view;
   const visibleRef = useRef(view.visible);
+  const canvasSnapshot = useRef(new Map<string, NodeMeta>());
+  const displaySnapshot = useRef(new Map<string, { visible: boolean; opacity: number }>());
   useLayoutEffect(() => { visibleRef.current = view.visible; }, [view.visible]);
   const addToCy = useCallback((arr: NodeMeta[]) => {
     const cy = cyInstance.current;
@@ -129,36 +126,6 @@ export default function Graph({ projectId }: GraphProps) {
     cy.add(eles);
   }, []);
 
-  const applyAuthoritativePatchResponse = (saved: NodeOut) => {
-    const nodeId = String(saved.id);
-    const current = nodesRef.current.find(node => node.id === nodeId);
-    if (current && current.version > saved.version) return current;
-    const widthHeight = measureNodeSize(saved.content ?? "");
-    const updated = updateLocalNode(nodeId, (node) => ({
-      ...node,
-      label: saved.content,
-      pos_x: saved.pos_x ?? node.pos_x,
-      pos_y: saved.pos_y ?? node.pos_y,
-      version: saved.version,
-      ...widthHeight,
-    }));
-
-    const cyNode = cyInstance.current?.$id(nodeId);
-    if (cyNode && cyNode.length > 0) {
-      cyNode.data({
-        label: saved.content,
-        width: widthHeight.width,
-        height: widthHeight.height,
-      });
-      cyNode.position({
-        x: saved.pos_x ?? updated?.pos_x ?? 0,
-        y: saved.pos_y ?? updated?.pos_y ?? 0,
-      });
-    }
-    return updated;
-  };
-
-
   const [ctxNodeId, setCtxNodeId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const showMenu = useNodeMenu();
@@ -183,95 +150,10 @@ export default function Graph({ projectId }: GraphProps) {
       });
     }
   }, [highlightTag, nodesRef]);
-  const { handleAddTag, handleRemoveTag, spawnChildren, activateNodeLocal } =
-    useGraphActions(data, ctxNodeId, visibleRef);
-
-  /* ───── 헬퍼 ───── */
-  // const isNumericId = (s: string) => /^\d+$/.test(s);
-
-  /* ───── handleTap 교체 ───── */
-  const handleTap = async (e: cytoscape.EventObject) => {
-    const oldId = e.target.id();
-    const cur = nodesRef.current.find((n) => n.id === oldId);
-    if (!cur || !visibleRef.current.has(oldId)) return;
-    const targetProjectId = projectIdRef.current;
-    const scope = getScope();
-    if (!scope.isCurrent()) return;
-
-    /* 1) AI GHOST (서버에 이미 있음) → 바로 activate */
-    if (cur.status === "GHOST") {
-      if (cur.label === "?") {
-        // 서버에 빈 노드로만 생성된 경우 → 사용자 입력 받아서 내용 갱신
-        const input = window.prompt("노드 내용을 입력하세요", cur.label);
-        if (!input) return;
-
-        try {
-          const saved = await updateNode(targetProjectId, Number(cur.id), {
-            content: input,
-            pos_x: cur.pos_x,
-            pos_y: cur.pos_y,
-            expected_version: cur.version,
-          }, scope.signal);
-          if (!scope.isCurrent()) return;
-
-          applyAuthoritativePatchResponse(saved);
-          const active = await activateNodeLocal(cur);
-          if (active) await spawnChildren(active);
-        } catch (err) {
-          console.error(err);
-          if (!scope.isCurrent()) return;
-          await resyncNodes();
-        }
-      } else {
-        // AI 생성된 노드 → 바로 activate
-        await activateNodeLocal(cur);
-      }
-      return;
-    }
-
-    /* 3) 이미 ACTIVE + 숫자 ID → 라벨 수정(updateNode) */
-    const newLabel = window.prompt("노드 내용을 수정하세요", cur.label);
-    if (!newLabel || newLabel === cur.label) return;
-
-    const previousLabel = cur.label;
-    const previousWidth = cur.width;
-    const previousHeight = cur.height;
-    try {
-      const saved = await updateNode(targetProjectId, Number(cur.id), {
-        content: newLabel,
-        expected_version: cur.version,
-      }, scope.signal);
-      if (!scope.isCurrent()) return;
-      const updated = applyAuthoritativePatchResponse(saved);
-
-      /* ✅ 내용이 바뀐 첫 클릭이라면 spawnChildren */
-      if (!updated?.generated) {
-        await spawnChildren(updated ?? cur);
-      }
-
-    } catch (err) {
-      console.error(err);
-      if (!scope.isCurrent()) return;
-      await resyncNodes(() => {
-        const restored = updateLocalNode(cur.id, (node) => ({
-          ...node,
-          label: previousLabel,
-          width: previousWidth,
-          height: previousHeight,
-        }));
-        if (restored) {
-          cyInstance.current?.$id(cur.id).data({
-            label: restored.label,
-            width: restored.width,
-            height: restored.height,
-          });
-        }
-      });
-    }
-  };
-
-
-
+  const actions = useGraphActions(data, ctxNodeId, visibleRef);
+  const { handleAddTag, handleRemoveTag } = actions;
+  const editing = useGraphEditing(data, actions, cyInstance, visibleRef);
+  const { save } = editing;
 
   /* ----- cytoscape init ----- */
   useEffect(() => {
@@ -356,45 +238,9 @@ export default function Graph({ projectId }: GraphProps) {
     cyInstance.current = cy;
     addToCy(nodesRef.current);
 
-    cy.on("tap", "node", handleTap);
+    cy.on("tap", "node", editing.handleTap);
     //위치 변경시 이벤트
-    cy.on("dragfree", "node", async (event) => {
-      const node = event.target;
-      const id = node.id();
-      const pos = node.position();
-      const current = nodesRef.current.find((n) => n.id === String(id));
-      if (!current || !visibleRef.current.has(String(id))) return;
-      const targetProjectId = projectIdRef.current;
-    const scope = getScope();
-    if (!scope.isCurrent()) return;
-      const previousPosition = {
-        x: current.pos_x,
-        y: current.pos_y,
-      };
-
-      try {
-        const saved = await updateNode(targetProjectId, id, {
-          pos_x: pos.x,
-          pos_y: pos.y,
-          expected_version: current.version,
-        }, scope.signal);
-        if (!scope.isCurrent()) return;
-        applyAuthoritativePatchResponse(saved);
-      } catch (err) {
-        console.error("노드 위치 업데이트 실패", err);
-        if (!scope.isCurrent()) return;
-        await resyncNodes(() => {
-          const restored = updateLocalNode(String(id), (localNode) => ({
-            ...localNode,
-            pos_x: previousPosition.x,
-            pos_y: previousPosition.y,
-          }));
-          if (restored) {
-            cy.$id(String(id)).position(previousPosition);
-          }
-        });
-      }
-    });
+    cy.on("dragfree", "node", editing.handleDrag);
 
     cy.on("cxttap", "node", (ev) => {
       const nodeId = ev.target.id();
@@ -424,8 +270,26 @@ export default function Graph({ projectId }: GraphProps) {
     const cy = cyInstance.current;
     if (!cy) return;
     cy.batch(() => {
-      cy.elements().remove();
-      addToCy(nodes);
+      const ids = new Set(nodes.map(n => n.id));
+      cy.nodes().filter(n => !ids.has(n.id())).remove();
+      for (const id of displaySnapshot.current.keys()) if (!ids.has(id)) displaySnapshot.current.delete(id);
+      const added = nodes.filter(n => !cy.$id(n.id).length);
+      const addedIds = new Set(added.map(n => n.id));
+      addToCy(added);
+      for (const node of nodes) {
+        if (addedIds.has(node.id)) continue;
+        const previous = canvasSnapshot.current.get(node.id);
+        if (previous === node) continue;
+        const element = cy.$id(node.id);
+        if (!element.length) { addToCy([node]); continue; }
+        element.data({ label: node.label, status: node.status, width: node.width, height: node.height, tag: node.tags ?? [] });
+        element.position({ x: node.pos_x, y: node.pos_y });
+        if (previous?.parentId !== node.parentId) {
+          element.incomers("edge").remove();
+          if (node.parentId) cy.add({ data: { id: `e-${node.parentId}-${node.id}`, source: node.parentId, target: node.id } });
+        }
+      }
+      canvasSnapshot.current = new Map(nodes.map(n => [n.id, n]));
     });
   }, [nodes, addToCy]);
   useEffect(() => {
@@ -433,17 +297,29 @@ export default function Graph({ projectId }: GraphProps) {
     if (!cy) return;
     const byId = new Map(nodes.map(n => [n.id, n]));
     cy.batch(() => {
+      const show: NodeSingular[] = [], hide: NodeSingular[] = [];
+      const opacityGroups = new Map<number, NodeSingular[]>();
       cy.nodes().forEach(n => {
         const visible = view.visible.has(n.id());
-        if (n.style("display") !== (visible ? "element" : "none")) n.style("display", visible ? "element" : "none");
+        const previous = displaySnapshot.current.get(n.id());
+        if (previous?.visible !== visible) (visible ? show : hide).push(n);
         if (!visible && n.selected()) n.unselect();
         const opacity = view.filtering && !view.matches.has(n.id()) ? 0.22 : n.data("status") === "GHOST" ? 0.3 : 1;
-        if (Number(n.style("opacity")) !== opacity) n.style("opacity", opacity);
+        if (previous?.opacity !== opacity) {
+          const group = opacityGroups.get(opacity) ?? [];
+          group.push(n); opacityGroups.set(opacity, group);
+        }
+        displaySnapshot.current.set(n.id(), { visible, opacity });
         const source = byId.get(n.id());
         const count = view.hiddenCounts.get(n.id()) ?? 0;
         const label = `${source?.label ?? ""}${view.collapsed.has(n.id()) && !view.expanded.has(n.id()) && count ? ` (+${count})` : ""}`;
         if (n.data("label") !== label) n.data("label", label);
       });
+      // A scratch setter also recalculates Cytoscape styles. Keep our cache outside
+      // Cytoscape and notify the renderer once per changed style group.
+      if (show.length) cy.collection(show).style("display", "element");
+      if (hide.length) cy.collection(hide).style("display", "none");
+      for (const [opacity, group] of opacityGroups) cy.collection(group).style("opacity", opacity);
       // Cytoscape automatically hides incident edges when either endpoint has display:none.
       if (explorer.focus && view.visible.has(explorer.focus)) cy.$id(explorer.focus).select();
     });
@@ -473,6 +349,16 @@ export default function Graph({ projectId }: GraphProps) {
   if (data.accessError) return <div role="alert" className="p-6">{data.accessError}</div>;
   return (
     <div className="relative h-full w-full">
+      <div aria-label="동기화 상태" className="absolute bottom-4 left-4 z-30 max-w-md rounded-lg border bg-white/95 p-3 shadow-sm">
+        <p role="status" className="text-sm">{data.connection} · {save.state.message}</p>
+        {save.state.detail && <p className="mt-1 max-h-24 overflow-auto whitespace-pre-wrap text-sm text-slate-600">{save.state.detail}</p>}
+        {save.state.kind === "failed" && <button className="mt-2 rounded border px-3 py-1 text-sm" onClick={() => void save.retry()}>저장 다시 시도</button>}
+        {save.state.kind === "conflict" && <button className="mt-2 rounded border px-3 py-1 text-sm" onClick={() => void refreshNodes(projectId, true).catch(() => undefined)}>최신 상태 확인</button>}
+        {["failed", "conflict"].includes(save.state.kind) && <button className="ml-2 text-sm underline" onClick={save.discard}>입력 버리기</button>}
+      </div>
+      {data.loadError && <div role="alert" className="absolute left-4 top-20 z-40 max-w-md rounded border border-red-200 bg-white p-4 shadow">
+        <p>{data.loadError}</p><button disabled={data.loading} onClick={() => void refreshNodes(projectId).catch(() => undefined)} className="mt-2 rounded border px-3 py-1">노드 다시 불러오기</button>
+      </div>}
       <GraphExplorer explorer={explorer} tags={tags} loaded={loaded} onFocus={() => undefined} />
       <ProjectFiles projectId={projectId} nodes={nodes} />
       <OperationPanel key={`${projectId}:${deleteId ?? ""}`} projectId={projectId} deleteId={deleteId}
@@ -578,18 +464,9 @@ export default function Graph({ projectId }: GraphProps) {
         onRemove={handleRemoveTag}
         onDelete={() => { if (ctxNodeId && view.visible.has(ctxNodeId)) setDeleteId(ctxNodeId); }}
         onCollapse={() => { if (ctxNodeId) explorer.toggle(ctxNodeId); }}
-        onCreate={async () => {
+        onCreate={() => {
           const parent = nodesRef.current.find(n => n.id === ctxNodeId);
-          if (!parent || !view.visible.has(parent.id)) return;
-          const content = window.prompt("새 자식 노드의 내용을 입력하세요");
-          if (!content?.trim()) return;
-          const scope = getScope();
-          if (!scope.isCurrent()) return;
-          try {
-            await createNode(projectId, { content, parent_id: Number(parent.id), depth: parent.depth + 1,
-              pos_x: parent.pos_x + 180, pos_y: parent.pos_y + 120 }, undefined, scope.signal);
-            await refreshNodes(projectId);
-          } catch { if (!scope.isCurrent()) return; window.alert("노드를 만들지 못했어요. 변경 기록과 연결 상태를 확인해 주세요."); }
+          if (parent && view.visible.has(parent.id)) void editing.addChild(parent);
         }}
       />
     </div>

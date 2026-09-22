@@ -28,10 +28,10 @@ export type NodeMeta = {
   height?: number;  // 👈 추가!
 };
 
+let measurementContext: CanvasRenderingContext2D | null = null;
 export function measureNodeSize(label: string, maxWidth = 220, font = "bold 18px Arial") {
   // 텍스트 줄수와 최대 가로길이에 따라 width, height 산출
-  const canvas = document.createElement("canvas");
-  const ctx = canvas.getContext("2d")!;
+  const ctx = measurementContext ??= document.createElement("canvas").getContext("2d")!;
   ctx.font = font;
 
   // 줄 단위로 나누기 (text-wrap용)
@@ -60,7 +60,12 @@ export function measureNodeSize(label: string, maxWidth = 220, font = "bold 18px
 export function toNodeMeta(n: NodeOut, previous?: NodeMeta): NodeMeta {
   // GET snapshots can predate an already acknowledged PATCH or event.
   if (previous && previous.version > n.version) return previous;
-  const { width, height } = measureNodeSize(n.content ?? "");
+  if (previous && previous.version === n.version && previous.label === n.content &&
+      previous.pos_x === n.pos_x && previous.pos_y === n.pos_y && previous.status === n.state &&
+      previous.parentId === (n.parent_id ? String(n.parent_id) : undefined) &&
+      previous.order === n.order_index && previous.depth === n.depth &&
+      (previous.tags ?? []).join(",") === (n.tags ?? []).join(",")) return previous;
+  const { width, height } = previous?.label === n.content ? previous : measureNodeSize(n.content ?? "");
   return {
     id: String(n.id),
     label: n.content,

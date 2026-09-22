@@ -18,5 +18,6 @@ frontend/.test-dist/
 frontend/test-results/
 frontend/playwright-report/
 deploy/validation-logs/
+/.tools/
 experiments/runtime-nodes/results/**/soak-progress.json
 experiments/runtime-nodes/results/**/completed

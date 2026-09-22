@@ -39,7 +39,7 @@ test("a delayed project response cannot replace the project selected afterward",
     await expect(page).toHaveURL(/\/projects\/202$/);
     await expect(page.getByRole("heading", { name: "Project A", exact: true })).toHaveCount(0);
     await page.goto("/dashboard/projects/303");
-    await expect(page.getByRole("alert").filter({ hasText: "프로젝트를 불러올 수 없습니다" })).toBeVisible();
+    await expect(page.getByRole("alert").filter({ hasText: "권한이 없거나" })).toBeVisible();
     await expect(page.getByTestId("idea-graph")).toHaveCount(0);
   } finally { releaseA(); }
 });

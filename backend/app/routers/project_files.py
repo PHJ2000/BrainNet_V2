@@ -6,7 +6,7 @@ from app.services.markdown_export import render_markdown, safe_filename
 from app.services import project_backup as backup_service
 from app.services.project_snapshot import MAX_BYTES
 from app.services.node_operations import fail
-from app.routers.nodes import get_db
+from app.db.dependencies import get_db
 
 router = APIRouter(prefix="/projects", tags=["Project files"])
 

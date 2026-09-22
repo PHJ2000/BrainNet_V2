@@ -6,6 +6,7 @@ import { apiClient } from "@/lib/apiClient";
 /** Invalidation reloads authorized state; duplicate events never append duplicate nodes. */
 export function useNodeEvents(projectId: number, reload: (projectId: number) => Promise<unknown>) {
   const [accessError, setAccessError] = useState<{ projectId: number; message: string } | null>(null);
+  const [connection, setConnection] = useState("연결 중");
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) return;
@@ -37,7 +38,7 @@ export function useNodeEvents(projectId: number, reload: (projectId: number) => 
       base.searchParams.set("token", token);
       const currentSocket = new WebSocket(base);
       socket = currentSocket;
-      currentSocket.onopen = () => { delay = 500; invalidate(); };
+      currentSocket.onopen = () => { delay = 500; setConnection("연결됨"); };
       currentSocket.onmessage = (event) => {
         try {
           const message = JSON.parse(event.data);
@@ -49,6 +50,7 @@ export function useNodeEvents(projectId: number, reload: (projectId: number) => 
         if (stopped) return;
         if (event.code === 4401 || event.code === 4403) {
           stopped = true;
+          setConnection("접근 종료");
           clearInterval(reconcile);
           if (refresh) clearTimeout(refresh);
           if (event.code === 4401 && localStorage.getItem("token") === token) {
@@ -59,6 +61,7 @@ export function useNodeEvents(projectId: number, reload: (projectId: number) => 
           }
           return;
         }
+        setConnection("재연결 중");
         retry = setTimeout(connect, delay);
         delay = Math.min(delay * 2, 10000);
       };
@@ -75,5 +78,5 @@ export function useNodeEvents(projectId: number, reload: (projectId: number) => 
       socket?.close();
     };
   }, [projectId, reload]);
-  return accessError?.projectId === projectId ? accessError.message : null;
+  return { accessError: accessError?.projectId === projectId ? accessError.message : null, connection };
 }

@@ -39,12 +39,13 @@ export type NodeUpdatePayload = Partial<NodePayload> & {
 /* ────────── GET: 노드 목록 ──────────*/
 export async function fetchNodes(
   projectId: number | string,
-  tagIds?: (number | string)[]
+  tagIds?: (number | string)[],
+  signal?: AbortSignal,
 ): Promise<NodeOut[]> {
   const query =
     tagIds && tagIds.length ? `?tag_ids=${tagIds.join(",")}` : "";
   const { data } = await apiClient.get(
-    `/projects/${projectId}/nodes${query}`
+    `/projects/${projectId}/nodes${query}`, { signal }
   );
   return data;
 }
@@ -94,11 +95,12 @@ export async function updateNode(
   nodeId: number | string,
   payload: NodeUpdatePayload,
   signal?: AbortSignal,
+  idempotencyKey?: string,
 ): Promise<NodeOut> {
   const { data } = await createRequest((key) => apiClient.patch(
     `/projects/${projectId}/nodes/${nodeId}`,
     payload, { headers: { "Idempotency-Key": key }, signal }
-  ));
+  ), idempotencyKey);
   return data;
 }
 

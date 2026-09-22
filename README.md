@@ -10,12 +10,12 @@
 
 | 사용자 흐름 | 기능 |
 | --- | --- |
-| 주제 만들기 | 회원가입·로그인, 프로젝트 생성과 관리 |
+| 주제 만들기 | 회원가입·로그인, 프로젝트 생성·이름 검색·정렬·계정별 초대 |
 | 아이디어 확장 | 직접 노드 작성, AI로 연관 아이디어 생성 |
-| 생각 구조화 | Cytoscape.js 마인드맵에서 노드·연결 탐색, 태그 분류 |
-| 기록 돌아보기 | 프로젝트의 아이디어와 히스토리 조회 |
+| 생각 구조화 | 마인드맵 본문·태그 검색, 가지 접기, 연결·저장 상태와 실패 재시도 |
+| 기록 돌아보기 | 작업 이력·되돌리기, Markdown 내보내기, JSON 백업·복원 |
 
-협업·WebSocket 코드도 포함되어 있지만, 동시 다중 사용자 편집 기능은 아직 완성되지 않았습니다.
+초대된 계정 사이의 변경 알림과 재조회, 버전 충돌 거부를 지원합니다. 충돌한 입력은 보존하며 자동으로 덮어쓰지 않습니다. 공동 커서·오프라인 편집·자동 병합은 지원하지 않습니다.
 
 ## 개발팀
 
@@ -107,7 +107,7 @@ Spring 후보의 처리량과 지연은 개선됐지만 메모리는 더 사용�
 - 원자적 저장: 노드·상속 태그·멱등성 응답·Outbox 이벤트를 한 DB 트랜잭션에 저장합니다.
 - 외부 호출 분리: AI provider 응답은 DB 저장 트랜잭션을 열기 전에 기다립니다.
 
-[Spring 통합 테스트](./spring/vertical-slice/src/test/java/com/brainnet/spring/VerticalSliceIntegrationTest.java)는 생성·재시도·동시 수정·권한·응답 형식을 검증합니다. Outbox 기록 이후 외부 pub/sub와 FastAPI WebSocket으로 이벤트를 전달하는 구간은 남아 있습니다.
+[Spring 통합 테스트](./spring/vertical-slice/src/test/java/com/brainnet/spring/VerticalSliceIntegrationTest.java)는 생성·재시도·동시 수정·권한·응답 형식을 검증합니다. Outbox 기록을 PostgreSQL NOTIFY/LISTEN과 FastAPI WebSocket으로 전달하고, 연결 복구와 주기적 재조회로 화면을 동기화합니다. [두 인스턴스 이벤트 검증](./spring/vertical-slice/event_probe.py)에서 FastAPI·Spring의 변경 전달을 함께 확인합니다.
 
 ## 검증과 전환 현황
 
@@ -116,12 +116,17 @@ Spring 후보의 처리량과 지연은 개선됐지만 메모리는 더 사용�
 - FastAPI의 인증·오류·요청 추적 계약과 실제 PostgreSQL 동시성 테스트
 - Alembic 스키마 변경과 되돌리기, 프론트엔드 빌드
 - FastAPI·Spring 컨테이너의 시작·health 확인, 동일 DB 스키마에서의 API 계약 비교
+- 초대·세션 만료·통신 실패·저장 재시도·프로젝트 이동의 Chromium 브라우저 검증
+
+2026-09-22 개선 내역: [1단계 보안·안정화](./docs/PHASE1_RESULT_2026-09-22.md) · [2단계 사용성·성능](./docs/PHASE2_RESULT_2026-09-22.md). 측정 조건과 로컬/원격 검증 결과는 각 보고서에서 구분합니다.
 
 Spring 구현은 병합됐지만 운영 전환은 완료되지 않았습니다. 실제 AI provider 계약, shadow·canary, 장시간 부하와 rollback 검증을 거친 뒤 요청 경로를 전환하도록 [전환 절차](./docs/migration/adr-rollout-runbook.txt)를 정리했습니다.
 
 ## 로컬 실행
 
 Git, Docker Engine 24 이상, Docker Compose v2가 필요합니다.
+
+이 PC의 로컬 배포는 PowerShell에서 `./deploy/start-local.ps1`로 실행합니다. 웹은 `http://localhost:3000`, API는 `http://localhost:18000`이며 전용 `brainnet-local` 볼륨을 유지합니다. `.env.local`은 최초 실행 시 생성되고 Git에 포함되지 않습니다. AI 키가 없는 기본 로컬 프로필에서도 수동 작성·검색·백업을 사용할 수 있습니다. AI 생성에는 별도의 provider 설정이 필요합니다.
 
 ```bash
 git clone https://github.com/PHJ2000/BrainNet_V2.git

@@ -3,15 +3,12 @@ from typing import Annotated, List, Optional
 from fastapi import APIRouter, Depends, Header, Path, Query, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.security import get_current_user_id as _uid
-from app.db.session import AsyncSessionLocal
+from app.db.dependencies import get_db
 from app.models.node import NodeCreate, NodeOut, NodeUpdate
 from app.services import node_service
 
 router = APIRouter(prefix="/projects/{project_id}/nodes", tags=["Nodes"])
 
-async def get_db():
-    async with AsyncSessionLocal() as session:
-        yield session
 
 @router.get("", response_model=List[NodeOut])
 async def list_nodes(

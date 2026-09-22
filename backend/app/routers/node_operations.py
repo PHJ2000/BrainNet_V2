@@ -5,7 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.security import get_current_user_id
 from app.db.models.node_operation import NodeOperation
-from app.routers.nodes import get_db
+from app.db.dependencies import get_db
 from app.services import node_operations as service
 
 router = APIRouter(prefix="/projects/{project_id}", tags=["Node operations"])

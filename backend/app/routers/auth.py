@@ -8,16 +8,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.security import create_access_token
 from app.db.models.user import User
-from app.db.session import AsyncSessionLocal
+from app.db.dependencies import get_db
 from app.models.auth import Token, UserCreate, UserRead
 from app.services.passwords import DUMMY_HASH, hash_password, verify_password
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
 
-async def get_db():
-    async with AsyncSessionLocal() as session:
-        yield session
 
 
 @router.post("/register", status_code=status.HTTP_201_CREATED, response_model=UserRead)

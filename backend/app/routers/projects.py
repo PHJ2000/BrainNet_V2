@@ -16,16 +16,12 @@ from app.db.models.project import Project as ProjectORM
 from app.db.models.project_user_role import ProjectUserRole
 from app.db.models.node import Node as NodeORM, NodeStateEnum
 from app.db.models.tag import Tag as TagORM
-from app.db.session import AsyncSessionLocal
+from app.db.dependencies import get_db
 
 from app.services.project_invitations import create_invitation, accept_invitation
 router = APIRouter(prefix="/projects", tags=["Projects"])
 
 
-# ── DB 세션 의존성 ────────────────────────────────────────────────
-async def get_db():
-    async with AsyncSessionLocal() as session:
-        yield session
 
 
 # ── CRUD 기본 ────────────────────────────────────────────────────

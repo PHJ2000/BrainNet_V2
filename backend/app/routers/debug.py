@@ -5,17 +5,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 from app.db.models.invite_token import InviteToken      # ORM 모델
-from app.db.session import AsyncSessionLocal
+from app.db.dependencies import get_db
 from app.core.security import get_current_user_id as _uid  # 토큰에서 user_id 추출 헬퍼
 
 
 router = APIRouter(prefix="/_debug", tags=["Debug"])
 
 
-# 비동기 세션 제공 헬퍼
-async def get_db():
-    async with AsyncSessionLocal() as session:
-        yield session
 
 
 @router.get("/invites")

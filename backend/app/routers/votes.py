@@ -18,13 +18,10 @@ from app.db.models.vote import Vote            # ORM: 투표 레코드
 from app.db.models.tag_summary import TagSummary
 from app.db.models.tag import Tag
 from app.db.models.history import ProjectHistory
-from app.db.session import AsyncSessionLocal
+from app.db.dependencies import get_db
 
 router = APIRouter(prefix="/projects/{project_id}", tags=["Votes"])
 
-async def get_db():
-    async with AsyncSessionLocal() as session:
-        yield session
 
 @router.post(
     "/tags/{tag_id}/vote",

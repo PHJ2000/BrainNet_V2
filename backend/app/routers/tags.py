@@ -13,7 +13,7 @@ from app.utils.helpers import ensure_member as _m
 from app.db.models.tag import Tag as TagORM
 from app.db.models.tag_node import TagNode as TagNodeORM
 from app.db.models.node import Node as NodeORM
-from app.db.session import AsyncSessionLocal
+from app.db.dependencies import get_db
 from app.services.outbox import append_event
 from app.core.errors import error_detail
 from app.db.models.tag_summary import TagSummary
@@ -23,10 +23,6 @@ from app.db.models.history import ProjectHistory
 router = APIRouter(prefix="/projects/{project_id}/tags", tags=["Tags"])
 
 
-# ── DB 세션 의존성 ────────────────────────────────────────────────
-async def get_db():
-    async with AsyncSessionLocal() as session:
-        yield session
 
 
 # ── 태그 목록 조회 ─────────────────────────────────────────────────

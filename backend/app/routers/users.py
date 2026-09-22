@@ -13,13 +13,10 @@ from app.db.models.node import Node
 from app.db.models.project_user_role import ProjectUserRole
 from app.db.models.tag_node import TagNode
 from app.core.security import get_current_user_id as _uid
-from app.db.session import AsyncSessionLocal
+from app.db.dependencies import get_db
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
-async def get_db():
-    async with AsyncSessionLocal() as session:
-        yield session
 
 
 @router.get("/me", response_model=UserRead)

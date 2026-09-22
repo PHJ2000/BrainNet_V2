@@ -10,7 +10,7 @@ import ProjectFormModal from "./ProjectFormModal";
 import JoinProjectDialog from "@/features/projects/JoinProjectDialog";
 
 export default function Sidebar() {
-  const { data: projects = [], isLoading } = useProjects();
+  const { data: projects = [], isLoading, error, refetch } = useProjects();
   const [modalOpen, setModalOpen] = useState(false);
   const [joinOpen, setJoinOpen] = useState(false);
 
@@ -22,7 +22,7 @@ export default function Sidebar() {
         {/* 프로젝트 목록 */}
         {isLoading ? (
           <div className="text-sm text-gray-400">불러오는 중...</div>
-        ) : (
+        ) : error ? <button onClick={() => void refetch()} className="text-sm text-red-700">목록을 불러오지 못했습니다. 다시 시도</button> : (
           projects.map((p: Project) => (
             <Link
               key={p.id}

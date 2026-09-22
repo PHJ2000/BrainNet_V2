@@ -15,8 +15,8 @@ export interface TagPayload {
   color?: string;
 }
 
-export const listTags = (pid: string | number): Promise<TagResponse[]> =>
-  apiClient.get<TagResponse[]>(`/projects/${pid}/tags`).then((response) => response.data);
+export const listTags = (pid: string | number, signal?: AbortSignal): Promise<TagResponse[]> =>
+  apiClient.get<TagResponse[]>(`/projects/${pid}/tags`, { signal }).then((response) => response.data);
 export const createTag = (
   pid: string | number,
   body: TagPayload,

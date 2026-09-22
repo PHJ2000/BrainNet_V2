@@ -92,7 +92,7 @@ export function useGraphActions(data: ReturnType<typeof useGraphData>, ctxNodeId
   /* ----- AI·빈 노드 생성 로직 ----- */
   const spawning = useRef(new Set<string>());
   const spawnPlans = useRef(new Map<string, ChildCreationPlan>());
-  const spawnChildren = async (parent: NodeMeta) => {
+  const spawnChildren = async (parent: NodeMeta, propagate = false) => {
     if (parent.generated) return;
     const targetProjectId = projectIdRef.current;
     const scope = getScope();
@@ -124,7 +124,7 @@ export function useGraphActions(data: ReturnType<typeof useGraphData>, ctxNodeId
         regular: (payload, key) => createNode(targetProjectId, payload, key, scope.signal),
       }, scope.isCurrent);
       if (!complete) return;
-      await refreshNodes(targetProjectId);
+      await refreshNodes(targetProjectId, true);
       if (!scope.isCurrent()) return;
       updateLocalNode(parent.id, (node) => ({ ...node, frozen: true, generated: true }));
       spawnPlans.current.delete(operation);
@@ -136,24 +136,26 @@ export function useGraphActions(data: ReturnType<typeof useGraphData>, ctxNodeId
       } catch (refreshError) {
         console.error(refreshError);
       }
+      if (propagate) throw error;
     } finally {
       spawning.current.delete(operation);
     }
   };
 
   /* ----- 노드 활성화 ----- */
-  const activateNodeLocal = async (meta: NodeMeta): Promise<NodeMeta | undefined> => {
+  const activateNodeLocal = async (meta: NodeMeta, propagate = false): Promise<NodeMeta | undefined> => {
     const targetProjectId = projectIdRef.current;
     const scope = getScope();
     if (!scope.isCurrent()) return;
     try {
       await apiActivateNode(targetProjectId, Number(meta.id), scope.signal);
-      const refreshed = await refreshNodes(targetProjectId);
+      const refreshed = await refreshNodes(targetProjectId, true);
       return refreshed?.find((node) => node.id === meta.id);
     } catch (e) {
       console.error(e);
       if (!scope.isCurrent()) return undefined;
       await resyncNodes();
+      if (propagate) throw e;
       return undefined;
     }
   };
