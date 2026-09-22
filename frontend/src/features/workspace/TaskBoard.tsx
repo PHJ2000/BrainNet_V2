@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { v4 as uuid } from "uuid";
 import { apiClient } from "@/lib/apiClient";
 import ProjectDialog from "@/features/projects/ProjectDialog";
@@ -8,6 +8,7 @@ import { button, field, primary, priorities, statuses, TaskPayload, useMembers, 
 import { useWorkspaceDraft } from "./useWorkspaceDraft";
 import CloudDraft from "./CloudDraft";
 import { TaskDependencies } from "./Collaboration";
+import { ChecklistEditor } from "./Execution";
 
 export function TaskEditor({ projectId, task, onClose, readOnly = false }: { projectId: number; task: Task; onClose: () => void; readOnly?: boolean }) {
   const [value, setValue] = useState(task), [busy, setBusy] = useState(false), [error, setError] = useState("");
@@ -40,7 +41,11 @@ export function TaskEditor({ projectId, task, onClose, readOnly = false }: { pro
           <label className="text-sm">우선순위<select className={field} value={value.priority} onChange={e => update("priority", e.target.value as Task["priority"])}>{Object.entries(priorities).map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select></label>
           <label className="text-sm">담당자<select className={field} value={value.assignee_id ?? ""} onChange={e => update("assignee_id", Number(e.target.value) || null)}><option value="">미지정</option>{members.data?.filter(m => m.role !== "VIEWER").map(m => <option key={m.user_id} value={m.user_id}>{m.email}</option>)}{value.assignee_id && !members.data?.some(m => m.user_id === value.assignee_id) && <option value={value.assignee_id}>이전 담당자 #{value.assignee_id}</option>}</select></label>
           <label className="text-sm">마감일<input type="date" className={field} value={value.due_date ?? ""} onChange={e => update("due_date", e.target.value || null)} /></label>
+          <label className="text-sm">반복 간격 · 일<input type="number" aria-label="반복 간격" className={field} min={1} max={365} placeholder="반복 안 함" value={value.repeat_every_days ?? ""} onChange={e => update("repeat_every_days", e.target.value ? Number(e.target.value) : null)} /></label>
         </div>
+        {value.repeat_every_days && <p className="text-xs text-slate-500">마감일이 필요합니다. 완료 시 다음 회차를 한 번 만들고 체크리스트를 초기화합니다. 기존 다음 회차에는 수정이 전파되지 않습니다.</p>}
+        {value.recurrence_parent_id && <p className="text-xs text-slate-500">이전 회차를 완료해 생성된 반복 과제입니다.</p>}
+        <ChecklistEditor items={value.checklist ?? []} onChange={items => update("checklist", items)} />
         {value.node_id && <p className="text-xs text-slate-500">연결된 아이디어 #{value.node_id} <button type="button" className="ml-2 underline" onClick={() => update("node_id", null)}>연결 해제</button></p>}
       </fieldset>
       {members.error && <p role="alert">담당자 목록을 불러오지 못했습니다. <button type="button" className="underline" onClick={() => void members.refetch()}>다시 불러오기</button></p>}
@@ -57,7 +62,7 @@ export function newTask(nodeId: number | null = null, title = ""): Task {
   return { id: uuid(), title: title.slice(0, 240), body: "", status: "TODO", priority: "MEDIUM", assignee_id: null, due_date: null, node_id: nodeId, version: -1, created_at: new Date().toISOString() };
 }
 
-export default function TaskBoard({ projectId, readOnly }: { projectId: number; readOnly: boolean }) {
+export default function TaskBoard({ projectId, readOnly, initialTask }: { projectId: number; readOnly: boolean; initialTask?: string | null }) {
   const [editing, setEditing] = useState<Task | null>(null), [search, setSearch] = useState(""), [assignee, setAssignee] = useState(""), [priority, setPriority] = useState("");
   const query = useWorkspaceList<Task>(projectId, "tasks", { q: search, assignee, priority }), members = useMembers(projectId);
   const [selected, setSelected] = useState<Record<string, number>>({}), [bulkState, setBulkState] = useState("TODO"), [bulkError, setBulkError] = useState(""), [bulkBusy, setBulkBusy] = useState(false);
@@ -67,9 +72,16 @@ export default function TaskBoard({ projectId, readOnly }: { projectId: number; 
     catch (e) { setBulkError(workspaceError(e)); } finally { setBulkBusy(false); }
   };
   const storage = useWorkspaceDraft<Task>(projectId, "task");
+  const [linkedDismissed, setLinkedDismissed] = useState(false);
+  const detail = useQuery({ queryKey: ["workspace", projectId, "task-detail", initialTask], enabled: !!initialTask && !linkedDismissed, retry: false,
+    queryFn: async ({ signal }) => (await apiClient.get<Task>(`/projects/${projectId}/tasks/${initialTask}`, { signal })).data });
+  const linked = !linkedDismissed && storage.ready && detail.data && (!storage.draft || storage.draft.item.id === detail.data.id) ? storage.draft?.item ?? detail.data : null;
+  const activeEditor = editing ?? linked;
   const rows = query.data?.pages.flatMap(page => page.items) ?? [];
   if (query.error) return <div role="alert">{workspaceError(query.error)} <button className={button} onClick={() => void query.refetch()}>다시 불러오기</button></div>;
   return <section className="space-y-5" aria-label="실행 보드">
+    {initialTask && !linkedDismissed && detail.error && <p role="alert">{workspaceError(detail.error)}</p>}
+    {initialTask && !linkedDismissed && detail.data && storage.draft && storage.draft.item.id !== detail.data.id && <p role="status" className="text-sm text-amber-800">다른 과제의 초안이 있습니다. 먼저 이어쓰거나 폐기하면 연결한 과제를 열 수 있습니다.</p>}
     <header className="flex flex-wrap items-start justify-between gap-3"><div><h2 className="text-xl font-semibold">아이디어를 실행으로</h2><p className="mt-1 text-sm text-slate-500">담당자와 완료 조건을 정하고 진행 상황을 함께 확인하세요.</p></div>{!readOnly && <button className={primary} disabled={!!storage.draft} onClick={() => setEditing(newTask())}>새 과제</button>}</header>
     {!readOnly && storage.draft && <div role="status" className="flex flex-wrap items-center gap-3 rounded border border-amber-200 bg-amber-50 p-3 text-sm"><span>이 탭에 저장된 과제 초안이 있습니다.</span><button className={button} onClick={() => setEditing(storage.draft!.item)}>과제 초안 이어쓰기</button><button className="underline" onClick={storage.discard}>초안 폐기</button></div>}
     {!readOnly && <CloudDraft projectId={projectId} kind="task" />}
@@ -87,6 +99,6 @@ export default function TaskBoard({ projectId, readOnly }: { projectId: number; 
       </button></div>)}{!rows.some(row => row.status === status) && <p className="text-xs text-slate-400">표시할 과제가 없습니다.</p>}</div>
     </section>)}</div>
     {query.hasNextPage && <button className={button} disabled={query.isFetchingNextPage} onClick={() => void query.fetchNextPage()}>검색 결과 더 불러오기</button>}
-    {editing && <TaskEditor key={editing.id} projectId={projectId} task={editing} readOnly={readOnly} onClose={() => setEditing(null)} />}
+    {activeEditor && <TaskEditor key={activeEditor.id} projectId={projectId} task={activeEditor} readOnly={readOnly} onClose={() => { setEditing(null); setLinkedDismissed(true); }} />}
   </section>;
 }

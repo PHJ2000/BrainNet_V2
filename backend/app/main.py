@@ -14,6 +14,7 @@ from app.services.node_events import NodeEventBridge
 from app.services.ai_provider import close_ai_client
 from app.services.node_admission import NodeCreationAdmission
 from app.services.proposal_queue import ProposalWorker
+from app.routers import execution
 from fastapi.responses import PlainTextResponse
 
 
@@ -101,5 +102,5 @@ app.add_middleware(
 )
 app.add_middleware(TraceIdMiddleware)
 
-for r in (auth, users, projects, nodes, tags, votes, history, websocket, node_operations, project_files, members, workspace, proposals, personal_assets, workspace_plus):
+for r in (auth, users, projects, nodes, tags, votes, history, websocket, node_operations, project_files, members, workspace, proposals, personal_assets, workspace_plus, execution):
     app.include_router(r.router)

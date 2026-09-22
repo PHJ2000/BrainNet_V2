@@ -10,12 +10,14 @@ import KnowledgeLibrary from "./KnowledgeLibrary";
 import Discussions from "./Discussions";
 import AIReview from "./AIReview";
 import WorkspaceExport from "./WorkspaceExport";
+import { ProjectOverview } from "./Execution";
 import { button, useMembers, useWorkspaceList, workspaceError, type Knowledge } from "./api";
 
-const tabs = { graph: "아이디어 맵", tasks: "실행 보드", knowledge: "지식", discussions: "토론", ai: "AI 검토", activity: "활동" };
+const tabs = { graph: "아이디어 맵", tasks: "실행 보드", overview: "현황", knowledge: "지식", discussions: "토론", ai: "AI 검토", activity: "활동" };
 type Tab = keyof typeof tabs;
 type Activity = { id: number; kind: string; actor_id: number | null; target_id: string; created_at: string };
 const kinds: Record<string, string> = { "task.created": "과제 생성", "task.updated": "과제 수정", "discussion.created": "토론 작성", "discussion.updated": "토론 수정", "proposal.requested": "AI 검토 요청", "proposal.finished": "AI 검토 완료", "proposal.accepted": "AI 제안 채택", "project.restored": "프로젝트 복원" };
+Object.assign(kinds, { "task.repeated": "반복 과제 다음 회차 생성", "task.dependencies": "선행 과제 변경", "discussion.replied": "토론 답글 작성", "knowledge.linked": "지식 연결", "knowledge.unlinked": "지식 연결 해제", "proposal.budget": "AI 사용량 제한 변경", "proposal.canceled": "AI 검토 취소" });
 
 function ActivityFeed({ projectId }: { projectId: number }) {
   const query = useWorkspaceList<Activity>(projectId, "activity"), members = useMembers(projectId);
@@ -38,7 +40,13 @@ function LiveWorkspace({ projectId, children }: { projectId: number; children: R
 
 export default function ProjectWorkspace({ project }: { project: Project }) {
   const params = useSearchParams();
-  const [tab, setTab] = useState<Tab>(params.get("view") === "discussions" ? "discussions" : "graph"), [selected, setSelected] = useState<Knowledge[]>([]), [message, setMessage] = useState("");
+  return <WorkspaceContent key={`${project.id}:${params.get("view")}:${params.get("task")}:${params.get("thread")}`} project={project} />;
+}
+
+function WorkspaceContent({ project }: { project: Project }) {
+  const params = useSearchParams();
+  const requested = params.get("view");
+  const [tab, setTab] = useState<Tab>(requested && Object.prototype.hasOwnProperty.call(tabs, requested) ? requested as Tab : "graph"), [selected, setSelected] = useState<Knowledge[]>([]), [message, setMessage] = useState("");
   const projectId = Number(project.id), readOnly = project.my_role === "VIEWER";
   const select = (node: Knowledge) => {
     if (selected.some(item => item.id === node.id)) { setMessage("이미 선택한 아이디어입니다."); return; }
@@ -49,7 +57,8 @@ export default function ProjectWorkspace({ project }: { project: Project }) {
     <nav aria-label="프로젝트 보기" className="flex shrink-0 gap-1 overflow-x-auto border-b border-slate-200 px-4 sm:px-6">{Object.entries(tabs).map(([key, label]) => <button key={key} aria-current={tab === key ? "page" : undefined} onClick={() => { setTab(key as Tab); setMessage(""); }} className={`shrink-0 border-b-2 px-3 py-3 text-sm font-medium focus-visible:outline-2 focus-visible:outline-indigo-600 ${tab === key ? "border-indigo-600 text-indigo-700" : "border-transparent text-slate-500 hover:text-slate-900"}`}>{label}{key === "ai" && selected.length > 0 ? ` (${selected.length})` : ""}</button>)}</nav>
     {message && <p role="status" className="bg-indigo-50 px-6 py-2 text-sm text-indigo-800">{message}</p>}
     <div className="min-h-0 flex-1">{tab === "graph" ? <Graph projectId={projectId} readOnly={readOnly} aiEnabled={project.ai_enabled} /> : <LiveWorkspace projectId={projectId}>
-      {tab === "tasks" && <TaskBoard projectId={projectId} readOnly={readOnly} />}
+      {tab === "tasks" && <TaskBoard projectId={projectId} readOnly={readOnly} initialTask={params.get("task")} />}
+      {tab === "overview" && <ProjectOverview projectId={projectId} />}
       {tab === "knowledge" && <KnowledgeLibrary projectId={projectId} readOnly={readOnly} onSelectAI={select} />}
       {tab === "discussions" && <Discussions projectId={projectId} readOnly={readOnly} owner={project.my_role === "OWNER"} initialThread={params.get("thread")} />}
       {tab === "ai" && <AIReview projectId={projectId} readOnly={readOnly} owner={project.my_role === "OWNER"} enabled={!!project.ai_enabled} selected={selected} onRemove={id => setSelected(rows => rows.filter(row => row.id !== id))} onPick={() => setTab("knowledge")} />}

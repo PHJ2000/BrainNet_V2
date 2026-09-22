@@ -102,6 +102,10 @@ async def import_backup(db, actor_id, key, backup):
         for discussion in portable["discussions"]:
             if discussion["ref"] is None:
                 discussion.pop("ref")
+        for task in portable["tasks"]:
+            for extension in ("checklist", "repeat_every_days", "recurrence_parent_ref"):
+                if not task[extension]:
+                    task.pop(extension)
     fingerprint = digest(portable)
     lock = int(hashlib.sha256(f"project-import:{actor_id}:{key}".encode()).hexdigest()[:15], 16)
     try:

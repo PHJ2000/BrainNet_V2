@@ -1,4 +1,5 @@
 """Bounded collaboration commands with project locks and private recovery."""
+from app.services.task_execution import ensure_dependencies_done, ensure_dependents_reopened, finish_transition
 from typing import Literal
 from uuid import UUID
 from fastapi import APIRouter, Depends, Query
@@ -138,20 +139,6 @@ async def task_row(db, project_id, task_id):
     return row
 
 
-async def ensure_dependencies_done(db, task_id, completing=()):
-    blocked = await db.scalar(select(WorkItem.id).join(TaskDependency, TaskDependency.requires_id == WorkItem.id).where(
-        TaskDependency.task_id == task_id, WorkItem.status != "DONE", WorkItem.id.not_in(completing)).limit(1))
-    if blocked:
-        fail("TASK_BLOCKED", "Complete prerequisite tasks first")
-
-
-async def ensure_dependents_reopened(db, task_id, reopening=()):
-    done = await db.scalar(select(WorkItem.id).join(TaskDependency, TaskDependency.task_id == WorkItem.id).where(
-        TaskDependency.requires_id == task_id, WorkItem.status == "DONE", WorkItem.id.not_in(reopening)).limit(1))
-    if done:
-        fail("TASK_DEPENDENTS_DONE", "Reopen completed dependent tasks first")
-
-
 @router.get("/projects/{project_id}/tasks/{task_id}/dependencies")
 async def dependencies(project_id: int, task_id: UUID, uid=User, db: AsyncSession = Db):
     await ensure_member(int(uid), project_id, db)
@@ -206,8 +193,10 @@ async def bulk_status(project_id: int, body: BulkTasks, uid=User, db: AsyncSessi
             await ensure_dependencies_done(db, row.id, ids)
         else:
             await ensure_dependents_reopened(db, row.id, ids)
+        previous_status = row.status
         check_version(row, item.expected_version)
         row.status = body.status
+        await finish_transition(db, row, previous_status, uid)
         record(db, project_id, uid, "task.updated", row.id)
         rows.append(row)
     await db.commit()

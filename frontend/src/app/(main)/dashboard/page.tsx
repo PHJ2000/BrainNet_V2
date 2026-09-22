@@ -9,6 +9,7 @@ import KnowledgeLibrary from "@/features/workspace/KnowledgeLibrary";
 import ProjectTrash from "@/features/workspace/ProjectTrash";
 import { AssetList } from "@/features/workspace/PersonalAssets";
 import { Inbox } from "@/features/workspace/Collaboration";
+import { MyWork } from "@/features/workspace/Execution";
 
 
 export default function DashboardPage() {
@@ -28,12 +29,13 @@ export default function DashboardPage() {
         + 새 프로젝트 만들기
       </button>
       </header>
-      <nav aria-label="대시보드 보기" className="flex gap-4 border-b border-slate-200">
+      <nav aria-label="대시보드 보기" className="flex flex-wrap gap-3 border-b border-slate-200">
         <button className="px-2 py-3 text-sm" aria-current={view === "projects" ? "page" : undefined} onClick={() => setView("projects")}>프로젝트</button>
         <button className="px-2 py-3 text-sm" aria-current={view === "knowledge" ? "page" : undefined} onClick={() => setView("knowledge")}>전체 지식 검색</button>
         <button className="px-2 py-3 text-sm" aria-current={view === "inbox" ? "page" : undefined} onClick={() => setView("inbox")}>알림함</button>
+        <button className="px-2 py-3 text-sm" aria-current={view === "work" ? "page" : undefined} onClick={() => setView("work")}>내 작업함</button>
       </nav>
-      {view === "projects" ? <ProjectList /> : view === "inbox" ? <Inbox /> : <KnowledgeLibrary />}
+      {view === "projects" ? <ProjectList /> : view === "inbox" ? <Inbox /> : view === "work" ? <MyWork /> : <KnowledgeLibrary />}
       {modalOpen && <ProjectFormModal onClose={() => setModalOpen(false)} />}
       <div className="mt-4"><BackupImport /></div>
       <AssetList kind="TEMPLATE" />

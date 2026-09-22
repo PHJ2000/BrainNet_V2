@@ -1,6 +1,6 @@
 """Workspace records survive deletion of their source graph nodes."""
 from datetime import datetime, timezone
-from sqlalchemy import BigInteger, Boolean, CheckConstraint, Column, Date, DateTime, ForeignKey, Index, Integer, String, Text
+from sqlalchemy import BigInteger, Boolean, CheckConstraint, Column, Date, DateTime, ForeignKey, Index, Integer, String, Text, UniqueConstraint, text
 from sqlalchemy.dialects.postgresql import JSONB
 from app.db.models.base import Base
 
@@ -21,11 +21,18 @@ class WorkItem(Base):
     priority = Column(String(16), nullable=False, default="MEDIUM")
     assignee_id = Column(BigInteger, ForeignKey("app_user.id", ondelete="SET NULL"))
     due_date = Column(Date)
+    checklist = Column(JSONB, nullable=False, default=list, server_default=text("'[]'::jsonb"))
+    repeat_every_days = Column(Integer)
+    recurrence_parent_id = Column(String(36), ForeignKey("work_item.id", name="fk_work_item_recurrence", ondelete="SET NULL"))
     version = Column(Integer, nullable=False, default=0)
     request_hash = Column(String(64), nullable=False)
     created_at = Column(DateTime(timezone=True), nullable=False, default=now)
     updated_at = Column(DateTime(timezone=True), nullable=False, default=now)
     __table_args__ = (
+        UniqueConstraint("recurrence_parent_id", name="uq_work_item_recurrence_parent"),
+        CheckConstraint("repeat_every_days IS NULL OR (repeat_every_days BETWEEN 1 AND 365 AND due_date IS NOT NULL)", name="ck_work_item_repeat"),
+        Index("ix_work_item_assignee_due", "assignee_id", "due_date", "id"),
+        Index("ix_work_item_project_status_due", "project_id", "status", "due_date"),
         CheckConstraint("status IN ('TODO','DOING','DONE','CANCELED')", name="ck_work_item_status"),
         CheckConstraint("priority IN ('LOW','MEDIUM','HIGH')", name="ck_work_item_priority"),
         Index("ix_work_item_project_created", "project_id", "created_at", "id"),

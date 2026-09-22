@@ -15,6 +15,7 @@ from app.db.models.workspace import WorkItem, Discussion, NodeBookmark, Workspac
 from app.models.workspace import TaskCreate, TaskUpdate, DiscussionCreate, DiscussionUpdate
 from app.services.workspace import check_version, digest, existing, fail, lock_project, record, serialize, task_links, page_before
 from app.utils.helpers import ensure_member, get_node
+from app.services.task_execution import task_digest, finish_transition, ensure_dependencies_done, ensure_dependents_reopened
 
 router = APIRouter(tags=["Workspace"])
 Db = Depends(get_db)
@@ -48,11 +49,14 @@ async def tasks(project_id: int, before: str | None = Query(None, max_length=36)
 @router.post("/projects/{project_id}/tasks", status_code=201)
 async def create_task(project_id: int, body: TaskCreate, uid=User, db: AsyncSession = Db):
     await lock_project(db, project_id, uid)
-    row = await existing(db, WorkItem, body.id, project_id, uid, digest(body), "creator_id")
+    row = await existing(db, WorkItem, body.id, project_id, uid, task_digest(body), "creator_id")
     if row:
         return serialize(row)
     await task_links(db, project_id, body)
-    row = WorkItem(**body.model_dump(exclude={"id"}), id=str(body.id), project_id=project_id, creator_id=int(uid), request_hash=digest(body))
+    if body.status == "DONE" and any(not item.done for item in body.checklist):
+        fail("CHECKLIST_INCOMPLETE", "Complete all checklist items first")
+    row = WorkItem(**body.model_dump(exclude={"id", "checklist"}), checklist=body.model_dump(mode="json")["checklist"],
+        id=str(body.id), project_id=project_id, creator_id=int(uid), request_hash=task_digest(body))
     db.add(row)
     record(db, project_id, uid, "task.created", row.id)
     await db.commit()
@@ -67,14 +71,18 @@ async def update_task(project_id: int, task_id: UUID, body: TaskUpdate, uid=User
         fail("TASK_NOT_FOUND", "Task not found", 404)
     await task_links(db, project_id, body)
     if body.status == "DONE":
-        from app.routers.workspace_plus import ensure_dependencies_done
         await ensure_dependencies_done(db, row.id)
     else:
-        from app.routers.workspace_plus import ensure_dependents_reopened
         await ensure_dependents_reopened(db, row.id)
+    previous_status = row.status
     check_version(row, body.expected_version)
     for key, value in body.model_dump(exclude={"expected_version"}).items():
+        if key in ("checklist", "repeat_every_days") and key not in body.model_fields_set:
+            continue  # Older clients must not silently erase execution settings.
+        if key == "checklist":
+            value = body.model_dump(mode="json")[key]
         setattr(row, key, value)
+    await finish_transition(db, row, previous_status, uid)
     record(db, project_id, uid, "task.updated", row.id)
     await db.commit()
     return serialize(row)

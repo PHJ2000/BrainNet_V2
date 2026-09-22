@@ -1,12 +1,18 @@
 from datetime import date
 from typing import Literal
 from uuid import UUID
-from pydantic import ConfigDict, Field, field_validator
+from pydantic import ConfigDict, Field, field_validator, model_validator
 from app.models.fields import StoredTextModel
 
 
 class Strict(StoredTextModel):
     model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+
+
+class ChecklistItem(Strict):
+    id: UUID
+    text: str = Field(min_length=1, max_length=240)
+    done: bool = False
 
 
 class TaskFields(Strict):
@@ -17,6 +23,16 @@ class TaskFields(Strict):
     assignee_id: int | None = Field(default=None, gt=0)
     due_date: date | None = None
     node_id: int | None = Field(default=None, gt=0)
+    checklist: list[ChecklistItem] = Field(default_factory=list, max_length=50)
+    repeat_every_days: int | None = Field(default=None, ge=1, le=365)
+
+    @model_validator(mode="after")
+    def execution_fields(self):
+        if len({item.id for item in self.checklist}) != len(self.checklist):
+            raise ValueError("Checklist IDs must be unique")
+        if self.repeat_every_days and self.due_date is None:
+            raise ValueError("Repeating tasks require a due date")
+        return self
 
 
 class TaskCreate(TaskFields):

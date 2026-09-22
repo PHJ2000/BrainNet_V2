@@ -7,7 +7,8 @@ export const primary = `${button} !border-indigo-700 !bg-indigo-700 !text-white 
 export const field = "mt-1 block w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-2 focus:outline-indigo-600";
 export const statuses = { TODO: "할 일", DOING: "진행 중", DONE: "완료", CANCELED: "취소" };
 export const priorities = { LOW: "낮음", MEDIUM: "보통", HIGH: "높음" };
-export type Task = { id: string; title: string; body: string; status: keyof typeof statuses; priority: keyof typeof priorities; assignee_id: number | null; due_date: string | null; node_id: number | null; version: number; created_at: string };
+export type ChecklistItem = { id: string; text: string; done: boolean };
+export type Task = { id: string; title: string; body: string; status: keyof typeof statuses; priority: keyof typeof priorities; assignee_id: number | null; due_date: string | null; node_id: number | null; version: number; created_at: string; checklist?: ChecklistItem[]; repeat_every_days?: number | null; recurrence_parent_id?: string | null };
 export type Discussion = { id: string; body: string; author_id: number | null; node_id: number | null; resolved: boolean; version: number; created_at: string };
 export type Knowledge = { id: number; project_id: number; project_name: string; content: string; bookmarked: boolean; version: number; state: string };
 export type Proposal = { id: string; mode: "EXPAND" | "SUMMARY" | "ACTION"; instruction: string; sources: {id: number; version: number; content: string}[]; status: string; output: string | null; error_code: string | null; task_id: string | null; created_at: string };
@@ -29,6 +30,9 @@ export function useMembers(projectId: number) {
 export function workspaceError(error: unknown): string {
   const code = axios.isAxiosError(error) ? error.response?.data?.code : "";
   const messages: Record<string, string> = {
+    CHECKLIST_INCOMPLETE: "체크리스트의 모든 항목을 완료한 뒤 과제를 완료해 주세요.",
+    REPEAT_NEEDS_DUE_DATE: "반복 과제에는 마감일이 필요합니다.",
+    INVALID_REPEAT_DATE: "다음 회차의 마감일을 계산할 수 없습니다. 날짜나 반복 간격을 확인해 주세요.",
     TASK_BLOCKED: "선행 과제를 먼저 완료해 주세요.",
     TASK_DEPENDENTS_DONE: "이 과제를 선행 조건으로 삼는 완료 과제를 먼저 다시 열어 주세요.",
     DEPENDENCY_CYCLE: "서로를 선행 조건으로 삼는 순환 관계는 만들 수 없습니다.",
@@ -52,5 +56,5 @@ export function workspaceError(error: unknown): string {
 
 export function TaskPayload(task: Task) {
   const { title, body, status, priority, assignee_id, due_date, node_id } = task;
-  return { title, body, status, priority, assignee_id, due_date, node_id };
+  return { title, body, status, priority, assignee_id, due_date, node_id, checklist: task.checklist ?? [], repeat_every_days: task.repeat_every_days ?? null };
 }

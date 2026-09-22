@@ -39,7 +39,9 @@ def export_workspace(snapshot):
     thread_refs = {row.id: f"d{i + 1}" for i, row in enumerate(data["discussions"])}
     result = WorkspaceBackup.model_validate({"schema_version": 2, "graph": graph,
         "tasks": [{"ref": task_refs[row.id], "node_ref": refs.get(row.node_id), "title": row.title, "body": row.body,
-            "status": row.status, "priority": row.priority, "due_date": row.due_date, "created_at": row.created_at} for row in data["tasks"]],
+            "status": row.status, "priority": row.priority, "due_date": row.due_date, "created_at": row.created_at,
+            "checklist": row.checklist, "repeat_every_days": row.repeat_every_days,
+            "recurrence_parent_ref": task_refs.get(row.recurrence_parent_id)} for row in data["tasks"]],
         "discussions": [{"ref": thread_refs[row.id], "node_ref": refs.get(row.node_id), "body": row.body, "resolved": row.resolved,
             "created_at": row.created_at} for row in data["discussions"]],
         "proposals": [{"mode": row.mode, "instruction": row.instruction, "sources": [{"node_ref": refs.get(source["id"]),
@@ -60,7 +62,13 @@ async def restore_workspace(db, backup, project_id, actor_id, node_map):
     for row in backup.tasks:
         db.add(WorkItem(id=task_map[row.ref], project_id=project_id, creator_id=actor_id, node_id=node_map.get(row.node_ref),
             title=row.title, body=row.body, status=row.status, priority=row.priority, due_date=row.due_date,
+            checklist=[item.model_dump(mode="json") for item in row.checklist], repeat_every_days=row.repeat_every_days,
             created_at=row.created_at, updated_at=now(), request_hash="imported"))
+    await db.flush()
+    for row in backup.tasks:
+        if row.recurrence_parent_ref:
+            task = await db.get(WorkItem, task_map[row.ref])
+            task.recurrence_parent_id = task_map[row.recurrence_parent_ref]
     await db.flush()
     thread_map = {}
     for row in backup.discussions:

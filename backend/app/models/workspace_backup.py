@@ -3,6 +3,7 @@ from datetime import date
 from typing import Literal
 from pydantic import AwareDatetime, Field, model_validator
 from app.models.project_backup import ProjectBackup, StrictModel, Ref
+from app.models.workspace import ChecklistItem
 
 
 class SavedTask(StrictModel):
@@ -14,6 +15,21 @@ class SavedTask(StrictModel):
     priority: Literal["LOW", "MEDIUM", "HIGH"]
     due_date: date | None = None
     created_at: AwareDatetime
+
+
+    checklist: list[ChecklistItem] = Field(default_factory=list, max_length=50)
+    repeat_every_days: int | None = Field(default=None, ge=1, le=365)
+    recurrence_parent_ref: Ref | None = None
+
+    @model_validator(mode="after")
+    def execution(self):
+        if len({item.id for item in self.checklist}) != len(self.checklist):
+            raise ValueError("duplicate checklist ID")
+        if self.repeat_every_days and not self.due_date:
+            raise ValueError("recurrence requires due date")
+        if self.status == "DONE" and any(not item.done for item in self.checklist):
+            raise ValueError("completed task has unfinished checklist")
+        return self
 
 
 class SavedDiscussion(StrictModel):
@@ -44,8 +60,6 @@ class SavedReply(StrictModel):
     discussion_ref: Ref
     body: str = Field(min_length=1, max_length=8000)
     created_at: AwareDatetime
-
-
 class SavedLink(StrictModel):
     source_ref: Ref
     target_ref: Ref
@@ -74,6 +88,17 @@ class WorkspaceBackup(StrictModel):
         tasks = {row.ref for row in self.tasks}
         if len(tasks) != len(self.tasks):
             raise ValueError("tasks: duplicate reference")
+        parents = [row.recurrence_parent_ref for row in self.tasks if row.recurrence_parent_ref is not None]
+        if len(set(parents)) != len(parents) or not set(parents) <= tasks:
+            raise ValueError("recurrence: duplicate or unknown parent")
+        lineage = {row.ref: row.recurrence_parent_ref for row in self.tasks}
+        for origin in lineage:
+            seen, current = set(), origin
+            while current is not None:
+                if current in seen:
+                    raise ValueError("recurrence: cycle")
+                seen.add(current)
+                current = lineage[current]
         threads = [row.ref for row in self.discussions if row.ref is not None]
         if len(set(threads)) != len(threads) or any(r.discussion_ref not in threads for r in self.replies):
             raise ValueError("replies: unknown or duplicate discussion reference")
