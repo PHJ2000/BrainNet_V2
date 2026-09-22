@@ -1,6 +1,6 @@
 import { test, expect, type Page, type WebSocketRoute } from "@playwright/test";
 
-async function fixture(page: Page) {
+async function fixture(page: Page, options: { initialResync?: boolean } = {}) {
   const state = { userId: 1, readOnly: false, tagFail: false, tagAttached: false, aiEnabled: false, aiFail: false, projectFail: false, nodeFail: false, detailFail: false, writeMode: "ok", writes: [] as string[],
     reads: 0, nodeWrites: [] as string[], createFail: false, socket: null as WebSocketRoute | null, connections: 0,
     nodes: [{ id: 1, project_id: 1, content: "원본", parent_id: null as number | null, state: "ACTIVE", depth: 0,
@@ -47,7 +47,7 @@ async function fixture(page: Page) {
   });
   await page.routeWebSocket(/\/projects\/[12]\/ws/, ws => {
     state.socket = ws; state.connections++;
-    ws.send(JSON.stringify({ type: "resync.required" }));
+    if (options.initialResync !== false) ws.send(JSON.stringify({ type: "resync.required" }));
   });
   return state;
 }
@@ -70,7 +70,9 @@ test("project errors recover into searchable sorted results and distinct empty s
 });
 
 test("server outage is not a deleted project and graph load offers retry", async ({ page }) => {
-  const state = await fixture(page); state.detailFail = true;
+  // Exercise manual recovery without a pending socket resync recovering the
+  // graph between enabling responses and clicking the retry button.
+  const state = await fixture(page, { initialResync: false }); state.detailFail = true;
   await page.goto("/dashboard/projects/1");
   await expect(page.getByText("요청을 처리하지 못했습니다. 연결 상태를 확인하고 다시 시도해 주세요.")).toBeVisible();
   await expect(page.getByText("프로젝트 또는 초대 코드를 찾을 수 없습니다.")).toHaveCount(0);
