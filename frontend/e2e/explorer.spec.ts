@@ -20,6 +20,9 @@ test("search, OR tags, collapse, IME and remote tag events share one display mod
     const graph = pages[0].getByRole("list", { name: "그래프 노드" });
     await panel.getByRole("button", { name: "탐색 루트 접기", exact: true }).click();
     await expect(graph.locator("li")).toHaveCount(1);
+    // Hidden nodes must stop receiving canvas input, even though geometry is cached.
+    await pages[0].getByTestId("idea-graph").click({ position: { x: 400, y: 300 } });
+    await expect(pages[0].getByRole("dialog")).toHaveCount(0);
     await pages[0].reload();
     await expect(graph.locator("li")).toHaveCount(1);
     const search = panel.getByRole("searchbox", { name: "노드 검색" });

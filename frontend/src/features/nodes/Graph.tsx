@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, memo } from "react";
-import cytoscape, { Core, ElementDefinition, NodeSingular } from "cytoscape";
+import cytoscape, { Core, ElementDefinition, NodeSingular, EdgeSingular } from "cytoscape";
 import { useGraphActions } from "./useGraphActions";
 import { useGraphData } from "./useGraphData";
 import { useGraphEditing } from "./useGraphEditing";
@@ -107,6 +107,7 @@ export default function Graph({ projectId, readOnly = false, aiEnabled = false }
   const visibleRef = useRef(view.visible);
   const canvasSnapshot = useRef(new Map<string, NodeMeta>());
   const displaySnapshot = useRef(new Map<string, { visible: boolean; opacity: number }>());
+  const edgeVisibility = useRef(new Map<string, boolean>());
   useLayoutEffect(() => { visibleRef.current = view.visible; }, [view.visible]);
   const addToCy = useCallback((arr: NodeMeta[]) => {
     const cy = cyInstance.current;
@@ -299,6 +300,8 @@ export default function Graph({ projectId, readOnly = false, aiEnabled = false }
         }
       }
       canvasSnapshot.current = new Map(nodes.map(n => [n.id, n]));
+      const edgeIds = new Set(cy.edges().map(edge => edge.id()));
+      for (const id of edgeVisibility.current.keys()) if (!edgeIds.has(id)) edgeVisibility.current.delete(id);
     });
   }, [nodes, addToCy]);
   useEffect(() => {
@@ -329,10 +332,20 @@ export default function Graph({ projectId, readOnly = false, aiEnabled = false }
       });
       // A scratch setter also recalculates Cytoscape styles. Keep our cache outside
       // Cytoscape and notify the renderer once per changed style group.
-      if (show.length) cy.collection(show).style("display", "element");
-      if (hide.length) cy.collection(hide).style("display", "none");
+      // Fixed positions can retain geometry when hidden. display:none invalidates
+      // endpoint/parallel-edge bounds and recomputes curves for the whole branch.
+      if (show.length) cy.collection(show).style("visibility", "visible");
+      if (hide.length) cy.collection(hide).style("visibility", "hidden");
       for (const [opacity, group] of opacityGroups) cy.collection(group).style("opacity", opacity);
-      // Cytoscape automatically hides incident edges when either endpoint has display:none.
+      // visibility does not inherit across edges: hide edges explicitly as well.
+      const showEdges: EdgeSingular[] = [], hideEdges: EdgeSingular[] = [];
+      cy.edges().forEach(edge => {
+        const visible = view.visible.has(edge.data("source")) && view.visible.has(edge.data("target"));
+        if (edgeVisibility.current.get(edge.id()) !== visible) (visible ? showEdges : hideEdges).push(edge);
+        edgeVisibility.current.set(edge.id(), visible);
+      });
+      if (showEdges.length) cy.collection(showEdges).style("visibility", "visible");
+      if (hideEdges.length) cy.collection(hideEdges).style("visibility", "hidden");
       if (explorer.focus && view.visible.has(explorer.focus)) cy.$id(explorer.focus).select();
     });
   }, [view, nodes, explorer.focus]);
