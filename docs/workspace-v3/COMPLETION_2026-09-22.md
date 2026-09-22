@@ -1,7 +1,7 @@
 # Workspace V3 후속 범위 구현 기록
 
-기준 브랜치 `feat/brainnet-workspace-v3`, 이전 배포 `9560bfe`. 마이그레이션 `b922003`.
-앞선 릴리스에서 후속으로 남겼던 제품 기능을 실제 API·화면·복원 계약까지 연결한다.
+기준 브랜치 `feat/brainnet-workspace-v3`, 구현 커밋 `b2037bd`, 최종 수정·배포 코드 `ee6d0e5`. 마이그레이션 `b922003`.
+앞선 릴리스에서 후속으로 남겼던 제품 기능을 실제 API·화면·복원 계약까지 연결했다.
 
 ## 팀 협업과 실행
 
@@ -46,7 +46,15 @@ API 인스턴스의 worker는 프로젝트 잠금과 skip-locked claim을 사용
 - 프런트 단위 14개, TypeScript·ESLint·새 Python 파일 Ruff 통과.
 - 전용 빈 PostgreSQL에서 head → b922002 → head 및 Alembic check 통과.
 - 1만 과제 + 1만 노드의 로컬 순차 ASGI 검색: 각 20회, 과제 p95 51.90ms, 지식 p95 38.18ms. 최초 요청 포함 최대값은 각각 4.88초, 1.28초다. 이 규모에서 PostgreSQL은 순차 스캔을 선택했다. 고부하·외부 네트워크 성능을 의미하지 않는다.
-- 브라우저·최종 배포 결과는 완료 후 이 절에 확정 기록한다.
+- 브라우저 고유 시나리오 25개 통과: 로컬 실패 원인 수정 후 해당 시나리오 재검사 및 최종 CI 전체 실행 기준. 장시간 성능/진단 3개는 실행하지 않았다.
+- 새 협업 시나리오에서 두 계정 알림→토론 진입, 선행 조건과 일괄 완료, 링크/역링크, Tab/Escape/포커스 복원, 두 브라우저의 서버 초안 공유, 390px 모바일 저장을 확인했다. 실제 모바일·데스크톱 캡처도 확인했다.
+- 저장 중 버튼이 비활성화되어 초점이 body로 옮겨진 경우에도 대화상자가 Tab 초점을 회수한다. 일괄 선택은 이벤트 당시 체크 상태를 복사해 React의 지연 상태 갱신에서도 유지한다.
+- Windows bind mount의 PostCSS 빌드 시간 초과를 피하도록 검증 프런트도 소스를 이미지에 복사해 빌드한다. 로컬 배포와 같은 Dockerfile을 사용하며 API 주소만 build arg로 다르게 지정한다.
+- 로컬 `http://localhost:3000` 배포 완료. DB·API·프런트 모두 healthy, DB revision `b922003`, event bridge/AI worker ready.
+- 배포 전 SQL 백업 `.tools/local-before-workspace-plus.sql`. 전후 프로젝트 1개·노드 2개와 프로젝트/노드/멤버 전체 행 해시가 동일하다.
+- 실행 중 이미지의 변경된 백엔드·프런트 소스 27개가 작업 트리와 일치한다. 배포 환경에서 인증한 읽기 전용 새 API와 작업 공간 네 화면을 확인했다. 개인 데이터에 테스트 쓰기는 하지 않았다.
+- 최종 코드의 [GitHub CI](https://github.com/PHJ2000/BrainNet_V2/actions/runs/35710933515): 백엔드 계약/마이그레이션, 프런트 빌드, Python 의존성 보안, Spring 호환, 브라우저/제공자 장애/이벤트/전환·롤백 검사 통과.
+- `brainnet-next-validation` 검증 컨테이너는 종료하고 DB 볼륨은 보존했다. 개인 `brainnet-local`은 계속 실행한다.
 
 AI worker의 마지막 정상 poll·실행 여부·누적 실패는 `/health/ai`로 확인한다. `/metrics`에 worker 준비 상태와 실패 횟수를 노출한다.
 
