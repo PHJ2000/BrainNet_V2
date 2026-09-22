@@ -33,8 +33,12 @@ test("team replies, inbox, dependencies, bidirectional knowledge and portable cl
   await page.getByRole("button", { name: "과제 저장", exact: true }).click();
   await page.getByLabel("선택: 사전 조사", { exact: true }).check();
   await page.getByLabel("선택: 실험 실행", { exact: true }).check();
+  await expect(page.getByText("2개 선택 · 최대 100개", { exact: true })).toBeVisible();
   await page.getByLabel("일괄 변경 상태").selectOption("DONE");
+  const bulkResponse = page.waitForResponse(response => response.url().endsWith(`${base}/tasks/bulk-status`) && response.request().method() === "POST");
   await page.getByRole("button", { name: "선택 과제 상태 변경" }).click();
+  const bulk = await bulkResponse;
+  expect(bulk.status(), await bulk.text()).toBe(200);
   await expect(page.getByRole("region", { name: "완료", exact: true })).toContainText("실험 실행");
   await page.getByRole("button", { name: "지식", exact: true }).click();
   const linkButton = page.getByRole("button", { name: "관련 지식 / 역링크" }).first();

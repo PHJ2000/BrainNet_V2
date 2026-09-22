@@ -45,7 +45,7 @@ SELECT json_build_object('operations',(SELECT count(*) FROM node_operation),
 Start-Transcript -LiteralPath $log | Out-Null
 Push-Location $repo
 try {
-    if (-not $SkipBuild) { Compose -Arguments @('build', 'fastapi', 'spring') }
+    if (-not $SkipBuild) { Compose -Arguments @('build', 'fastapi', 'spring', 'frontend') }
     Compose -Arguments @('up', '-d', '--wait', 'db', 'tools')
     if (-not $RuntimeOnly) {
         # Outbox workers must not race tests that inspect/reset the same test tables.
