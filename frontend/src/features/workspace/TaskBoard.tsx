@@ -21,6 +21,13 @@ export function TaskEditor({ projectId, task, onClose, readOnly = false }: { pro
   const update = <K extends keyof Task>(key: K, next: Task[K]) => setValue(current => ({ ...current, [key]: next }));
   const save = async () => {
     if (busy) return;
+    // Reject editable input before freezing a new request for safe retries.
+    if (value.repeat_every_days && !value.due_date) {
+      setError("반복 과제에는 마감일이 필요합니다."); return;
+    }
+    if (value.status === "DONE" && value.checklist?.some(item => !item.done)) {
+      setError("체크리스트의 모든 항목을 완료한 뒤 과제를 완료해 주세요."); return;
+    }
     setBusy(true); setAttempted(true); setError("");
     storage.save({ item: value, attempted: true });
     try {

@@ -19,7 +19,12 @@ test("my work, checklist completion, recurring next occurrence and project overv
   await page.getByLabel("반복 간격", { exact: true }).fill("7");
   await page.getByRole("button", { name: "체크 항목 추가" }).click();
   await page.getByLabel("체크리스트 1 내용").fill("오류 로그 검토");
+  await page.getByLabel("과제 상태").selectOption("DONE");
   await page.getByRole("button", { name: "과제 저장", exact: true }).click();
+  await expect(page.getByRole("dialog").getByRole("alert")).toContainText("체크리스트의 모든 항목");
+  await expect(page.getByLabel("체크리스트 1 완료")).toBeEnabled();
+  await page.getByLabel("과제 상태").selectOption("TODO");
+  await page.getByRole("button", { name: "같은 내용으로 재시도", exact: true }).click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await page.goto("/dashboard");
   await page.getByRole("button", { name: "내 작업함", exact: true }).click();
