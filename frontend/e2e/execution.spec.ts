@@ -14,7 +14,7 @@ test("my work, checklist completion, recurring next occurrence and project overv
   await page.getByRole("button", { name: "실행 보드", exact: true }).click();
   await page.getByRole("button", { name: "새 과제", exact: true }).click();
   await page.getByLabel("과제 제목", { exact: true }).fill("매주 운영 점검");
-  await page.getByLabel("담당자", { exact: true }).selectOption(String(me.id));
+  await page.getByRole("combobox", { name: "담당자", exact: true }).selectOption(String(me.id));
   await page.getByLabel("마감일", { exact: true }).fill("2026-09-22");
   await page.getByLabel("반복 간격", { exact: true }).fill("7");
   await page.getByRole("button", { name: "체크 항목 추가" }).click();
@@ -26,10 +26,10 @@ test("my work, checklist completion, recurring next occurrence and project overv
   await page.getByLabel("작업 기준일").fill("2026-09-22");
   await page.getByLabel("마감 필터").selectOption("today");
   await page.getByRole("link", { name: "매주 운영 점검", exact: true }).click();
-  await expect(page.getByRole("dialog", { name: "실행 과제", exact: true })).toBeVisible();
+  await expect(page.getByRole("dialog").getByRole("heading", { name: "실행 과제", exact: true })).toBeVisible();
   await page.getByLabel("과제 상태").selectOption("DONE");
   await page.getByRole("button", { name: "과제 저장", exact: true }).click();
-  await expect(page.getByRole("alert")).toContainText("체크리스트의 모든 항목");
+  await expect(page.getByRole("dialog").getByRole("alert")).toContainText("체크리스트의 모든 항목");
   await page.getByLabel("체크리스트 1 완료").check();
   await page.getByRole("button", { name: "같은 내용으로 재시도", exact: true }).click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
