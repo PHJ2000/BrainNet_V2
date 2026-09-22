@@ -17,7 +17,9 @@ final class ApiModels {
             boolean is_deleted,
             Long member_count,
             long node_count,
-            long tag_count) {}
+            long tag_count,
+            String my_role,
+            boolean ai_enabled) {}
 
     record NodeView(
             long id,

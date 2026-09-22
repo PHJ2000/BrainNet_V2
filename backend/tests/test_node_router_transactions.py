@@ -180,7 +180,7 @@ async def test_ai_releases_read_transaction_then_rechecks_in_write_transaction(m
         events.append(f"inherit:{parent_id}:{node_id}")
         return [5]
 
-    monkeypatch.setattr(nodes, "_m", ensure_member)
+    monkeypatch.setattr(nodes, "_e", ensure_member)
     monkeypatch.setattr(nodes, "_validate_parent", validate_parent)
     monkeypatch.setattr(nodes, "_inherit_parent_tags", inherit_tags)
     monkeypatch.setattr(ai_provider, "_get_ai_client", lambda: fake_ai_client(events))
@@ -227,7 +227,7 @@ async def test_ai_timeout_has_no_write_after_read_transaction_release(monkeypatc
     client = SimpleNamespace(
         chat=SimpleNamespace(completions=TimeoutCompletions(events))
     )
-    monkeypatch.setattr(nodes, "_m", ensure_member)
+    monkeypatch.setattr(nodes, "_e", ensure_member)
     monkeypatch.setattr(nodes, "_validate_parent", validate_parent)
     monkeypatch.setattr(ai_provider, "_get_ai_client", lambda: client)
 
@@ -264,7 +264,7 @@ async def test_ai_parent_deleted_during_provider_returns_stable_404_without_writ
                 detail=error_detail("PARENT_NODE_NOT_FOUND", "Parent node not found"),
             )
 
-    monkeypatch.setattr(nodes, "_m", ensure_member)
+    monkeypatch.setattr(nodes, "_e", ensure_member)
     monkeypatch.setattr(nodes, "_validate_parent", validate_parent)
     monkeypatch.setattr(ai_provider, "_get_ai_client", lambda: fake_ai_client(events))
 
@@ -308,7 +308,7 @@ async def test_ai_node_and_inherited_tags_rollback_together(monkeypatch):
         events.append("inherit")
         raise RuntimeError("forced tag failure")
 
-    monkeypatch.setattr(nodes, "_m", ensure_member)
+    monkeypatch.setattr(nodes, "_e", ensure_member)
     monkeypatch.setattr(nodes, "_validate_parent", validate_parent)
     monkeypatch.setattr(nodes, "_inherit_parent_tags", fail_inherit)
     monkeypatch.setattr(ai_provider, "_get_ai_client", lambda: fake_ai_client(events))
@@ -352,7 +352,7 @@ async def test_ai_rechecks_membership_after_provider_before_writing(monkeypatch)
     async def validate_parent(_project_id, _parent_id, _db, *, for_key_share=False):
         events.append("parent-lock" if for_key_share else "parent-read")
 
-    monkeypatch.setattr(nodes, "_m", ensure_member)
+    monkeypatch.setattr(nodes, "_e", ensure_member)
     monkeypatch.setattr(nodes, "_validate_parent", validate_parent)
     monkeypatch.setattr(ai_provider, "_get_ai_client", lambda: fake_ai_client(events))
 

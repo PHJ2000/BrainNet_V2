@@ -87,3 +87,10 @@ async def get_tag(tag_id: int, project_id: int, db: AsyncSession):
     return tag
 
 
+
+
+async def ensure_editor(uid: int, project_id: int, db: AsyncSession):
+    member = await ensure_member(uid, project_id, db)
+    if getattr(member.role, "value", member.role) not in ("OWNER", "EDITOR"):
+        raise HTTPException(403, "Read-only project access")
+    return member

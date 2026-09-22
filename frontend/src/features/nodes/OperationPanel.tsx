@@ -7,8 +7,8 @@ import { confirmDelete, DeletePreview, listOperations, Operation, operationError
 const labels = { create: "노드 생성", update: "본문·위치 변경", delete: "가지 삭제", undo: "실행 취소" };
 const button = "rounded border border-slate-300 bg-white px-3 py-1.5 text-sm hover:bg-slate-50 disabled:opacity-50";
 
-export default function OperationPanel({ projectId, deleteId, closeDelete, refresh }: {
-  projectId: number; deleteId: string | null; closeDelete: () => void; refresh: () => Promise<unknown>;
+export default function OperationPanel({ projectId, deleteId, closeDelete, refresh, readOnly = false }: {
+  readOnly?: boolean; projectId: number; deleteId: string | null; closeDelete: () => void; refresh: () => Promise<unknown>;
 }) {
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState<Operation[]>([]);
@@ -69,7 +69,7 @@ export default function OperationPanel({ projectId, deleteId, closeDelete, refre
       <ol className="divide-y">{items.map(item => <li key={item.id} className="py-3 text-sm">
         <div>{labels[item.kind]} · 노드 {item.node_id}</div>
         <div className="text-xs text-slate-500">사용자 {item.actor_id ?? "삭제됨"} · {new Date(item.created_at).toLocaleString()}</div>
-        <button className={`${button} mt-2`} disabled={!item.can_undo || busy} onClick={() => void inspect(item)}>
+        <button className={`${button} mt-2`} disabled={readOnly || !item.can_undo || busy} onClick={() => void inspect(item)}>
           {item.expired ? "보존 기간 만료" : item.undone_by ? "취소 완료" : item.can_undo ? "되돌리기 미리보기" : "취소할 수 없음"}
         </button>
       </li>)}</ol>
@@ -88,7 +88,7 @@ export default function OperationPanel({ projectId, deleteId, closeDelete, refre
         {error && <p role="alert" className="my-3 text-sm text-red-700">{error}</p>}
         <div className="mt-5 flex justify-end gap-2">
           <button className={button} disabled={busy} onClick={() => { setPreview(null); setDeletion(null); closeDelete(); setError(""); }}>닫기</button>
-          <button className={button} disabled={busy || (!!deleteId && !deletion)} onClick={() => void confirm()}>{busy ? "처리 중…" : deleteId ? "가지 삭제 확인" : "실행 취소 확인"}</button>
+          <button className={button} disabled={readOnly || busy || (!!deleteId && !deletion)} onClick={() => void confirm()}>{busy ? "처리 중…" : deleteId ? "가지 삭제 확인" : "실행 취소 확인"}</button>
         </div>
       </section>
     </div>}

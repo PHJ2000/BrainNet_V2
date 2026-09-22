@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from app.routers import (
-    auth, users, projects, nodes, tags, votes, history, websocket, node_operations, project_files
+    auth, users, projects, nodes, tags, votes, history, websocket, node_operations, project_files, members
 )
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.errors import install_error_handlers
@@ -80,9 +80,9 @@ app.add_middleware(
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
-    expose_headers=["X-Trace-Id", "Retry-After"],
+    expose_headers=["X-Trace-Id", "Retry-After", "ETag"],
 )
 app.add_middleware(TraceIdMiddleware)
 
-for r in (auth, users, projects, nodes, tags, votes, history, websocket, node_operations, project_files):
+for r in (auth, users, projects, nodes, tags, votes, history, websocket, node_operations, project_files, members):
     app.include_router(r.router)

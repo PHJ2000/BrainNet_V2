@@ -124,6 +124,16 @@ class VerticalSliceIntegrationTest {
     }
 
     @Test
+    void viewerReadsButCannotCreatePatchOrReplayWrites() throws Exception {
+        jdbc.update("UPDATE project_user_role SET role='VIEWER' WHERE project_id=1 AND user_id=7");
+        assertThat(request("GET", "/projects/1", bearer(7), null, "viewer-read").statusCode()).isEqualTo(200);
+        assertThat(request("GET", "/projects/1/nodes/11", bearer(7), null, "viewer-node").statusCode()).isEqualTo(200);
+        assertThat(requestWithIdempotency("POST", "/projects/1/nodes", bearer(7), "{\"content\":\"denied\",\"parent_id\":11}", "viewer-create").statusCode()).isEqualTo(403);
+        assertThat(request("PATCH", "/projects/1/nodes/11", bearer(7), "{\"content\":\"denied\",\"expected_version\":0}", "viewer-patch").statusCode()).isEqualTo(403);
+        assertThat(jdbc.queryForObject("SELECT content FROM node WHERE id=11", String.class)).isEqualTo("before");
+    }
+
+    @Test
     void createsRegularNodeAndWritesOutboxAtomically() throws Exception {
         HttpResponse<String> response = request("POST", "/projects/1/nodes", bearer(7),
                 "{\"content\":\"child\",\"parent_id\":11,\"depth\":1,\"order\":2,\"pos_x\":3.5,\"pos_y\":4.5,\"state\":\"GHOST\"}",

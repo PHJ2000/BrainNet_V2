@@ -8,6 +8,8 @@ deploy/validation-logs
 **/.next
 **/__pycache__
 **/.pytest_cache
+**/test-results*
+**/playwright-report
 **/*.pyc
 backend/tests
 docs

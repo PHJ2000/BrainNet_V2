@@ -28,6 +28,7 @@ export async function runChildCreationPlan(
     regular: (payload: Payload, key: string) => Promise<unknown>;
   },
   isCurrent: () => boolean = () => true,
+  allowFallback = true,
 ): Promise<boolean> {
   for (let index = 0; index < plan.children.length; index++) {
     if (!isCurrent()) return false;
@@ -39,7 +40,7 @@ export async function runChildCreationPlan(
         child.done = true;
         continue;
       } catch (error) {
-        if (!isProviderFailure(error)) throw error;
+        if (!allowFallback || !isProviderFailure(error)) throw error;
         // A definitive provider failure permits the existing blank-node fallback.
         // Freeze that choice; a later retry must not create AI nodes in filled slots.
         for (const remaining of plan.children.slice(index)) {

@@ -20,6 +20,8 @@ class ProjectOut(BaseModel):
     created_at: datetime
     updated_at: datetime
     is_deleted: Optional[bool] = None
+    my_role: Optional[str] = None
+    ai_enabled: bool = False
     member_count: Optional[int] = None
     node_count: Optional[int] = None
     tag_count: Optional[int] = None

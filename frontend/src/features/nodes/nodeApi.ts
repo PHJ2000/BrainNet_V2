@@ -50,6 +50,15 @@ export async function fetchNodes(
   return data;
 }
 
+/** Cache belongs to one mounted project/account, never a shared global snapshot. */
+export async function fetchGraphSnapshot(projectId: number, etag: string | undefined, signal: AbortSignal) {
+  const response = await apiClient.get<NodeOut[]>(`/projects/${projectId}/nodes`, {
+    signal, headers: { "X-Graph-Cache": "1", ...(etag ? { "If-None-Match": etag } : {}) },
+    validateStatus: status => status === 304 || (status >= 200 && status < 300),
+  });
+  return { unchanged: response.status === 304, nodes: response.data, etag: response.headers.etag as string | undefined };
+}
+
 /* ────────── POST: 일반 노드 생성 ──────────*/
 export async function createNode(
   projectId: number | string,

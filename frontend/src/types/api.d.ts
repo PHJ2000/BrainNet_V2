@@ -9,6 +9,8 @@ export interface User {
 }
 
 export interface Project {
+  my_role?: "OWNER" | "EDITOR" | "VIEWER";
+  ai_enabled?: boolean;
   id: string;
   name: string;
   description?: string;

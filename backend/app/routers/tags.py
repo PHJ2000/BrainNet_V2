@@ -9,7 +9,7 @@ from sqlalchemy import select, delete, func
 
 from app.models.tag import TagCreate, TagUpdate, TagOut
 from app.core.security import get_current_user_id as _uid
-from app.utils.helpers import ensure_member as _m
+from app.utils.helpers import ensure_editor as _e, ensure_member as _m
 from app.db.models.tag import Tag as TagORM
 from app.db.models.tag_node import TagNode as TagNodeORM
 from app.db.models.node import Node as NodeORM
@@ -88,7 +88,7 @@ async def create_tag(
     - ensure_member 검사: 프로젝트에 속한 사용자여야 함
     - name, color 필드로 TagORM 인스턴스 삽입
     """
-    await _m(int(uid), project_id, db)
+    await _e(int(uid), project_id, db)
 
     new_tag = TagORM(
         project_id=project_id,
@@ -166,7 +166,7 @@ async def update_tag(
     태그 이름(name) 혹은 색상(color)을 수정합니다.
     - ensure_member 검사
     """
-    await _m(int(uid), project_id, db)
+    await _e(int(uid), project_id, db)
 
     # (1) ORM에서 태그 조회
     result = await db.execute(
@@ -215,7 +215,7 @@ async def delete_tag(
     - ensure_member 검사
     - TagNode 테이블에서 해당 tag_id로 연결된 모든 행도 함께 삭제됩니다 (CASCADE)
     """
-    await _m(int(uid), project_id, db)
+    await _e(int(uid), project_id, db)
 
     # (1) ORM에서 태그 조회 & 삭제
     result = await db.execute(
@@ -258,7 +258,7 @@ async def attach_tag(
     - 이미 연결되어 있으면 409 에러
     """
     t0 = time.time()
-    await _m(int(uid), project_id, db)
+    await _e(int(uid), project_id, db)
     t1 = time.time()
 
     # (1) Tag가 project_id에 속하는지 확인
@@ -338,7 +338,7 @@ async def detach_tag(
     - 연결된 적 없으면 400 에러
     """
     t0 = time.time()
-    await _m(int(uid), project_id, db)
+    await _e(int(uid), project_id, db)
     t1 = time.time()
 
     # (1) Tag 존재 여부 검사

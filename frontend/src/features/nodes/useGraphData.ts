@@ -1,7 +1,7 @@
 "use client";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { listTags } from "@/features/projects/tagApi";
-import { fetchNodes } from "./nodeApi";
+import { fetchGraphSnapshot } from "./nodeApi";
 import { NodeMeta, Tag, toNodeMeta } from "./graphModel";
 import { useNodeEvents } from "./useNodeEvents";
 import { projectError } from "@/features/projects/projectError";
@@ -18,12 +18,14 @@ export function useGraphData(projectId: number) {
   const refreshSequence = useRef(0);
   const alive = useRef(true);
   const controller = useRef(new AbortController());
+  const etag = useRef<string | undefined>(undefined);
   const inflight = useRef<{ projectId: number; promise: Promise<NodeMeta[] | undefined> } | null>(null);
   useLayoutEffect(() => {
     controller.current = new AbortController();
     projectIdRef.current = projectId;
     alive.current = true;
     refreshSequence.current++;
+    etag.current = undefined;
     return () => { alive.current = false; controller.current.abort(); };
   }, [projectId]);
 
@@ -43,7 +45,11 @@ export function useGraphData(projectId: number) {
     const request = async () => {
       setLoading(true);
       try {
-        const [list, tagList] = await Promise.all([fetchNodes(targetProjectId, undefined, scope.signal), listTags(targetProjectId, scope.signal)]);
+        const snapshot = await fetchGraphSnapshot(targetProjectId, afterWrite ? undefined : etag.current, scope.signal);
+        if (!scope.isCurrent()) return;
+        if (snapshot.unchanged) { setLoadError(null); return nodesRef.current; }
+        const list = snapshot.nodes;
+        const tagList = await listTags(targetProjectId, scope.signal);
         if (!scope.isCurrent() || targetProjectId !== projectIdRef.current || sequence !== refreshSequence.current) return;
         const previous = new Map(nodesRef.current.map(node => [node.id, node]));
         const next = list.map(node => toNodeMeta(node, previous.get(String(node.id))));
@@ -55,6 +61,7 @@ export function useGraphData(projectId: number) {
         setTags(previousTags => JSON.stringify(previousTags) === JSON.stringify(nextTags) ? previousTags : nextTags);
         setLoaded(true);
         setLoadError(null);
+        etag.current = snapshot.etag;
         return next;
       } catch (error) {
         if (scope.isCurrent()) setLoadError(projectError(error));

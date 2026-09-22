@@ -7,6 +7,7 @@ import { useGraphData } from "./useGraphData";
 import { useGraphEditing } from "./useGraphEditing";
 import { type NodeMeta, type Tag } from "./graphModel";
 export type { NodeMeta, Tag } from "./graphModel";
+import NodeEditor from "./NodeEditor";
 import OperationPanel from "./OperationPanel";
 import GraphExplorer from "./GraphExplorer";
 import { useGraphView } from "./useGraphView";
@@ -22,6 +23,8 @@ import "react-contexify/ReactContexify.css";
 /* ───────────── 타입 ───────────── */
 export interface GraphProps {
   projectId: number;
+  readOnly?: boolean;
+  aiEnabled?: boolean;
 }
 
 /* ──────────── Context-menu 컴포넌트 ─────────── */
@@ -35,6 +38,9 @@ interface CtxProps {
   onDelete: () => void;
   onCreate: () => void;
   onCollapse: () => void;
+  onGenerate: () => void;
+  readOnly: boolean;
+  aiEnabled: boolean;
 }
 
 const NodeContextMenu = memo(function NodeContextMenu({
@@ -44,14 +50,15 @@ const NodeContextMenu = memo(function NodeContextMenu({
   onRemove,
   onDelete,
   onCreate,
-  onCollapse,
+  onCollapse, onGenerate, readOnly, aiEnabled,
 }: CtxProps) {
   return (
     <Menu id={NODE_MENU_ID} animation="fade">
-      <Item onClick={onCreate}>자식 노드 추가…</Item>
+      <Item disabled={readOnly} onClick={onCreate}>자식 노드 추가…</Item>
+      <Item disabled={readOnly || !aiEnabled} onClick={onGenerate}>AI 아이디어 생성</Item>
       <Item onClick={onCollapse}>가지 접기 / 펼치기</Item>
-      <Item onClick={onDelete}>가지 삭제…</Item>
-      <Submenu label="태그 달기…">
+      <Item disabled={readOnly} onClick={onDelete}>가지 삭제…</Item>
+      <Submenu disabled={readOnly} label="태그 달기…">
         {tags.map((t) => (
           <Item
             key={t.id}
@@ -65,7 +72,7 @@ const NodeContextMenu = memo(function NodeContextMenu({
       </Submenu>
 
       {nodeTags.length > 0 && (
-        <Submenu label="태그 떼기…">
+        <Submenu disabled={readOnly} label="태그 떼기…">
           {nodeTags.map((tid) => {
             const tg = tags.find((t) => t.id === tid);
             return (
@@ -85,7 +92,7 @@ function useNodeMenu() {
   return show;
 }
 /* ──────────── 그래프 컴포넌트 ─────────── */
-export default function Graph({ projectId }: GraphProps) {
+export default function Graph({ projectId, readOnly = false, aiEnabled = false }: GraphProps) {
   const cyRef = useRef<HTMLDivElement>(null);
   const cyInstance = useRef<Core | null>(null);
   const data = useGraphData(projectId);
@@ -152,7 +159,7 @@ export default function Graph({ projectId }: GraphProps) {
   }, [highlightTag, nodesRef]);
   const actions = useGraphActions(data, ctxNodeId, visibleRef);
   const { handleAddTag, handleRemoveTag } = actions;
-  const editing = useGraphEditing(data, actions, cyInstance, visibleRef);
+  const editing = useGraphEditing(data, actions, cyInstance, visibleRef, readOnly);
   const { save } = editing;
 
   /* ----- cytoscape init ----- */
@@ -265,6 +272,8 @@ export default function Graph({ projectId }: GraphProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => { cyInstance.current?.autoungrabify(readOnly); }, [readOnly]);
+
   // Update the canvas in one batch; searching only changes visibility, never positions.
   useEffect(() => {
     const cy = cyInstance.current;
@@ -296,6 +305,9 @@ export default function Graph({ projectId }: GraphProps) {
     const cy = cyInstance.current;
     if (!cy) return;
     const byId = new Map(nodes.map(n => [n.id, n]));
+    // Empty results hide the canvas as a whole. Keep the last per-node display
+    // state so returning to results does not restyle thousands of unchanged nodes.
+    if (!view.visible.size) { cy.$(":selected").unselect(); return; }
     cy.batch(() => {
       const show: NodeSingular[] = [], hide: NodeSingular[] = [];
       const opacityGroups = new Map<number, NodeSingular[]>();
@@ -350,18 +362,26 @@ export default function Graph({ projectId }: GraphProps) {
   return (
     <div className="relative h-full w-full">
       <div aria-label="동기화 상태" className="absolute bottom-4 left-4 z-30 max-w-md rounded-lg border bg-white/95 p-3 shadow-sm">
-        <p role="status" className="text-sm">{data.connection} · {save.state.message}</p>
+        <p role="status" className="text-sm">{readOnly ? "읽기 전용 · " : ""}{data.connection} · {save.state.message}</p>
         {save.state.detail && <p className="mt-1 max-h-24 overflow-auto whitespace-pre-wrap text-sm text-slate-600">{save.state.detail}</p>}
         {save.state.kind === "failed" && <button className="mt-2 rounded border px-3 py-1 text-sm" onClick={() => void save.retry()}>저장 다시 시도</button>}
         {save.state.kind === "conflict" && <button className="mt-2 rounded border px-3 py-1 text-sm" onClick={() => void refreshNodes(projectId, true).catch(() => undefined)}>최신 상태 확인</button>}
-        {["failed", "conflict"].includes(save.state.kind) && <button className="ml-2 text-sm underline" onClick={save.discard}>입력 버리기</button>}
+        {["failed", "conflict"].includes(save.state.kind) && <button className="ml-2 text-sm underline" onClick={editing.discard}>입력 버리기</button>}
       </div>
+      {editing.draft && !editing.open && <button onClick={editing.resume} className="absolute bottom-28 left-4 z-30 rounded border bg-white px-4 py-2">초안 이어쓰기</button>}
+      <NodeEditor editing={editing} />
+      {actions.tagSave.state.kind !== "idle" && <div role="status" className="absolute bottom-44 left-4 z-30 max-w-sm rounded border bg-white p-3 text-sm">태그 · {actions.tagSave.state.message}
+        <p>{actions.tagSave.state.detail}</p>
+        {actions.tagSave.state.kind === "failed" && <button onClick={() => void actions.tagSave.retry()} className="mt-2 rounded border px-2 py-1">태그 다시 시도</button>}
+        {!["saving"].includes(actions.tagSave.state.kind) && <button className="ml-2 underline" onClick={actions.tagSave.discard}>안내 닫기</button>}
+      </div>}
+      {!aiEnabled && <p className="absolute right-4 top-16 z-10 text-xs text-slate-500">수동 작성 모드 · AI 생성은 설정 후 사용할 수 있습니다.</p>}
       {data.loadError && <div role="alert" className="absolute left-4 top-20 z-40 max-w-md rounded border border-red-200 bg-white p-4 shadow">
         <p>{data.loadError}</p><button disabled={data.loading} onClick={() => void refreshNodes(projectId).catch(() => undefined)} className="mt-2 rounded border px-3 py-1">노드 다시 불러오기</button>
       </div>}
       <GraphExplorer explorer={explorer} tags={tags} loaded={loaded} onFocus={() => undefined} />
       <ProjectFiles projectId={projectId} nodes={nodes} />
-      <OperationPanel key={`${projectId}:${deleteId ?? ""}`} projectId={projectId} deleteId={deleteId}
+      <OperationPanel readOnly={readOnly} key={`${projectId}:${deleteId ?? ""}`} projectId={projectId} deleteId={deleteId}
         closeDelete={() => setDeleteId(null)} refresh={() => refreshNodes(projectId)} />
       <div
         ref={cyRef}
@@ -369,6 +389,7 @@ export default function Graph({ projectId }: GraphProps) {
         style={{
           width: "100%",
           height: "100%",
+          visibility: view.visible.size ? "visible" : "hidden",
           background: "linear-gradient(135deg, #f0f4ff 0%, #f9fafe 100%)",
         }}
       />
@@ -453,7 +474,8 @@ export default function Graph({ projectId }: GraphProps) {
         )
       }
 
-      <NodeContextMenu
+      <NodeContextMenu readOnly={readOnly} aiEnabled={aiEnabled}
+        onGenerate={() => { const node = nodesRef.current.find(n => n.id === ctxNodeId); if (node && aiEnabled && !readOnly) void editing.generate(node); }}
         tags={tags}
         nodeTags={
           ctxNodeId

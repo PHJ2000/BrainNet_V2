@@ -1,6 +1,7 @@
 // app/(main)/dashboard/projects/[projectId]/page.tsx
 "use client";
 
+import { useEffect } from "react";
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/lib/apiClient";
@@ -23,6 +24,11 @@ export default function ProjectDetailPage() {
     },
     retry: false,
   });
+  useEffect(() => {
+    const refresh = () => { void refetch(); };
+    window.addEventListener("brainnet:membership", refresh);
+    return () => window.removeEventListener("brainnet:membership", refresh);
+  }, [refetch]);
   if (!validId || isError) return <div role="alert" className="p-6">
     <p>{validId ? projectError(error) : "올바르지 않은 프로젝트 주소입니다."}</p>
     {validId && <button disabled={isFetching} onClick={() => void refetch()} className="mt-3 rounded border px-3 py-2">다시 시도</button>}
@@ -49,7 +55,7 @@ export default function ProjectDetailPage() {
         {project.description}
       </p> */}
       <div className="flex-1 min-h-0">  {/* ⬅️ 여기서 그래프가 flex-1로 꽉 차도록! */}
-        <Graph key={project.id} projectId={Number(project.id)} />
+        <Graph key={project.id} projectId={Number(project.id)} readOnly={project.my_role === "VIEWER"} aiEnabled={project.ai_enabled} />
       </div>
     </div>
   );

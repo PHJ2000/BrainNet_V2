@@ -6,6 +6,9 @@ from app.core.security import get_current_user_id as _uid
 from app.db.dependencies import get_db
 from app.models.node import NodeCreate, NodeOut, NodeUpdate
 from app.services import node_service
+from sqlalchemy import text
+from fastapi import Response
+from app.utils.helpers import ensure_member
 
 router = APIRouter(prefix="/projects/{project_id}/nodes", tags=["Nodes"])
 
@@ -16,7 +19,27 @@ async def list_nodes(
     tag_ids: Optional[str] = Query(None),
     uid: str = Depends(_uid),
     db: AsyncSession = Depends(get_db),
+    request: Request = None,
+    response: Response = None,
 ):
+    # Authorize even when the browser already has a matching representation.
+    # Opt-in keeps existing API consumers and filtered list responses unchanged.
+    if request is not None and request.headers.get("X-Graph-Cache") == "1" and not tag_ids:
+        await ensure_member(int(uid), project_id, db)
+        revision = (await db.execute(text("""
+          SELECT md5(
+            coalesce((SELECT string_agg(row_to_json(n)::text,',' ORDER BY n.id) FROM node n WHERE n.project_id=:pid),'') || '|' ||
+            coalesce((SELECT string_agg(row_to_json(t)::text,',' ORDER BY t.id) FROM tag t WHERE t.project_id=:pid),'') || '|' ||
+            coalesce((SELECT string_agg(tn.node_id::text || ':' || tn.tag_id::text,',' ORDER BY tn.node_id,tn.tag_id)
+                      FROM tag_node tn JOIN node n ON n.id=tn.node_id WHERE n.project_id=:pid),'')
+          )
+        """), {"pid": project_id})).scalar_one()
+        etag = f'"{revision}"'
+        headers = {"ETag": etag, "Cache-Control": "private, no-cache"}
+        if request.headers.get("If-None-Match") == etag:
+            return Response(status_code=304, headers=headers)
+        if response is not None:
+            response.headers.update(headers)
     return await node_service.list_nodes(project_id=project_id, tag_ids=tag_ids, uid=uid, db=db)
 
 

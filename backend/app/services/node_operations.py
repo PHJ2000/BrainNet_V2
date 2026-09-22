@@ -19,7 +19,7 @@ from app.db.models.tag_node import TagNode
 from app.db.models.user import User
 from app.models.node import NodeOut
 from app.services.outbox import append_event
-from app.utils.helpers import ensure_member
+from app.utils.helpers import ensure_member, ensure_editor
 
 
 def fail(code, message, status=409):
@@ -206,6 +206,7 @@ def typed_row(model, row):
 
 
 async def undo(db, project_id, actor_id, operation_id, key, preview_hash):
+    await ensure_editor(int(actor_id), project_id, db)
     await authorize(db, project_id, actor_id)
     request = ["undo", operation_id, preview_hash]
     prior = await replay(db, project_id, actor_id, key, request)

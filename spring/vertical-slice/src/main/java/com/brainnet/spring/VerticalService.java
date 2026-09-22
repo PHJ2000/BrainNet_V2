@@ -83,6 +83,14 @@ class VerticalService {
         }
     }
 
+    private void requireEditor(long projectId, long userId) {
+        requireMember(projectId, userId);
+        String role = jdbc.queryForObject("SELECT role::text FROM project_user_role WHERE project_id=? AND user_id=?", String.class, projectId, userId);
+        if (!"OWNER".equals(role) && !"EDITOR".equals(role)) {
+            throw new ApiException(HttpStatus.FORBIDDEN, "FORBIDDEN", "Read-only project access");
+        }
+    }
+
     ProjectView getProject(long projectId, long userId) {
         requireMember(projectId, userId);
         List<ProjectView> projects = jdbc.query(
@@ -94,7 +102,8 @@ class VerticalService {
                         rs.getLong("id"), rs.getString("name"), rs.getString("description"),
                         rs.getLong("owner_id"), timestamp(rs, "created_at"), timestamp(rs, "updated_at"),
                         rs.getBoolean("is_deleted"), null,
-                        rs.getLong("node_count"), rs.getLong("tag_count")), projectId);
+                        rs.getLong("node_count"), rs.getLong("tag_count"),
+                        jdbc.queryForObject("SELECT role::text FROM project_user_role WHERE project_id=? AND user_id=?", String.class, projectId, userId), provider.configured()), projectId);
         if (projects.isEmpty()) {
             throw new ApiException(HttpStatus.NOT_FOUND, "NOT_FOUND", "Project not found");
         }
@@ -114,7 +123,7 @@ class VerticalService {
     }
 
     CreateResult createNodes(long projectId, NodeCreate body, long userId, String idempotencyKey) {
-        requireMember(projectId, userId);
+        requireEditor(projectId, userId);
         if (body == null) {
             throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY, "VALIDATION_ERROR", "Request validation failed");
         }
@@ -161,7 +170,7 @@ class VerticalService {
             NodeIdempotencyService.Claim claim) {
         return transaction.execute(status -> {
             idempotency.lock(claim);
-            requireMember(projectId, userId);
+            requireEditor(projectId, userId);
             boolean isRoot = body.parent_id() == null || body.parent_id() == 0;
             Long parentId = isRoot ? null : body.parent_id();
             if (isRoot && !"GHOST".equals(forcedState)) {
@@ -211,7 +220,7 @@ class VerticalService {
 
     @Transactional
     NodeView patchNode(long projectId, long nodeId, NodePatch body, long userId) {
-        requireMember(projectId, userId);
+        requireEditor(projectId, userId);
         if (body == null) {
             throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY, "VALIDATION_ERROR", "Request validation failed");
         }

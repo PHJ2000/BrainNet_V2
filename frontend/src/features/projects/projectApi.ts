@@ -26,8 +26,8 @@ export async function deleteProject(id: string): Promise<void> {
   await apiClient.delete(`/projects/${id}`);
 }
 
-export async function inviteProject(id: string, email: string): Promise<{ invite_token: string }> {
-  return (await apiClient.post(`/projects/${id}/invite`, undefined, { params: { email } })).data;
+export async function inviteProject(id: string, email: string, role: "EDITOR" | "VIEWER" = "EDITOR"): Promise<{ invite_token: string }> {
+  return (await apiClient.post(`/projects/${id}/invite`, undefined, { params: { email, role } })).data;
 }
 
 export async function joinProject(token: string): Promise<{ project_id: number }> {

@@ -31,6 +31,7 @@ class NodeProviderService {
         this.aiHttp=HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1)
                 .connectTimeout(Duration.ofSeconds(this.aiTimeoutSeconds)).build();
     }
+    boolean configured() { return aiKey != null && !aiKey.isBlank(); }
     String generateContent(String prompt) {
         if (aiKey == null || aiKey.isBlank()) {
             throw new ApiException(HttpStatus.SERVICE_UNAVAILABLE, "AI_PROVIDER_NOT_CONFIGURED",

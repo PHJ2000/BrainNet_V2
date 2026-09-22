@@ -25,8 +25,12 @@ test("lost creation response, two browsers, mutation events and offline recovery
     await Promise.all(pages.map((page) => page.goto("/dashboard/projects/1")));
     const lists = pages.map((page) => page.getByRole("list", { name: "그래프 노드" }));
     await Promise.all(lists.map((list) => expect(list.locator("li")).toHaveCount(3)));
-    pages[0].once("dialog", (dialog) => dialog.accept("브라우저 재시도 검증"));
     await pages[0].getByTestId("idea-graph").click({ position: { x: 400, y: 300 } });
+    await pages[0].getByLabel("노드 내용", { exact: true }).fill("브라우저 재시도 검증");
+    await pages[0].getByRole("dialog").getByRole("button", { name: "저장", exact: true }).click();
+    await expect(pages[0].getByRole("dialog")).toHaveCount(0);
+    await pages[0].getByTestId("idea-graph").click({ button: "right", position: { x: 400, y: 300 } });
+    await pages[0].getByText("AI 아이디어 생성", { exact: true }).click();
     await Promise.all(lists.map((list) => expect(list.locator("li")).toHaveCount(6, { timeout: 20000 })));
     expect(dropped).toBe(true);
     expect(keys).toHaveLength(4);

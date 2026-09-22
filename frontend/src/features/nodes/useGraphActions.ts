@@ -1,14 +1,15 @@
 "use client";
 import { useRef, type RefObject } from "react";
 import type { useGraphData } from "./useGraphData";
+import { useSaveOperation } from "./useSaveOperation";
 import type { NodeMeta } from "./graphModel";
 import { childCreationPlan, runChildCreationPlan, type ChildCreationPlan } from "./childCreationPlan";
-import { createAINodes as apiCreateAINodes, createNode, activateNode as apiActivateNode, findChildrenIds } from "./nodeApi";
-import { attachTag, detachTag, createTag } from "@/features/projects/tagApi";
+import { createAINodes as apiCreateAINodes, createNode, activateNode as apiActivateNode } from "./nodeApi";
+import { attachTag, detachTag, createTag, listTags } from "@/features/projects/tagApi";
 
 /** User commands retain their retry state independently of canvas rendering. */
 export function useGraphActions(data: ReturnType<typeof useGraphData>, ctxNodeId: string | null, visibleRef: RefObject<Set<string>>) {
-  const { nodesRef, projectIdRef, getScope, setTags, refreshNodes, updateNodesAndCy, updateLocalNode, resyncNodes } = data;
+  const { nodesRef, projectIdRef, getScope, refreshNodes, updateLocalNode, resyncNodes } = data;
   /* ----- util ----- */
   const radius = 280;
   const polarToXY = (cx: number, cy: number, r: number, rad: number) => ({
@@ -16,77 +17,32 @@ export function useGraphActions(data: ReturnType<typeof useGraphData>, ctxNodeId
     y: cy + r * Math.sin(rad),
   });
 
-  /* ----- 태그 attach / detach ----- */
+  const tagSave = useSaveOperation(getScope);
   const handleAddTag = async (tagId: string) => {
-    if (!ctxNodeId || !visibleRef.current.has(ctxNodeId)) return;
-    const targetProjectId = projectIdRef.current;
-    const scope = getScope();
-    if (!scope.isCurrent()) return;
-    const targetNodeId = ctxNodeId;
-    const allNodeIds = [
-      targetNodeId,
-      ...findChildrenIds(nodesRef.current, targetNodeId),
-    ];
+    if (!ctxNodeId || !visibleRef.current.has(ctxNodeId) || tagSave.isBlocked()) return;
+    const projectId = projectIdRef.current, nodeId = ctxNodeId, scope = getScope();
+    const name = tagId === "__new__" ? window.prompt("새 태그 이름")?.trim() : undefined;
+    if (tagId === "__new__" && !name) return;
     let realId = tagId;
-
-    if (tagId === "__new__") {
-      const name = window.prompt("새 태그 이름");
-      if (!name) return;
-      try {
-        const t = await createTag(targetProjectId, { name });
-        if (!scope.isCurrent()) return;
-        const newTag = { ...t, id: String(t.id) };
-        setTags((ts) => [...ts, newTag]);
-        realId = newTag.id;
-      } catch (e) {
-        if (!scope.isCurrent()) return;
-        console.error(e);
-        return;
+    await tagSave.run(async () => {
+      if (realId === "__new__") {
+        const existing = (await listTags(projectId, scope.signal)).find(t => t.name === name);
+        realId = String(existing?.id ?? (await createTag(projectId, { name: name! })).id);
       }
-    }
-
-    try {
-      // 모든 노드에 태그를 attach
-      await attachTag(targetProjectId, realId, targetNodeId);
       if (!scope.isCurrent()) return;
-      updateNodesAndCy((ns) =>
-        ns.map((n) =>
-          allNodeIds.includes(n.id)
-            ? { ...n, tags: [...(n.tags ?? []), realId] }
-            : n
-        )
-      );
-    } catch (e) {
-      if (!scope.isCurrent()) return;
-      console.error(e);
-    }
+      const snapshot = await refreshNodes(projectId, true);
+      if (!snapshot?.find(n => n.id === nodeId)?.tags?.includes(realId)) await attachTag(projectId, realId, nodeId);
+      if (scope.isCurrent()) await refreshNodes(projectId, true);
+    }, name ? `태그: ${name}` : "태그 연결");
   };
-
   const handleRemoveTag = async (tagId: string) => {
     if (!ctxNodeId || !visibleRef.current.has(ctxNodeId)) return;
-    const targetProjectId = projectIdRef.current;
-    const scope = getScope();
-    if (!scope.isCurrent()) return;
-    const targetNodeId = ctxNodeId;
-    const allNodeIds = [
-      targetNodeId,
-      ...findChildrenIds(nodesRef.current, targetNodeId),
-    ];
-
-    try {
-      await detachTag(targetProjectId, tagId, targetNodeId);
-      if (!scope.isCurrent()) return;
-      updateNodesAndCy((ns) =>
-        ns.map((n) =>
-          allNodeIds.includes(n.id)
-            ? { ...n, tags: (n.tags ?? []).filter((t) => t !== tagId) }
-            : n
-        )
-      );
-    } catch (e) {
-      if (!scope.isCurrent()) return;
-      console.error(e);
-    }
+    const projectId = projectIdRef.current, nodeId = ctxNodeId, scope = getScope();
+    await tagSave.run(async () => {
+      const snapshot = await refreshNodes(projectId, true);
+      if (scope.isCurrent() && snapshot?.find(n => n.id === nodeId)?.tags?.includes(tagId)) await detachTag(projectId, tagId, nodeId);
+      if (scope.isCurrent()) await refreshNodes(projectId, true);
+    }, "태그 연결 해제");
   };
 
   /* ----- AI·빈 노드 생성 로직 ----- */
@@ -122,7 +78,7 @@ export function useGraphActions(data: ReturnType<typeof useGraphData>, ctxNodeId
       const complete = await runChildCreationPlan(plan, {
         ai: (prompt, payload, key) => apiCreateAINodes(targetProjectId, prompt, payload, key, scope.signal),
         regular: (payload, key) => createNode(targetProjectId, payload, key, scope.signal),
-      }, scope.isCurrent);
+      }, scope.isCurrent, false);
       if (!complete) return;
       await refreshNodes(targetProjectId, true);
       if (!scope.isCurrent()) return;
@@ -160,5 +116,5 @@ export function useGraphActions(data: ReturnType<typeof useGraphData>, ctxNodeId
     }
   };
 
-  return { handleAddTag, handleRemoveTag, spawnChildren, activateNodeLocal };
+  return { tagSave, handleAddTag, handleRemoveTag, spawnChildren, activateNodeLocal };
 }

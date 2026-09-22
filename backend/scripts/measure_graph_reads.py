@@ -36,20 +36,31 @@ async def main():
                 await db.execute("INSERT INTO node(project_id,author_id,parent_id,content,state,depth,order_index,created_at,updated_at) "
                                  "SELECT $1,$2,$3,'fixture ' || n,'GHOST',1,n,now(),now() FROM generate_series(1,$4::int) n",
                                  project, actor, root, size - 1)
-                runtimes = [("before", os.environ["BASELINE_API_URL"]), ("after", os.environ["FASTAPI_BASE_URL"])]
+                conditional = os.getenv("MEASURE_CONDITIONAL_READS") == "1"
+                base = os.environ["FASTAPI_BASE_URL"]
+                if conditional:
+                    first = await client.get(f"{base}/projects/{project}/nodes", headers={"X-Graph-Cache": "1"})
+                    first.raise_for_status()
+                    revision = first.headers["etag"]
+                runtimes = [("full", base), ("unchanged", base)] if conditional else [("before", os.environ["BASELINE_API_URL"]), ("after", base)]
                 samples = {label: [] for label, _ in runtimes}
                 response_bytes = {}
                 for round_index in range(42):
                     # Alternate ordering so one runtime does not always get the warm DB/cache.
                     for label, base in (runtimes if round_index % 2 == 0 else runtimes[::-1]):
                         start = time.perf_counter()
-                        result = await client.get(f"{base}/projects/{project}/nodes")
+                        extra = {"X-Graph-Cache": "1", "If-None-Match": revision} if conditional and label == "unchanged" else {}
+                        result = await client.get(f"{base}/projects/{project}/nodes", headers=extra)
                         elapsed = (time.perf_counter() - start) * 1000
-                        result.raise_for_status()
-                        assert len(result.json()) == size
+                        if conditional and label == "unchanged":
+                            assert result.status_code == 304 and not result.content
+                        else:
+                            result.raise_for_status()
+                            assert len(result.json()) == size
                         samples[label].append(elapsed)
                         response_bytes[label] = len(result.content)
-                assert response_bytes["before"] == response_bytes["after"]
+                if not conditional:
+                    assert response_bytes["before"] == response_bytes["after"]
                 for label, _ in runtimes:
                     measured = sorted(samples[label][2:])
                     report.append({"runtime": label, "nodes": size, "samples_ms": samples[label],
@@ -60,7 +71,7 @@ async def main():
                 await db.execute("DELETE FROM project WHERE id=$1", project)
                 project = None
         Path(".tools").mkdir(exist_ok=True)
-        Path(".tools/phase2-api-performance.json").write_text(json.dumps(report, indent=2))
+        Path(".tools/phase3-api-performance.json" if conditional else ".tools/phase2-api-performance.json").write_text(json.dumps(report, indent=2))
         print(json.dumps(report))
     finally:
         if project is not None:

@@ -12,14 +12,14 @@ from app.db.models.project_user_role import ProjectUserRole
 from app.db.models.user import User
 
 
-async def create_invitation(db, project_id: int, email: str):
+async def create_invitation(db, project_id: int, email: str, role: str = "EDITOR"):
     project = (await db.execute(select(Project).where(
         Project.id == project_id, Project.is_deleted.is_(False)
     ).with_for_update())).scalar_one_or_none()
     if project is None:
         raise HTTPException(404, "Project not found")
     token = secrets.token_urlsafe(32)
-    values = dict(token=token, project_id=project_id, email=email, role="EDITOR",
+    values = dict(token=token, project_id=project_id, email=email, role=role,
                   expires_at=datetime.now(timezone.utc) + timedelta(days=7), accepted_at=None)
     await db.execute(insert(InviteToken).values(**values).on_conflict_do_update(
         index_elements=[InviteToken.email, InviteToken.project_id],
@@ -54,7 +54,7 @@ async def accept_invitation(db, token: str, actor_id: int):
         raise HTTPException(410, "Invitation expired or already used")
     # Existing ownership must never be downgraded by accepting an invitation.
     await db.execute(insert(ProjectUserRole).values(
-        project_id=project_id, user_id=actor_id, role="EDITOR", accepted_at=now
+        project_id=project_id, user_id=actor_id, role=getattr(invite.role, "value", invite.role), accepted_at=now
     ).on_conflict_do_nothing(index_elements=[ProjectUserRole.project_id, ProjectUserRole.user_id]))
     invite.accepted_at = now
     await db.commit()

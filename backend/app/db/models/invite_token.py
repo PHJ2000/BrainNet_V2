@@ -7,6 +7,7 @@ import enum
 class RoleType(enum.Enum):
     OWNER = "OWNER"
     EDITOR = "EDITOR"
+    VIEWER = "VIEWER"
 
 class InviteToken(Base):
     __tablename__ = "invite_token"

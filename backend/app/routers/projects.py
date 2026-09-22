@@ -1,6 +1,7 @@
 # backend/app/routers/projects.py
 
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Literal
+import os
 
 from fastapi import APIRouter, Depends, Path, Query, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -113,7 +114,7 @@ async def get_project(
     - 멤버 권한 확인 (ensure_member)
     - node_count, tag_count는 동적 집계해서 반환 필드에 포함
     """
-    await _m(int(uid), project_id, db)
+    membership = await _m(int(uid), project_id, db)
 
     # (1) 프로젝트 자체 조회
     result = await db.execute(
@@ -136,6 +137,8 @@ async def get_project(
     tag_count = result.scalar_one()
 
     out = ProjectOut.from_orm(proj)
+    out.my_role = getattr(membership.role, "value", membership.role)
+    out.ai_enabled = bool(os.getenv("OPENAI_API_KEY", "").strip())
     out.member_count = None  # 출력 스키마에 optional로 있지만, 필요시 별도 API로 제공 가능
     out.node_count = node_count
     out.tag_count = tag_count
@@ -193,10 +196,11 @@ async def invite_project(
     email: EmailStr = Query(..., max_length=120),
     uid: str = Depends(_uid),
     db: AsyncSession = Depends(get_db),
+    role: Literal["EDITOR", "VIEWER"] = "EDITOR",
 ):
     """Create a seven-day invitation for the named account; no email is sent."""
     await _o(int(uid), project_id, db)
-    return await create_invitation(db, project_id, str(email))
+    return await create_invitation(db, project_id, str(email), role)
 
 
 @router.post("/join", status_code=status.HTTP_200_OK)

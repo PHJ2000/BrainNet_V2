@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { apiClient } from "@/lib/apiClient";
 import type { Project, User } from "@/types/api";
+import ProjectMembers from "./ProjectMembers";
 import ProjectDialog from "./ProjectDialog";
 import { deleteProject, inviteProject, updateProject } from "./projectApi";
 import { projectError } from "./projectError";
@@ -15,8 +16,10 @@ export default function ProjectSettings({ project }: { project: Project }) {
   const [open, setOpen] = useState(false);
   const { data: user } = useQuery({ queryKey: ["me"], queryFn: async ({ signal }) =>
     (await apiClient.get<User>("/users/me", { signal })).data, retry: false });
-  if (!user || String(user.id) !== String(project.owner_id)) return null;
+  if (!user) return null;
+  if (String(user.id) !== String(project.owner_id)) return <ProjectMembers projectId={project.id} canManage={false} />;
   return <>
+    <ProjectMembers projectId={project.id} canManage />
     <button onClick={() => setOpen(true)} className="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm hover:bg-slate-50">프로젝트 설정</button>
     {open && <SettingsForm project={project} onClose={() => setOpen(false)} />}
   </>;
@@ -27,6 +30,7 @@ function SettingsForm({ project, onClose }: { project: Project; onClose: () => v
   const router = useRouter();
   const [name, setName] = useState(project.name);
   const [description, setDescription] = useState(project.description ?? "");
+  const [role, setRole] = useState<"EDITOR" | "VIEWER">("EDITOR");
   const [email, setEmail] = useState("");
   const [token, setToken] = useState("");
   const [confirmation, setConfirmation] = useState("");
@@ -57,11 +61,12 @@ function SettingsForm({ project, onClose }: { project: Project; onClose: () => v
       </form>
       <form className="space-y-3 border-t border-slate-200 pt-5" onSubmit={event => {
         event.preventDefault(); setToken("");
-        void run(async () => { setToken((await inviteProject(project.id, email.trim())).invite_token); });
+        void run(async () => { setToken((await inviteProject(project.id, email.trim(), role)).invite_token); });
       }}>
         <h3 className="font-medium">멤버 초대</h3>
         <p className="text-sm leading-6 text-slate-500">코드는 7일 동안 유효하며 입력한 이메일 계정만 사용할 수 있습니다. 이메일은 자동 발송되지 않습니다. 재발급하면 이전 코드는 무효가 됩니다.</p>
         <label className="block text-sm">초대할 이메일<input type="email" required maxLength={120} className={field} value={email} onChange={e => { setEmail(e.target.value); setToken(""); }} /></label>
+        <label className="block text-sm">초대 권한<select className={field} value={role} onChange={e => { setRole(e.target.value as "EDITOR" | "VIEWER"); setToken(""); }}><option value="EDITOR">편집 가능</option><option value="VIEWER">읽기 전용</option></select></label>
         <button className={button} disabled={busy}>초대 코드 발급</button>
         {token && <div className="space-y-2">
           <label className="block text-sm">초대 코드<input readOnly value={token} className={`${field} font-mono text-xs`} onFocus={e => e.target.select()} /></label>

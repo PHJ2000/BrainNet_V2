@@ -43,7 +43,8 @@ export function useNodeEvents(projectId: number, reload: (projectId: number) => 
         try {
           const message = JSON.parse(event.data);
           if (message.type === "ping") { currentSocket.send("pong"); return; }
-          if (["node.created", "node.updated", "node.deleted", "tags.updated", "resync.required"].includes(message.type)) invalidate();
+          if (message.type === "project.membership_updated") window.dispatchEvent(new Event("brainnet:membership"));
+          if (["project.membership_updated", "node.created", "node.updated", "node.deleted", "tags.updated", "resync.required"].includes(message.type)) invalidate();
         } catch { /* Ignore unrelated protocol messages. */ }
       };
       currentSocket.onclose = (event) => {
@@ -69,10 +70,17 @@ export function useNodeEvents(projectId: number, reload: (projectId: number) => 
     };
     connect();
     // A lost notification/half-open connection is healed from the authoritative DB.
-    const reconcile = setInterval(invalidate, 30000);
+    let ticks = 0;
+    const reconcile = setInterval(() => {
+      if (document.visibilityState !== "visible") return;
+      if (socket?.readyState !== WebSocket.OPEN || ++ticks % 4 === 0) invalidate();
+    }, 30000);
+    const onVisible = () => { if (document.visibilityState === "visible") invalidate(); };
+    document.addEventListener("visibilitychange", onVisible);
     return () => {
       stopped = true;
       clearInterval(reconcile);
+      document.removeEventListener("visibilitychange", onVisible);
       if (retry) clearTimeout(retry);
       if (refresh) clearTimeout(refresh);
       socket?.close();

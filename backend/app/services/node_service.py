@@ -17,7 +17,7 @@ from app.services import ai_provider
 from app.services import node_operations as operations
 from app.db.models.tag import Tag
 from app.models.node import NodeCreate, NodeOut, NodeUpdate
-from app.utils.helpers import ensure_member as _m
+from app.utils.helpers import ensure_editor as _e, ensure_member as _m
 from app.services.node_idempotency import Claim, claim_request, lock_claim, complete_claim, release_claim
 
 
@@ -143,7 +143,7 @@ async def _gen_ai_nodes(
         # both in the write transaction, and keep a key-share lock on the
         # parent until the node and inherited tags commit together.
         await lock_claim(db, claim)
-        await _m(int(uid), project_id, db)
+        await _e(int(uid), project_id, db)
         await _validate_parent(
             project_id,
             parent_id,
@@ -202,7 +202,7 @@ async def list_nodes(project_id: int, tag_ids: Optional[str], uid: str, db: Asyn
 
 
 async def create_nodes(body: NodeCreate, project_id: int, uid: str, db: AsyncSession, idempotency_key: str | None = None):
-    await _m(int(uid), project_id, db)
+    await _e(int(uid), project_id, db)
 
     claim = None
     if idempotency_key is not None:
@@ -228,7 +228,7 @@ async def _create_nodes(body: NodeCreate, project_id: int, uid: str, db: AsyncSe
 
     await lock_claim(db, claim)
     if claim is not None:
-        await _m(int(uid), project_id, db)
+        await _e(int(uid), project_id, db)
     is_root = body.parent_id in (None, 0)
     if is_root:
         result = await db.execute(
@@ -288,7 +288,7 @@ async def get_node(project_id: int, node_id: int, uid: str, db: AsyncSession):
 
 async def update_node(body: NodeUpdate, project_id: int, node_id: int, uid: str, db: AsyncSession,
                       idempotency_key: str | None = None):
-    await _m(int(uid), project_id, db)
+    await _e(int(uid), project_id, db)
     request = ["update", node_id, body.model_dump(mode="json", exclude_unset=True)]
     prior = await operations.replay(db, project_id, uid, idempotency_key, request)
     if prior:
@@ -341,7 +341,7 @@ async def update_node(body: NodeUpdate, project_id: int, node_id: int, uid: str,
 async def delete_node(project_id: int, node_id: int, uid: str, db: AsyncSession,
                       expected_version: int | None = None, scope_hash: str | None = None,
                       idempotency_key: str | None = None):
-    await _m(int(uid), project_id, db)
+    await _e(int(uid), project_id, db)
     request = ["delete", node_id, expected_version, scope_hash]
     prior = await operations.replay(db, project_id, uid, idempotency_key, request)
     if prior:
@@ -379,7 +379,7 @@ async def delete_node(project_id: int, node_id: int, uid: str, db: AsyncSession,
 
 
 async def activate_node(project_id: int, node_id: int, uid: str, db: AsyncSession):
-    await _m(int(uid), project_id, db)
+    await _e(int(uid), project_id, db)
 
     result = await db.execute(_mutation_target_query(project_id, node_id))
     node = result.scalar_one_or_none()
@@ -413,7 +413,7 @@ async def activate_node(project_id: int, node_id: int, uid: str, db: AsyncSessio
 
 
 async def deactivate_node(project_id: int, node_id: int, uid: str, db: AsyncSession):
-    await _m(int(uid), project_id, db)
+    await _e(int(uid), project_id, db)
 
     result = await db.execute(_mutation_target_query(project_id, node_id))
     node = result.scalar_one_or_none()

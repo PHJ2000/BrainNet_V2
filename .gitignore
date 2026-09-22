@@ -16,6 +16,7 @@ venv
 spring/vertical-slice/target
 frontend/.test-dist/
 frontend/test-results/
+frontend/test-results-*/
 frontend/playwright-report/
 deploy/validation-logs/
 /.tools/

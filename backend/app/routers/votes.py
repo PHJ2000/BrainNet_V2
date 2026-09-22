@@ -10,7 +10,7 @@ from collections import Counter
 
 from app.models.vote import VoteOut, HistoryOut
 from app.core.security import get_current_user_id as _uid
-from app.utils.helpers import ensure_member as _m, ensure_owner as _o
+from app.utils.helpers import ensure_editor as _e, ensure_owner as _o
 from app.services.outbox import append_event
 from app.utils.time import utc_now as _now
 
@@ -35,7 +35,7 @@ async def cast_vote(
     db: AsyncSession = Depends(get_db),
 ):
     # 1) 프로젝트 멤버 여부 확인
-    await _m(int(uid), project_id, db)
+    await _e(int(uid), project_id, db)
 
     # 2) tag_id → TagSummary 테이블 내에서 해당 태그 요약(record) 조회
     #    (TagSummary.tag_id 컬럼이 실제 태그 테이블의 PK를 FK로 참조하므로)
