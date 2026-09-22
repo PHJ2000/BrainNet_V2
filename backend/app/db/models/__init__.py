@@ -19,8 +19,10 @@ from .project_import import ProjectImport
 from .base import Base
 from .workspace import WorkItem, Discussion, NodeBookmark, AIProposal, WorkspaceActivity
 from .personal_asset import PersonalAsset
+from .workspace_plus import DiscussionReply, Notification, KnowledgeLink, TaskDependency, WorkspaceDraft, AIProjectPolicy
 
 __all__ = [
+    "DiscussionReply", "Notification", "KnowledgeLink", "TaskDependency", "WorkspaceDraft", "AIProjectPolicy",
     "PersonalAsset",
     "WorkItem", "Discussion", "NodeBookmark", "AIProposal", "WorkspaceActivity",
     "ActivityLog",

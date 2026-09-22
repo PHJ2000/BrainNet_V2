@@ -20,7 +20,7 @@
 | AI 검토 | 확장·요약·실행 제안 기록, 원본 확인 후 과제로 채택 |
 | 작업 복구 | 프로젝트 휴지통, 과제·토론 초안, 작업 공간 JSON v2 복원 |
 
-[Workspace V3 구현·검증 기록](./docs/workspace-v3/RELEASE_2026-09-22.md) · [12주 로드맵](./docs/workspace-v3/ROADMAP.md)
+[Workspace V3 후속 구현·검증 기록](./docs/workspace-v3/COMPLETION_2026-09-22.md) · [첫 릴리스 기록](./docs/workspace-v3/RELEASE_2026-09-22.md) · [12주 로드맵](./docs/workspace-v3/ROADMAP.md)
 
 [편집·협업·성능 등 6개 후속 개선 결과와 검증](./docs/PHASE3_RESULT_2026-09-22.md)
 

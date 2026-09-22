@@ -13,6 +13,7 @@ class NodeStateEnum(enum.Enum):
 class Node(Base):
     __tablename__ = "node"
     __table_args__ = (
+        Index("ix_node_content_trgm", "content", postgresql_using="gin", postgresql_ops={"content": "gin_trgm_ops"}),
         Index(
             "uq_node_active_root_per_project",
             "project_id",

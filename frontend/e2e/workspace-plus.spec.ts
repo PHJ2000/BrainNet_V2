@@ -1,0 +1,124 @@
+import { test, expect, type APIRequestContext } from "@playwright/test";
+import { randomUUID } from "node:crypto";
+
+async function account(request: APIRequestContext, label: string) {
+  const email = `${label}-${randomUUID()}@example.com`, password = "WorkspaceValidation!42";
+  expect((await request.post("/auth/register", { data: { email, password, name: label } })).status()).toBe(201);
+  const token = (await (await request.post("/auth/login", { form: { username: email, password } })).json()).access_token;
+  const headers = { Authorization: `Bearer ${token}` };
+  const me = await (await request.get("/users/me", { headers })).json();
+  return { email, token, headers, id: me.id as number };
+}
+
+test("team replies, inbox, dependencies, bidirectional knowledge and portable cloud drafts", async ({ page, request, browser }, info) => {
+  const owner = await account(request, "plus-owner"), editor = await account(request, "plus-editor");
+  const project = await (await request.post("/projects", { headers: owner.headers, data: { name: "연결된 팀 작업 공간" } })).json();
+  const base = `/projects/${project.id}`;
+  const invite = await (await request.post(`${base}/invite`, { headers: owner.headers, params: { email: editor.email } })).json();
+  expect((await request.post("/projects/join", { headers: editor.headers, data: { token: invite.invite_token } })).status()).toBe(200);
+  const nodes = await (await request.get(`${base}/nodes`, { headers: owner.headers })).json();
+  const childResponse = await request.post(`${base}/nodes`, { headers: { ...owner.headers, "Idempotency-Key": randomUUID() }, data: { content: "고객의 근거 자료", parent_id: nodes[0].id } });
+  expect(childResponse.status()).toBe(201);
+  const child = (await childResponse.json())[0];
+  for (const title of ["사전 조사", "실험 실행"]) expect((await request.post(`${base}/tasks`, { headers: owner.headers, data: { id: randomUUID(), title } })).status()).toBe(201);
+  const thread = randomUUID();
+  expect((await request.post(`${base}/discussions`, { headers: owner.headers, data: { id: thread, body: "출시 범위 결정" } })).status()).toBe(201);
+  await page.addInitScript(token => localStorage.setItem("token", token), owner.token);
+  await page.goto(`/dashboard/projects/${project.id}`);
+  await page.getByRole("button", { name: "실행 보드", exact: true }).click();
+  await page.getByRole("button", { name: "실험 실행", exact: false }).click();
+  await page.getByLabel("선행 과제 검색").fill("사전 조사");
+  await page.getByRole("button", { name: "추가: 사전 조사", exact: true }).click();
+  await expect(page.getByRole("region", { name: "선행 과제" })).toContainText("○ 사전 조사");
+  await page.getByRole("button", { name: "과제 저장", exact: true }).click();
+  await page.getByLabel("선택: 사전 조사", { exact: true }).check();
+  await page.getByLabel("선택: 실험 실행", { exact: true }).check();
+  await page.getByLabel("일괄 변경 상태").selectOption("DONE");
+  await page.getByRole("button", { name: "선택 과제 상태 변경" }).click();
+  await expect(page.getByRole("region", { name: "완료", exact: true })).toContainText("실험 실행");
+  await page.getByRole("button", { name: "지식", exact: true }).click();
+  const linkButton = page.getByRole("button", { name: "관련 지식 / 역링크" }).first();
+  await linkButton.focus(); await page.keyboard.press("Enter");
+  const dialog = page.getByRole("dialog");
+  await page.getByLabel("연결할 노드 번호").fill(String(child.id));
+  await page.getByLabel("연결 설명", { exact: true }).fill("실험의 근거");
+  await page.getByRole("button", { name: "지식 연결", exact: true }).click();
+  await expect(dialog).toContainText("실험의 근거");
+  for (let i = 0; i < 8; i++) {
+    await page.keyboard.press("Tab");
+    expect(await dialog.evaluate(element => element.contains(document.activeElement))).toBe(true);
+  }
+  await page.keyboard.press("Escape");
+  await expect(dialog).toHaveCount(0);
+  await expect(linkButton).toBeFocused();
+  await page.getByRole("button", { name: "관련 지식 / 역링크" }).nth(1).click();
+  await expect(page.getByRole("dialog")).toContainText("이 아이디어를 참조");
+  await page.keyboard.press("Escape");
+  await page.getByRole("button", { name: "토론", exact: true }).click();
+  await page.getByRole("button", { name: "답글 보기 / 작성" }).click();
+  await page.getByLabel("답글 내용", { exact: true }).fill("의견을 부탁합니다.");
+  await page.getByLabel("멘션할 멤버").selectOption(String(editor.id));
+  await page.getByRole("button", { name: "답글 등록", exact: true }).click();
+  await expect(page.getByText("의견을 부탁합니다.", { exact: true })).toBeVisible();
+  const context = await browser.newContext();
+  await context.addInitScript(token => localStorage.setItem("token", token), editor.token);
+  const teammate = await context.newPage();
+  await teammate.goto("/dashboard");
+  await teammate.getByRole("button", { name: "알림함", exact: true }).click();
+  await expect(teammate.getByRole("region", { name: "알림함" })).toContainText("의견을 부탁합니다.");
+  await teammate.getByRole("link", { name: "연결된 팀 작업 공간의 토론 열기" }).click();
+  await expect(teammate.getByText("의견을 부탁합니다.", { exact: true })).toBeVisible();
+  await context.close();
+  await page.getByRole("button", { name: "실행 보드", exact: true }).click();
+  await page.getByRole("button", { name: "새 과제", exact: true }).click();
+  await page.getByLabel("과제 제목", { exact: true }).fill("다른 기기에서 계속할 과제");
+  await page.keyboard.press("Escape");
+  await page.getByText("다른 기기와 초안 공유 · 나에게만 공개", { exact: true }).click();
+  await page.getByRole("button", { name: "현재 초안을 서버에 저장" }).click();
+  await expect(page.getByText("서버에 보관했습니다. 다른 기기에서 불러올 수 있습니다.", { exact: true })).toBeVisible();
+  const second = await browser.newContext();
+  await second.addInitScript(token => localStorage.setItem("token", token), owner.token);
+  const mobile = await second.newPage();
+  await mobile.setViewportSize({ width: 390, height: 844 });
+  await mobile.goto(`/dashboard/projects/${project.id}`);
+  await mobile.getByRole("button", { name: "실행 보드", exact: true }).click();
+  await mobile.getByText("다른 기기와 초안 공유 · 나에게만 공개", { exact: true }).click();
+  await mobile.getByRole("button", { name: "서버 초안 불러오기" }).click();
+  await mobile.getByRole("button", { name: "과제 초안 이어쓰기" }).click();
+  await expect(mobile.getByLabel("과제 제목", { exact: true })).toHaveValue("다른 기기에서 계속할 과제");
+  await mobile.getByRole("button", { name: "과제 저장", exact: true }).click();
+  await expect(mobile.getByRole("button", { name: "다른 기기에서 계속할 과제", exact: false })).toBeVisible();
+  expect(await mobile.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await mobile.screenshot({ path: info.outputPath("workspace-plus-mobile.png"), fullPage: true });
+  await page.screenshot({ path: info.outputPath("workspace-plus-desktop.png"), fullPage: true });
+  await second.close();
+});
+
+test("AI queue comparison, budget controls and keyboard accessible backup dialog", async ({ page, request }) => {
+  const owner = await account(request, "ai-plus");
+  const project = await (await request.post("/projects", { headers: owner.headers, data: { name: "AI 검토 비교" } })).json();
+  const base = `/projects/${project.id}`;
+  const nodes = await (await request.get(`${base}/nodes`, { headers: owner.headers })).json();
+  for (const mode of ["SUMMARY", "ACTION"]) {
+    const created = await request.post(`${base}/proposals?enqueue=true`, { headers: owner.headers, data: { id: randomUUID(), mode, node_ids: [nodes[0].id] } });
+    expect(created.status()).toBe(201);
+  }
+  await page.addInitScript(token => localStorage.setItem("token", token), owner.token);
+  await page.goto(`/dashboard/projects/${project.id}`);
+  await page.getByRole("button", { name: "AI 검토", exact: true }).click();
+  await expect(page.getByText("검토 대기", { exact: true })).toHaveCount(2, { timeout: 15000 });
+  await page.getByRole("checkbox", { name: "비교 선택", exact: false }).nth(0).check();
+  await page.getByRole("checkbox", { name: "비교 선택", exact: false }).nth(1).check();
+  await expect(page.getByRole("region", { name: "AI 제안 비교" })).toContainText("선택한 제안 비교 · 2/2");
+  await page.getByText("AI 사용량 · 최근 24시간", { exact: false }).click();
+  await page.getByLabel("24시간 요청 한도", { exact: true }).fill("0");
+  await page.getByRole("button", { name: "사용량 제한 저장" }).click();
+  await expect(page.getByText("AI 사용량 · 최근 24시간 2 / 0건", { exact: true })).toBeVisible();
+  await page.goto("/dashboard");
+  const trigger = page.getByRole("button", { name: "JSON 백업 가져오기" });
+  await trigger.focus(); await page.keyboard.press("Enter");
+  await expect(page.getByRole("dialog", { name: "JSON 백업 복원" })).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(trigger).toBeFocused();
+});

@@ -71,7 +71,8 @@ def preview_backup(backup):
     if isinstance(backup, WorkspaceBackup):
         result = preview_backup(backup.graph)
         result.update(schema_version=2, task_count=len(backup.tasks), discussion_count=len(backup.discussions),
-                      proposal_count=len(backup.proposals), bookmark_count=len(backup.bookmarks))
+                       proposal_count=len(backup.proposals), bookmark_count=len(backup.bookmarks),
+                       reply_count=len(backup.replies), knowledge_link_count=len(backup.links), dependency_count=len(backup.dependencies))
         return result
     return {"name": backup.project.name, "description": backup.project.description,
             "node_count": len(backup.nodes), "tag_count": len(backup.tags), "link_count": len(backup.node_tags),
@@ -91,7 +92,17 @@ async def import_backup(db, actor_id, key, backup):
     graph = backup.graph if isinstance(backup, WorkspaceBackup) else backup
     if not key.strip() or len(key) > 128:
         fail("IDEMPOTENCY_KEY_INVALID", "Idempotency-Key must contain 1 to 128 characters", 422)
-    fingerprint = digest(backup.model_dump(mode="json"))
+    portable = backup.model_dump(mode="json")
+    if isinstance(backup, WorkspaceBackup):
+        # Added optional v2 fields must not invalidate receipts issued before
+        # this release for the exact same legacy file.
+        for extension in ("replies", "links", "dependencies"):
+            if not portable[extension]:
+                portable.pop(extension)
+        for discussion in portable["discussions"]:
+            if discussion["ref"] is None:
+                discussion.pop("ref")
+    fingerprint = digest(portable)
     lock = int(hashlib.sha256(f"project-import:{actor_id}:{key}".encode()).hexdigest()[:15], 16)
     try:
         await db.execute(text("SELECT pg_advisory_xact_lock(:lock)"), {"lock": lock})

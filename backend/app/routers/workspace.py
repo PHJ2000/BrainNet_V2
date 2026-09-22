@@ -1,5 +1,6 @@
 """Project collaboration and personal knowledge endpoints."""
 from uuid import UUID
+from typing import Literal
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy import delete, exists, select
 from sqlalchemy.dialects.postgresql import insert
@@ -21,9 +22,24 @@ User = Depends(get_current_user_id)
 
 
 @router.get("/projects/{project_id}/tasks")
-async def tasks(project_id: int, before: str | None = Query(None, max_length=36), limit: int = Query(100, ge=1, le=200), uid=User, db: AsyncSession = Db):
+async def tasks(project_id: int, before: str | None = Query(None, max_length=36), limit: int = Query(100, ge=1, le=200),
+                q: str = Query("", max_length=200), assignee: str = Query("", max_length=20), priority: Literal["", "LOW", "MEDIUM", "HIGH"] = "",
+                status: Literal["", "TODO", "DOING", "DONE", "CANCELED"] = "", uid=User, db: AsyncSession = Db):
     await ensure_member(int(uid), project_id, db)
     query = select(WorkItem).where(WorkItem.project_id == project_id)
+    if q:
+        if "\x00" in q or any(0xD800 <= ord(c) <= 0xDFFF for c in q):
+            fail("INVALID_SEARCH", "Search must contain valid text", 422)
+        escaped = q.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+        query = query.where(WorkItem.title.ilike(f"%{escaped}%", escape="\\"))
+    if assignee:
+        if assignee != "none" and (not assignee.isascii() or not assignee.isdigit() or len(assignee) > 18):
+            fail("INVALID_ASSIGNEE", "Invalid assignee filter", 422)
+        query = query.where(WorkItem.assignee_id.is_(None) if assignee == "none" else WorkItem.assignee_id == int(assignee))
+    if priority:
+        query = query.where(WorkItem.priority == priority)
+    if status:
+        query = query.where(WorkItem.status == status)
     query = await page_before(db, query, WorkItem, project_id, before)
     rows = list((await db.execute(query.order_by(WorkItem.created_at.desc(), WorkItem.id.desc()).limit(limit + 1))).scalars())
     return {"items": [serialize(row) for row in rows[:limit]], "next_cursor": rows[limit - 1].id if len(rows) > limit else None}
@@ -50,6 +66,12 @@ async def update_task(project_id: int, task_id: UUID, body: TaskUpdate, uid=User
     if row is None or row.project_id != project_id:
         fail("TASK_NOT_FOUND", "Task not found", 404)
     await task_links(db, project_id, body)
+    if body.status == "DONE":
+        from app.routers.workspace_plus import ensure_dependencies_done
+        await ensure_dependencies_done(db, row.id)
+    else:
+        from app.routers.workspace_plus import ensure_dependents_reopened
+        await ensure_dependents_reopened(db, row.id)
     check_version(row, body.expected_version)
     for key, value in body.model_dump(exclude={"expected_version"}).items():
         setattr(row, key, value)
@@ -59,9 +81,11 @@ async def update_task(project_id: int, task_id: UUID, body: TaskUpdate, uid=User
 
 
 @router.get("/projects/{project_id}/discussions")
-async def discussions(project_id: int, before: str | None = Query(None, max_length=36), limit: int = Query(50, ge=1, le=100), uid=User, db: AsyncSession = Db):
+async def discussions(project_id: int, before: str | None = Query(None, max_length=36), limit: int = Query(50, ge=1, le=100), thread_id: UUID | None = None, uid=User, db: AsyncSession = Db):
     await ensure_member(int(uid), project_id, db)
     query = select(Discussion).where(Discussion.project_id == project_id)
+    if thread_id:
+        query = query.where(Discussion.id == str(thread_id))
     query = await page_before(db, query, Discussion, project_id, before)
     rows = list((await db.execute(query.order_by(Discussion.created_at.desc(), Discussion.id.desc()).limit(limit + 1))).scalars())
     return {"items": [serialize(row) for row in rows[:limit]], "next_cursor": rows[limit - 1].id if len(rows) > limit else None}

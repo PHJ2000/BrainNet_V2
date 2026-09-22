@@ -7,10 +7,12 @@ import { button, field, primary, workspaceError, type Knowledge, type Page, type
 import { newTask, TaskEditor } from "./TaskBoard";
 import { useWorkspaceDraft } from "./useWorkspaceDraft";
 import { AssetList, SaveAsset } from "./PersonalAssets";
+import { KnowledgeLinks } from "./Collaboration";
 
 export default function KnowledgeLibrary({ projectId, readOnly = true, onSelectAI }: { projectId?: number; readOnly?: boolean; onSelectAI?: (node: Knowledge) => void }) {
   const [input, setInput] = useState(""), [search, setSearch] = useState(""), [bookmarked, setBookmarked] = useState(false);
   const [savedScope, setSavedScope] = useState<number | null>(null);
+  const [linked, setLinked] = useState<Knowledge | null>(null);
   const scope = projectId ?? savedScope ?? undefined;
   const [error, setError] = useState(""), [busy, setBusy] = useState<number | null>(null), [task, setTask] = useState<Task | null>(null);
   const cache = useQueryClient();
@@ -38,10 +40,12 @@ export default function KnowledgeLibrary({ projectId, readOnly = true, onSelectA
     {!query.error && <ul className="divide-y divide-slate-200 border-y border-slate-200">{nodes.map(node => <li key={node.id} className="py-4">
       <div className="mb-2 flex items-center justify-between gap-3 text-xs text-slate-500"><Link className="hover:text-indigo-700" href={`/dashboard/projects/${node.project_id}`}>{node.project_name} · #{node.id}</Link><button aria-label={node.bookmarked ? `북마크 해제 ${node.id}` : `북마크 저장 ${node.id}`} aria-pressed={node.bookmarked} className="rounded border px-2 py-1 text-sm" disabled={busy !== null} onClick={() => void toggle(node)}>{node.bookmarked ? "★ 저장됨" : "☆ 저장"}</button></div>
       <p className="whitespace-pre-wrap break-words text-sm leading-6 text-slate-800">{node.content}</p>
+      <button className="mt-3 text-sm text-indigo-700 underline" onClick={() => setLinked(node)}>관련 지식 / 역링크</button>
       {projectId && !readOnly && <div className="mt-3 flex flex-wrap gap-3"><button disabled={!!storage.draft} className="text-sm font-medium text-indigo-700 hover:underline disabled:opacity-40" onClick={() => setTask(newTask(node.id, node.content))}>실행 과제로 연결</button>{storage.draft && <span className="text-xs text-slate-500">실행 보드에서 기존 초안을 먼저 처리해 주세요.</span>}{onSelectAI && <button className="text-sm font-medium text-indigo-700 hover:underline" onClick={() => onSelectAI(node)}>AI 검토에 추가</button>}</div>}
     </li>)}</ul>}
     {!query.isLoading && !query.error && !nodes.length && <p className="py-8 text-center text-sm text-slate-500">일치하는 아이디어가 없습니다. 검색어나 북마크 필터를 바꿔 보세요.</p>}
     {query.hasNextPage && <button className={button} disabled={query.isFetchingNextPage} onClick={() => void query.fetchNextPage()}>아이디어 더 보기</button>}
     {task && projectId && <TaskEditor task={task} projectId={projectId} onClose={() => setTask(null)} />}
+    {linked && <KnowledgeLinks node={linked} readOnly={readOnly} onClose={() => setLinked(null)} />}
   </section>;
 }

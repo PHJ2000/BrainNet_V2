@@ -67,6 +67,7 @@ services:
       <<: *backend-env
       PYTHONPATH: /workspace/backend
       ALLOW_TEST_DATABASE_RESET: "1"
+      AI_QUEUE_ENABLED: "false"
       FASTAPI_BASE_URL: http://fastapi:8000
       FASTAPI_SECONDARY_URL: http://fastapi-secondary:8000
       SPRING_BASE_URL: http://spring:8080

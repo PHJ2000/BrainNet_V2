@@ -29,6 +29,7 @@ class WorkItem(Base):
         CheckConstraint("status IN ('TODO','DOING','DONE','CANCELED')", name="ck_work_item_status"),
         CheckConstraint("priority IN ('LOW','MEDIUM','HIGH')", name="ck_work_item_priority"),
         Index("ix_work_item_project_created", "project_id", "created_at", "id"),
+        Index("ix_work_item_title_trgm", "title", postgresql_using="gin", postgresql_ops={"title": "gin_trgm_ops"}),
     )
 
 
@@ -69,6 +70,8 @@ class AIProposal(Base):
     request_hash = Column(String(64), nullable=False)
     created_at = Column(DateTime(timezone=True), nullable=False, default=now)
     updated_at = Column(DateTime(timezone=True), nullable=False, default=now)
+    lease_token = Column(String(36))
+    started_at = Column(DateTime(timezone=True))
     __table_args__ = (Index("ix_ai_proposal_project_created", "project_id", "created_at", "id"),)
 
 

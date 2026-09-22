@@ -8,6 +8,7 @@ import ProjectList from "@/features/projects/ProjectList";
 import KnowledgeLibrary from "@/features/workspace/KnowledgeLibrary";
 import ProjectTrash from "@/features/workspace/ProjectTrash";
 import { AssetList } from "@/features/workspace/PersonalAssets";
+import { Inbox } from "@/features/workspace/Collaboration";
 
 
 export default function DashboardPage() {
@@ -30,8 +31,9 @@ export default function DashboardPage() {
       <nav aria-label="대시보드 보기" className="flex gap-4 border-b border-slate-200">
         <button className="px-2 py-3 text-sm" aria-current={view === "projects" ? "page" : undefined} onClick={() => setView("projects")}>프로젝트</button>
         <button className="px-2 py-3 text-sm" aria-current={view === "knowledge" ? "page" : undefined} onClick={() => setView("knowledge")}>전체 지식 검색</button>
+        <button className="px-2 py-3 text-sm" aria-current={view === "inbox" ? "page" : undefined} onClick={() => setView("inbox")}>알림함</button>
       </nav>
-      {view === "projects" ? <ProjectList /> : <KnowledgeLibrary />}
+      {view === "projects" ? <ProjectList /> : view === "inbox" ? <Inbox /> : <KnowledgeLibrary />}
       {modalOpen && <ProjectFormModal onClose={() => setModalOpen(false)} />}
       <div className="mt-4"><BackupImport /></div>
       <AssetList kind="TEMPLATE" />

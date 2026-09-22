@@ -1,5 +1,6 @@
 "use client";
 import { useCallback, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNodeEvents } from "@/features/nodes/useNodeEvents";
 import Graph from "@/features/nodes/Graph";
@@ -36,7 +37,8 @@ function LiveWorkspace({ projectId, children }: { projectId: number; children: R
 }
 
 export default function ProjectWorkspace({ project }: { project: Project }) {
-  const [tab, setTab] = useState<Tab>("graph"), [selected, setSelected] = useState<Knowledge[]>([]), [message, setMessage] = useState("");
+  const params = useSearchParams();
+  const [tab, setTab] = useState<Tab>(params.get("view") === "discussions" ? "discussions" : "graph"), [selected, setSelected] = useState<Knowledge[]>([]), [message, setMessage] = useState("");
   const projectId = Number(project.id), readOnly = project.my_role === "VIEWER";
   const select = (node: Knowledge) => {
     if (selected.some(item => item.id === node.id)) { setMessage("이미 선택한 아이디어입니다."); return; }
@@ -49,8 +51,8 @@ export default function ProjectWorkspace({ project }: { project: Project }) {
     <div className="min-h-0 flex-1">{tab === "graph" ? <Graph projectId={projectId} readOnly={readOnly} aiEnabled={project.ai_enabled} /> : <LiveWorkspace projectId={projectId}>
       {tab === "tasks" && <TaskBoard projectId={projectId} readOnly={readOnly} />}
       {tab === "knowledge" && <KnowledgeLibrary projectId={projectId} readOnly={readOnly} onSelectAI={select} />}
-      {tab === "discussions" && <Discussions projectId={projectId} readOnly={readOnly} owner={project.my_role === "OWNER"} />}
-      {tab === "ai" && <AIReview projectId={projectId} readOnly={readOnly} enabled={!!project.ai_enabled} selected={selected} onRemove={id => setSelected(rows => rows.filter(row => row.id !== id))} onPick={() => setTab("knowledge")} />}
+      {tab === "discussions" && <Discussions projectId={projectId} readOnly={readOnly} owner={project.my_role === "OWNER"} initialThread={params.get("thread")} />}
+      {tab === "ai" && <AIReview projectId={projectId} readOnly={readOnly} owner={project.my_role === "OWNER"} enabled={!!project.ai_enabled} selected={selected} onRemove={id => setSelected(rows => rows.filter(row => row.id !== id))} onPick={() => setTab("knowledge")} />}
       {tab === "activity" && <ActivityFeed projectId={projectId} />}
     </LiveWorkspace>}</div>
     <WorkspaceExport projectId={projectId} />
