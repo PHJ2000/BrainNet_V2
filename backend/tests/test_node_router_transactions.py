@@ -150,6 +150,22 @@ async def test_descendant_traversal_uses_locking_query_at_every_depth():
 
 
 @pytest.mark.asyncio
+async def test_wide_descendants_are_loaded_per_level_not_per_node():
+    class WideSession:
+        def __init__(self):
+            self.calls = 0
+
+        async def execute(self, statement):
+            self.calls += 1
+            values = list(range(8, 108)) if self.calls == 1 else []
+            return SimpleNamespace(scalars=lambda: SimpleNamespace(all=lambda: values))
+
+    db = WideSession()
+    assert await nodes._project_descendant_node_ids(3, 7, db) == list(range(7, 108))
+    assert db.calls == 2
+
+
+@pytest.mark.asyncio
 async def test_ai_releases_read_transaction_then_rechecks_in_write_transaction(monkeypatch):
     events: list[str] = []
     db = FakeSession(events)

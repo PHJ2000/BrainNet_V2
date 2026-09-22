@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 from fastapi import HTTPException
-from jose import jwt
+import jwt
 
 from app.core import config, security
 

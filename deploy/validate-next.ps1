@@ -3,7 +3,9 @@ $ErrorActionPreference = 'Stop'
 $repo = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 # Deliberately fixed: tests reset this disposable DB, never brainnet-local.
 $composeArgs = @('compose', '-p', 'brainnet-next-validation', '-f', (Join-Path $PSScriptRoot 'local-validation.compose.yml'))
-$log = Join-Path ([IO.Path]::GetTempPath()) ("brainnet-next-validation-{0}.log" -f (Get-Date -Format 'yyyyMMdd-HHmmss'))
+$logDirectory = Join-Path $repo 'deploy/validation-logs'
+New-Item -ItemType Directory -Force -Path $logDirectory | Out-Null
+$log = Join-Path $logDirectory ("brainnet-next-validation-{0}.log" -f (Get-Date -Format 'yyyyMMdd-HHmmss'))
 $npm = if ([Environment]::OSVersion.Platform -eq 'Win32NT') { 'npm.cmd' } else { 'npm' }
 $oldToken = $env:JWT_TOKEN
 function Compose([string[]]$Arguments) {
@@ -72,6 +74,7 @@ try {
     Compose -Arguments @('exec', '-T', '-e', 'JWT_TOKEN', '-e', 'CONTRACT_PROVIDER_CONFIGURED=1', 'tools',
         'python', 'spring/vertical-slice/contract_probe.py')
     Compose -Arguments @('exec', '-T', '-e', 'JWT_TOKEN', 'tools', 'python', 'spring/vertical-slice/event_probe.py')
+    Compose -Arguments @('exec', '-T', 'tools', 'python', 'backend/scripts/check_session_security.py')
     Seed -Browser
     if ($MeasureLimits) {
         Compose -Arguments @('exec', '-T', 'tools', 'python', 'backend/scripts/check_backup_limits.py')

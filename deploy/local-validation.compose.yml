@@ -6,6 +6,7 @@ x-backend-env: &backend-env
   JWT_SECRET: brainnet-local-validation-only-not-for-production
   ACCESS_TOKEN_EXPIRE_MINUTES: "180"
   REQUIRE_NODE_VERSION: "true"
+  CORS_ALLOWED_ORIGINS: http://localhost:18080
   NODE_EVENTS_ENABLED: "true"
   OPENAI_API_KEY: local-provider-only
   OPENAI_BASE_URL: http://provider:8090/v1

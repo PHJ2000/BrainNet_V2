@@ -20,6 +20,7 @@ _DEFAULT_CODES = {
     409: "CONFLICT",
     422: "VALIDATION_ERROR",
     428: "PRECONDITION_REQUIRED",
+    429: "RATE_LIMITED",
 }
 
 
@@ -89,7 +90,11 @@ def install_error_handlers(app: FastAPI) -> None:
             error_detail("VALIDATION_ERROR", "Request validation failed"),
             trace_id,
         )
-        body["errors"] = jsonable_encoder(exc.errors())
+        # Do not echo passwords, invitation tokens or rejected request bodies.
+        body["errors"] = jsonable_encoder([
+            {key: error[key] for key in ("type", "loc", "msg") if key in error}
+            for error in exc.errors()
+        ])
         _log_request_error(request, 422, body["code"], trace_id)
         return JSONResponse(
             status_code=422,

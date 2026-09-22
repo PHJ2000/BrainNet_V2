@@ -39,3 +39,16 @@ if JWT_ALGORITHM != "HS256":
 
 ACCESS_TOKEN_EXPIRE_MINUTES = positive_int_env("ACCESS_TOKEN_EXPIRE_MINUTES", "30")
 REQUIRE_NODE_VERSION = bool_env("REQUIRE_NODE_VERSION", "true")
+
+
+def allowed_origins() -> list[str]:
+    from urllib.parse import urlsplit
+    origins = [s.strip().rstrip("/") for s in os.getenv(
+        "CORS_ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:18080"
+    ).split(",") if s.strip()]
+    for origin in origins:
+        parsed = urlsplit(origin)
+        if (parsed.scheme not in ("http", "https") or not parsed.hostname
+                or parsed.username or parsed.password or parsed.path or parsed.query or parsed.fragment):
+            raise RuntimeError("CORS_ALLOWED_ORIGINS must contain explicit HTTP(S) origins")
+    return origins

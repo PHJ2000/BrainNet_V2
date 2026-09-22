@@ -10,7 +10,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import REQUIRE_NODE_VERSION
 from app.core.errors import error_detail
-from app.core.security import get_current_user_id as _uid
 from app.db.models.node import Node as NodeORM, NodeStateEnum
 from app.db.models.tag_node import TagNode
 from app.services.outbox import append_event
@@ -37,21 +36,21 @@ async def _project_descendant_node_ids(
     seen = {node_id}
     queue = [node_id]
     while queue:
-        current_id = queue.pop()
-        rows = await db.execute(_children_for_update_query(project_id, current_id))
+        rows = await db.execute(_children_for_update_query(project_id, queue))
         children = [child_id for child_id in rows.scalars().all() if child_id not in seen]
         seen.update(children)
         result.extend(children)
-        queue.extend(children)
+        queue = children
     return result
 
 
-def _children_for_update_query(project_id: int, parent_id: int):
+def _children_for_update_query(project_id: int, parent_id: int | list[int]):
+    parent_ids = [parent_id] if isinstance(parent_id, int) else parent_id
     return (
         select(NodeORM.id)
         .where(
             NodeORM.project_id == project_id,
-            NodeORM.parent_id == parent_id,
+            NodeORM.parent_id.in_(parent_ids),
         )
         .order_by(NodeORM.id)
         .with_for_update()

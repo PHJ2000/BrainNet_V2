@@ -14,17 +14,20 @@ async def ensure_member(uid: int, project_id: int, db: AsyncSession):
     """
     프로젝트 멤버 검증: ProjectUserRole에 uid, project_id 레코드가 있는지 확인합니다.
     """
-    stmt = select(ProjectUserRole).where(
+    stmt = select(ProjectUserRole, Project.is_deleted).join(Project, Project.id == ProjectUserRole.project_id).where(
         ProjectUserRole.project_id == project_id,
-        ProjectUserRole.user_id == uid
+        ProjectUserRole.user_id == uid,
     )
     result = await db.execute(stmt)
-    membership = result.scalar_one_or_none()
-    if not membership:
+    row = result.one_or_none()
+    if row is None:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not a project member"
         )
+    membership, is_deleted = row
+    if is_deleted:
+        raise HTTPException(status_code=404, detail="Project not found")
     return membership
 
 

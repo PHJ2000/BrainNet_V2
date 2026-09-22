@@ -1,4 +1,6 @@
 .git
+.tools
+deploy/validation-logs
 .github
 .env
 .env.*

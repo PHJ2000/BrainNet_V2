@@ -54,11 +54,12 @@ export async function createNode(
   projectId: number | string,
   payload: NodePayload,
   idempotencyKey?: string,
+  signal?: AbortSignal,
 ): Promise<NodeOut> {
   const { data } = await createRequest((key) => apiClient.post(
     `/projects/${projectId}/nodes`,
     payload,
-    { headers: { "Idempotency-Key": key }, timeout: 45000 },
+    { headers: { "Idempotency-Key": key }, timeout: 45000, signal },
   ), idempotencyKey);
   // 백엔드가 [NodeOut] 배열을 돌려주므로 첫 원소만 반환
   return Array.isArray(data) ? data[0] : data;
@@ -76,12 +77,13 @@ export async function createAINodes(
     parent_id?: number | string | null;
   } = {},
   idempotencyKey?: string,
+  signal?: AbortSignal,
 ): Promise<NodeOut[]> {
   const payload = { ai_prompt: aiPrompt, ...opts };
   const { data } = await createRequest((key) => apiClient.post(
     `/projects/${projectId}/nodes`,
     payload,
-    { headers: { "Idempotency-Key": key }, timeout: 45000 },
+    { headers: { "Idempotency-Key": key }, timeout: 45000, signal },
   ), idempotencyKey);
   return data;
 }
@@ -90,11 +92,12 @@ export async function createAINodes(
 export async function updateNode(
   projectId: number | string,
   nodeId: number | string,
-  payload: NodeUpdatePayload
+  payload: NodeUpdatePayload,
+  signal?: AbortSignal,
 ): Promise<NodeOut> {
   const { data } = await createRequest((key) => apiClient.patch(
     `/projects/${projectId}/nodes/${nodeId}`,
-    payload, { headers: { "Idempotency-Key": key } }
+    payload, { headers: { "Idempotency-Key": key }, signal }
   ));
   return data;
 }
@@ -110,10 +113,11 @@ export async function deleteNode(
 /* ────────── POST: GHOST → ACTIVE ──────────*/
 export async function activateNode(
   projectId: number | string,
-  nodeId: number | string
+  nodeId: number | string,
+  signal?: AbortSignal,
 ): Promise<NodeOut> {
   const { data } = await apiClient.post(
-    `/projects/${projectId}/nodes/${nodeId}/activate`
+    `/projects/${projectId}/nodes/${nodeId}/activate`, undefined, { signal }
   );
   return data;
 }

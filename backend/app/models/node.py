@@ -1,24 +1,25 @@
 # backend/app/models/node.py
-from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic import BaseModel, Field, FiniteFloat, field_validator, model_validator
 from typing import Optional, List
 from datetime import datetime
+from app.models.fields import StoredTextModel, ORDER_MAX
 
-class NodeCreate(BaseModel):
+class NodeCreate(StoredTextModel):
     content: Optional[str] = None
-    pos_x: Optional[float] = None
-    pos_y: Optional[float] = None
-    depth: Optional[int] = 0
-    order: Optional[int] = 0
+    pos_x: Optional[FiniteFloat] = None
+    pos_y: Optional[FiniteFloat] = None
+    depth: Optional[int] = Field(default=0, ge=0, le=ORDER_MAX)
+    order: Optional[int] = Field(default=0, ge=0, le=ORDER_MAX)
     ai_prompt: Optional[str] = None
     parent_id: Optional[int] = None
     state: Optional[str] = None
 
-class NodeUpdate(BaseModel):
+class NodeUpdate(StoredTextModel):
     content: Optional[str] = None
-    pos_x: Optional[float] = None
-    pos_y: Optional[float] = None
-    depth: Optional[int] = None
-    order: Optional[int] = None
+    pos_x: Optional[FiniteFloat] = None
+    pos_y: Optional[FiniteFloat] = None
+    depth: Optional[int] = Field(default=None, ge=0, le=ORDER_MAX)
+    order: Optional[int] = Field(default=None, ge=0, le=ORDER_MAX)
     expected_version: Optional[int] = Field(default=None, ge=0)
 
     @model_validator(mode="after")

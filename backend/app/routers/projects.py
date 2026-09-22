@@ -1,37 +1,24 @@
 # backend/app/routers/projects.py
 
-import uuid
 from typing import List, Dict, Any, Optional
 
 from fastapi import APIRouter, Depends, Path, Query, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func, delete
-from sqlalchemy.orm import selectinload
+from sqlalchemy import select, func
 from pydantic import EmailStr
 
 from app.db.models.tag_node import TagNode
 from app.models.project import ProjectCreate, ProjectUpdate, ProjectOut
+from app.models.invite_token import JoinProject
 from app.core.security import get_current_user_id as _uid
 from app.utils.helpers import ensure_member as _m, ensure_owner as _o
 from app.db.models.project import Project as ProjectORM
 from app.db.models.project_user_role import ProjectUserRole
-from app.db.models.node import Node as NodeORM
+from app.db.models.node import Node as NodeORM, NodeStateEnum
 from app.db.models.tag import Tag as TagORM
 from app.db.session import AsyncSessionLocal
 
-from fastapi import APIRouter, Depends, Path, HTTPException, status
-from sqlalchemy import select, func
-from sqlalchemy.ext.asyncio import AsyncSession
-from typing import List, Dict, Any, Optional
-
-from app.models.project import ProjectOut
-from app.core.security import get_current_user_id as _uid
-from app.utils.helpers import ensure_owner as _o
-from app.db.models.project import Project as ProjectORM
-from app.db.models.node import Node as NodeORM, NodeStateEnum  # ← Enum 같이 import
-from app.db.models.tag import Tag as TagORM
-from app.db.models.tag_node import TagNode
-from app.db.session import AsyncSessionLocal
+from app.services.project_invitations import create_invitation, accept_invitation
 router = APIRouter(prefix="/projects", tags=["Projects"])
 
 
@@ -63,7 +50,7 @@ async def list_projects(
         return []
 
     # (2) 실제 Project 테이블에서 조회
-    query = select(ProjectORM).where(ProjectORM.id.in_(project_ids))
+    query = select(ProjectORM).where(ProjectORM.id.in_(project_ids), ProjectORM.is_deleted.is_(False))
     if owned:
         query = query.where(ProjectORM.owner_id == int(uid))
 
@@ -134,7 +121,7 @@ async def get_project(
 
     # (1) 프로젝트 자체 조회
     result = await db.execute(
-        select(ProjectORM).where(ProjectORM.id == project_id, ProjectORM.is_deleted == False)
+        select(ProjectORM).where(ProjectORM.id == project_id, ProjectORM.is_deleted.is_(False))
     )
     proj = result.scalar_one_or_none()
     if not proj:
@@ -207,59 +194,22 @@ async def delete_project(
 @router.post("/{project_id}/invite", response_model=Dict[str, str])
 async def invite_project(
     project_id: int = Path(...),
-    email: EmailStr = Query(...),
+    email: EmailStr = Query(..., max_length=120),
     uid: str = Depends(_uid),
     db: AsyncSession = Depends(get_db),
 ):
-    """
-    프로젝트 참여 초대.  
-    - 프로젝트 소유자만 호출 가능
-    - InviteToken 테이블이 있으면, 해당 테이블에 레코드 저장
-      (편의상 로직 생략, 필요 시 InviteToken ORM으로 바꾸세요)
-    """
+    """Create a seven-day invitation for the named account; no email is sent."""
     await _o(int(uid), project_id, db)
-
-    # 예시: 단순 토큰 생성 (실제로는 InviteToken ORM에 저장)
-    token = uuid.uuid4().hex
-    # (1) InviteToken ORM 예시: 
-    #   invite = InviteToken(token=token, project_id=project_id, email=email, role="EDITOR", expires_at=...)
-    #   db.add(invite); await db.commit()
-
-    return {"invite_token": token, "message": f"Invitation sent to {email}"}
+    return await create_invitation(db, project_id, str(email))
 
 
 @router.post("/join", status_code=status.HTTP_200_OK)
 async def join_project(
-    token: str = Query(...),
+    body: JoinProject,
     uid: str = Depends(_uid),
     db: AsyncSession = Depends(get_db),
 ):
-    """
-    토큰으로 프로젝트 참여:  
-    - 예시: InviteToken ORM에서 project_id 조회  
-    - ProjectUserRole에 참여 레코드 삽입
-    """
-    # (1) InviteToken을 ORM에서 조회: 생략
-    # 예시로 넘어온 token에 대응하는 project_id를 임의로 설정
-    project_id = 1  # 실제 로직에 따라 InviteToken에서 읽어와야 함
-
-    # (2) 이미 멤버가 아닌 경우에만 추가
-    existing = await db.execute(
-        select(ProjectUserRole).where(
-            ProjectUserRole.project_id == project_id,
-            ProjectUserRole.user_id == int(uid)
-        )
-    )
-    if not existing.scalar_one_or_none():
-        membership = ProjectUserRole(
-            project_id=project_id,
-            user_id=int(uid),
-            role="EDITOR"  # 기본 역할
-        )
-        db.add(membership)
-        await db.commit()
-
-    return {"project_id": project_id, "status": "joined"}
+    return await accept_invitation(db, body.token, int(uid))
 
 
 # ── 프로젝트 요약 ───────────────────────────────────────────────────────

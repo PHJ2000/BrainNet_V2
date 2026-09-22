@@ -43,6 +43,9 @@ async def main():
                 async for raw in socket:
                     event=json.loads(raw)
                     kind=event.get('type')
+                    if kind == 'ping':
+                        await socket.send('pong')
+                        continue
                     if kind in ('node.created','node.deleted'):
                         counters[index][kind]+=1
                         if index==0 and kind=='node.created':

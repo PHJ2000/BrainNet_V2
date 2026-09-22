@@ -105,15 +105,16 @@ class ApiExceptionHandler {
                 .header("X-Trace-Id", traceId)
                 .body(new ApiModels.ValidationErrorView(
                         "VALIDATION_ERROR", message, traceId,
-                        errors == null ? defaultValidationErrors() : errors));
+                        errors == null ? defaultValidationErrors() : errors.stream()
+                                .map(error -> Map.<String, Object>of("type", error.get("type"),
+                                        "loc", error.get("loc"), "msg", error.get("msg")))
+                                .toList()));
     }
 
     private List<Map<String, Object>> defaultValidationErrors() {
         return List.of(Map.of(
                 "type", "value_error",
                 "loc", List.of("body"),
-                "msg", "Request validation failed",
-                "input", Map.of(),
-                "ctx", Map.of("error", Map.of())));
+                "msg", "Request validation failed"));
     }
 }

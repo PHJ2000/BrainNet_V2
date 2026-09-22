@@ -1,10 +1,10 @@
 // app/(main)/layout.tsx
 import Sidebar from "../components/Sidebar";
-import Providers from "../providers";
+import AuthBoundary from "@/features/auth/AuthBoundary";
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   return (
-    <Providers>
+    <AuthBoundary>
       <div className="flex h-screen w-screen bg-gradient-to-br from-blue-50 via-white to-purple-100">
         {/* 사이드바 */}
         <aside className="relative z-10 w-[24%] min-w-[220px] max-w-[320px] border-r border-gray-200 bg-white/70 backdrop-blur-xl shadow-md flex flex-col">
@@ -37,6 +37,6 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           </section>
         </main>
       </div>
-    </Providers>
+    </AuthBoundary>
   );
 }

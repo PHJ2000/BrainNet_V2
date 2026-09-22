@@ -136,7 +136,7 @@ docker compose up --build -d
 
 [웹 앱](http://localhost:3000) · [API 문서](http://localhost:8000/docs) · [상태 확인](http://localhost:8000/health)
 
-기본 Compose에는 DB 영속 볼륨이 없습니다. DB 컨테이너를 제거·재생성하기 전에 필요한 데이터를 백업하세요.
+기본 Compose는 `db-data` 명명 볼륨으로 DB 데이터를 유지합니다. 기존 익명 볼륨은 자동 이전되지 않으므로, 기존 사용자는 재생성 전에 [볼륨 유지 절차](docs/LOCAL_DEVELOPMENT.md#기존-db-볼륨-유지)를 확인하세요. `docker compose down -v`는 데이터를 삭제하므로 사용하지 마세요.
 
 Python 3.12 환경의 일반 계약 테스트:
 

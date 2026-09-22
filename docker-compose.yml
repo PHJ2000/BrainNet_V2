@@ -7,6 +7,8 @@ services:
       POSTGRES_USER: brain
       POSTGRES_PASSWORD: pass
     ports: ["5432:5432"]
+    volumes:
+      - db-data:/var/lib/postgresql/data
   backend:
     build:
       context: .
@@ -20,6 +22,13 @@ services:
       SQLALCHEMY_ECHO: ${SQLALCHEMY_ECHO:-false}
       NODE_EVENTS_ENABLED: ${NODE_EVENTS_ENABLED:-true}
       OUTBOX_RETENTION_DAYS: ${OUTBOX_RETENTION_DAYS:-7}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:3000}
+      AUTH_REQUESTS_PER_MINUTE: ${AUTH_REQUESTS_PER_MINUTE:-60}
+      AUTH_MAX_INFLIGHT: ${AUTH_MAX_INFLIGHT:-32}
+      AUTH_MAX_BODY_BYTES: ${AUTH_MAX_BODY_BYTES:-16384}
+      WS_AUTH_CHECK_SECONDS: ${WS_AUTH_CHECK_SECONDS:-10}
+      WS_MAX_CONNECTIONS: ${WS_MAX_CONNECTIONS:-512}
+      WS_MAX_CONNECTIONS_PER_USER: ${WS_MAX_CONNECTIONS_PER_USER:-8}
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       OPENAI_MODEL: ${OPENAI_MODEL:-gpt-3.5-turbo}
       OPENAI_TIMEOUT_SECONDS: ${OPENAI_TIMEOUT_SECONDS:-30}
@@ -41,3 +50,6 @@ services:
     environment:
       - CHOKIDAR_USEPOLLING=true  # Vite, Next 등 핫 리로드 문제 해결
       - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL:-http://localhost:8000}
+
+volumes:
+  db-data:

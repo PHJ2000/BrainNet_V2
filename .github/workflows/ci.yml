@@ -8,6 +8,23 @@ permissions:
   contents: read
 
 jobs:
+  dependency-security:
+    name: Python dependency lock and security audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Verify exported requirements and audit the locked dependencies
+        run: |
+          python -m venv "$RUNNER_TEMP/security-tools"
+          "$RUNNER_TEMP/security-tools/bin/pip" install poetry==2.5.1 poetry-plugin-export==1.10.1 pip-audit==2.10.1
+          export POETRY_VIRTUALENVS_CREATE=false
+          "$RUNNER_TEMP/security-tools/bin/poetry" check --lock
+          "$RUNNER_TEMP/security-tools/bin/poetry" export --with dev --without-hashes -o "$RUNNER_TEMP/exported-requirements.txt"
+          diff -u requirements.txt "$RUNNER_TEMP/exported-requirements.txt"
+          "$RUNNER_TEMP/security-tools/bin/pip-audit" -r requirements.txt --no-deps --disable-pip
   backend:
     name: Backend contract and migration
     runs-on: ubuntu-latest

@@ -2,27 +2,19 @@
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, memo } from "react";
 import cytoscape, { Core, ElementDefinition } from "cytoscape";
-import { childCreationPlan, runChildCreationPlan, type ChildCreationPlan } from "./childCreationPlan";
-import { useNodeEvents } from "./useNodeEvents";
+import { useGraphActions } from "./useGraphActions";
+import { useGraphData } from "./useGraphData";
+import { measureNodeSize, type NodeMeta, type Tag } from "./graphModel";
+export type { NodeMeta, Tag } from "./graphModel";
 import OperationPanel from "./OperationPanel";
 import GraphExplorer from "./GraphExplorer";
 import { useGraphView } from "./useGraphView";
 import ProjectFiles from "@/features/projects/ProjectFiles";
 import {
-  createAINodes as apiCreateAINodes,
   NodeOut,
   createNode,        // ✅ 추가
-  activateNode as apiActivateNode,
   updateNode,        // ✅ 추가
-  fetchNodes,
-  findChildrenIds,
 } from "./nodeApi";  // ← 변경
-import {
-  listTags,
-  attachTag,
-  detachTag,
-  createTag,
-} from "@/features/projects/tagApi";
 import {
   Menu,
   Item,
@@ -32,34 +24,6 @@ import {
 import "react-contexify/ReactContexify.css";
 
 /* ───────────── 타입 ───────────── */
-export interface Tag {
-  id: string;
-  name: string;
-  description?: string;
-  color?: string;
-  node_count: number;
-  summary?: string;
-}
-
-export type NodeMeta = {
-  id: string;
-  label: string;
-  pos_x: number;
-  pos_y: number;
-  parentId?: string;
-  depth: number;
-  order: number;
-  opacity?: number;
-  frozen?: boolean;
-  status?: "ACTIVE" | "GHOST" | "ARCHIVED";
-  generated?: boolean;
-  tags?: string[];
-  version: number;
-  // 자동 크기 조절용
-  width?: number;   // 👈 추가!
-  height?: number;  // 👈 추가!
-};
-
 export interface GraphProps {
   projectId: number;
 }
@@ -124,79 +88,22 @@ function useNodeMenu() {
   const { show } = useContextMenu({ id: NODE_MENU_ID });
   return show;
 }
-function measureNodeSize(label: string, maxWidth = 220, font = "bold 18px Arial") {
-  // 텍스트 줄수와 최대 가로길이에 따라 width, height 산출
-  const canvas = document.createElement("canvas");
-  const ctx = canvas.getContext("2d")!;
-  ctx.font = font;
-
-  // 줄 단위로 나누기 (text-wrap용)
-  const words = label.split(' ');
-  const lines: string[] = [];
-  let curLine = '';
-
-  for (const word of words) {
-    const testLine = curLine ? curLine + ' ' + word : word;
-    if (ctx.measureText(testLine).width > maxWidth && curLine) {
-      lines.push(curLine);
-      curLine = word;
-    } else {
-      curLine = testLine;
-    }
-  }
-  if (curLine) lines.push(curLine);
-
-  const widest = Math.max(...lines.map(l => ctx.measureText(l).width), 70);
-  const width = Math.min(Math.max(widest + 40, 110), 350); // min/max clamp
-  const height = lines.length * 26 + 30; // 한 줄 26px, +패딩
-
-  return { width, height };
-}
-
-function toNodeMeta(n: NodeOut, previous?: NodeMeta): NodeMeta {
-  const { width, height } = measureNodeSize(n.content ?? "");
-  return {
-    id: String(n.id),
-    label: n.content,
-    pos_x: n.pos_x ?? 400 + Math.min(n.depth, 5) * 120,
-    pos_y: n.pos_y ?? 300 + Math.min(n.order_index, 8) * 80,
-    parentId: n.parent_id ? String(n.parent_id) : undefined,
-    depth: n.depth,
-    order: n.order_index,
-    status: n.state,
-    opacity: n.state === "GHOST" ? 0.3 : 1,
-    frozen: n.state === "ACTIVE" ? true : previous?.frozen ?? true,
-    generated: previous?.generated,
-    version: n.version,
-    width,
-    height,
-    tags: (n.tags ?? []).map(String),
-  };
-}
-
 /* ──────────── 그래프 컴포넌트 ─────────── */
 export default function Graph({ projectId }: GraphProps) {
   const cyRef = useRef<HTMLDivElement>(null);
   const cyInstance = useRef<Core | null>(null);
-  const [tags, setTags] = useState<Tag[]>([]);
+  const data = useGraphData(projectId);
+  const { nodes, nodesRef, tags, loaded, projectIdRef, getScope, refreshNodes,
+    updateLocalNode, resyncNodes } = data;
   const [tagPopoverOpen, setTagPopoverOpen] = useState(false); // 태그 팝오버/모달
   const [highlightTag, setHighlightTag] = useState<string | null>(null); // 현재 하이라이팅할 태그 id
 
   /* ----- 상태 ----- */
-  const [nodes, setNodes] = useState<NodeMeta[]>([]);
-  const [loaded, setLoaded] = useState(false);
   const tagIds = useMemo(() => tags.map(t => t.id), [tags]);
   const explorer = useGraphView(projectId, nodes, tagIds, loaded);
   const view = explorer.view;
   const visibleRef = useRef(view.visible);
   useLayoutEffect(() => { visibleRef.current = view.visible; }, [view.visible]);
-  const nodesRef = useRef(nodes);
-  const projectIdRef = useRef(projectId);
-  useLayoutEffect(() => { projectIdRef.current = projectId; }, [projectId]);
-  useEffect(() => {
-    nodesRef.current = nodes;
-  }, [nodes]);
-
   const addToCy = useCallback((arr: NodeMeta[]) => {
     const cy = cyInstance.current;
     if (!cy) return;
@@ -222,59 +129,10 @@ export default function Graph({ projectId }: GraphProps) {
     cy.add(eles);
   }, []);
 
-  const updateNodesAndCy = (updater: (nodes: NodeMeta[]) => NodeMeta[]) => {
-    setNodes((prev) => {
-      const next = updater(prev);
-      nodesRef.current = next;
-      return next;
-    });
-};
-
-  const updateLocalNode = (
-    nodeId: string,
-    updater: (node: NodeMeta) => NodeMeta,
-  ) => {
-    const next = nodesRef.current.map((node) =>
-      node.id === nodeId ? updater(node) : node,
-    );
-    nodesRef.current = next;
-    setNodes(next);
-    return next.find((node) => node.id === nodeId);
-  };
-
-  const refreshSequence = useRef(0);
-  const refreshNodes = useCallback(async (targetProjectId = projectIdRef.current) => {
-    const sequence = ++refreshSequence.current;
-    const [list, tagList] = await Promise.all([fetchNodes(targetProjectId), listTags(targetProjectId)]);
-    if (targetProjectId !== projectIdRef.current || sequence !== refreshSequence.current) {
-      return undefined;
-    }
-    const previousById = new Map(
-      nodesRef.current.map((node) => [node.id, node]),
-    );
-    const metas = list.map((node) =>
-      toNodeMeta(node, previousById.get(String(node.id))),
-    );
-
-    nodesRef.current = metas;
-    setNodes(metas);
-    setTags(tagList.map(t => ({ ...t, id: String(t.id) })));
-    setLoaded(true);
-    return metas;
-  }, []);
-  useNodeEvents(projectId, refreshNodes);
-
-  const resyncNodes = async (fallback?: () => void) => {
-    try {
-      await refreshNodes(projectIdRef.current);
-    } catch (refreshError) {
-      console.error("노드 서버 상태 재동기화 실패", refreshError);
-      fallback?.();
-    }
-  };
-
   const applyAuthoritativePatchResponse = (saved: NodeOut) => {
     const nodeId = String(saved.id);
+    const current = nodesRef.current.find(node => node.id === nodeId);
+    if (current && current.version > saved.version) return current;
     const widthHeight = measureNodeSize(saved.content ?? "");
     const updated = updateLocalNode(nodeId, (node) => ({
       ...node,
@@ -301,12 +159,6 @@ export default function Graph({ projectId }: GraphProps) {
   };
 
 
-  useEffect(() => {
-    refreshNodes(projectId)
-      .catch(console.error);
-  }, [projectId, refreshNodes]);
-
-
   const [ctxNodeId, setCtxNodeId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const showMenu = useNodeMenu();
@@ -330,146 +182,9 @@ export default function Graph({ projectId }: GraphProps) {
         }
       });
     }
-  }, [highlightTag]);
-  /* ----- util ----- */
-  const radius = 280;
-  const polarToXY = (cx: number, cy: number, r: number, rad: number) => ({
-    x: cx + r * Math.cos(rad),
-    y: cy + r * Math.sin(rad),
-  });
-
-  /* ----- 태그 attach / detach ----- */
-  const handleAddTag = async (tagId: string) => {
-    if (!ctxNodeId || !visibleRef.current.has(ctxNodeId)) return;
-    const targetProjectId = projectIdRef.current;
-    const targetNodeId = ctxNodeId;
-    const allNodeIds = [
-      targetNodeId,
-      ...findChildrenIds(nodesRef.current, targetNodeId),
-    ];
-    let realId = tagId;
-
-    if (tagId === "__new__") {
-      const name = window.prompt("새 태그 이름");
-      if (!name) return;
-      try {
-        const t = await createTag(targetProjectId, { name });
-        if (targetProjectId !== projectIdRef.current) return;
-        const newTag = { ...t, id: String(t.id) };
-        setTags((ts) => [...ts, newTag]);
-        realId = newTag.id;
-      } catch (e) {
-        if (targetProjectId !== projectIdRef.current) return;
-        console.error(e);
-        return;
-      }
-    }
-
-    try {
-      // 모든 노드에 태그를 attach
-      await attachTag(targetProjectId, realId, targetNodeId);
-      if (targetProjectId !== projectIdRef.current) return;
-      updateNodesAndCy((ns) =>
-        ns.map((n) =>
-          allNodeIds.includes(n.id)
-            ? { ...n, tags: [...(n.tags ?? []), realId] }
-            : n
-        )
-      );
-    } catch (e) {
-      if (targetProjectId !== projectIdRef.current) return;
-      console.error(e);
-    }
-  };
-
-  const handleRemoveTag = async (tagId: string) => {
-    if (!ctxNodeId || !visibleRef.current.has(ctxNodeId)) return;
-    const targetProjectId = projectIdRef.current;
-    const targetNodeId = ctxNodeId;
-    const allNodeIds = [
-      targetNodeId,
-      ...findChildrenIds(nodesRef.current, targetNodeId),
-    ];
-
-    try {
-      await detachTag(targetProjectId, tagId, targetNodeId);
-      if (targetProjectId !== projectIdRef.current) return;
-      updateNodesAndCy((ns) =>
-        ns.map((n) =>
-          allNodeIds.includes(n.id)
-            ? { ...n, tags: (n.tags ?? []).filter((t) => t !== tagId) }
-            : n
-        )
-      );
-    } catch (e) {
-      if (targetProjectId !== projectIdRef.current) return;
-      console.error(e);
-    }
-  };
-
-  /* ----- AI·빈 노드 생성 로직 ----- */
-  const spawning = useRef(new Set<string>());
-  const spawnPlans = useRef(new Map<string, ChildCreationPlan>());
-  const spawnChildren = async (parent: NodeMeta) => {
-    if (parent.generated) return;
-    const targetProjectId = projectIdRef.current;
-    const operation = `${targetProjectId}:${parent.id}`;
-    if (spawning.current.has(operation)) return;
-    spawning.current.add(operation);
-    try {
-      let plan = spawnPlans.current.get(operation);
-      if (!plan) {
-        const isRoot = !parent.parentId;
-        const grandparent = nodesRef.current.find((node) => node.id === parent.parentId);
-        const direction = grandparent
-          ? Math.atan2(parent.pos_y - grandparent.pos_y, parent.pos_x - grandparent.pos_x) : 0;
-        const angles = isRoot
-          ? Array.from({ length: 3 }, (_, index) => -Math.PI / 2 + index * 2 * Math.PI / 3)
-          : [direction - Math.PI / 6, direction + Math.PI / 6];
-        plan = childCreationPlan(parent.label, isRoot ? 2 : 1, angles.map((angle, index) => {
-          const { x, y } = polarToXY(parent.pos_x, parent.pos_y, radius, angle);
-          return {
-            content: "?", parent_id: Number(parent.id), pos_x: x, pos_y: y,
-            depth: parent.depth + 1, order: index, state: "GHOST",
-          };
-        }));
-        spawnPlans.current.set(operation, plan);
-      }
-      const complete = await runChildCreationPlan(plan, {
-        ai: (prompt, payload, key) => apiCreateAINodes(targetProjectId, prompt, payload, key),
-        regular: (payload, key) => createNode(targetProjectId, payload, key),
-      }, () => targetProjectId === projectIdRef.current);
-      if (!complete) return;
-      await refreshNodes(targetProjectId);
-      if (targetProjectId !== projectIdRef.current) return;
-      updateLocalNode(parent.id, (node) => ({ ...node, frozen: true, generated: true }));
-      spawnPlans.current.delete(operation);
-    } catch (error) {
-      console.error(error);
-      try {
-        await refreshNodes(targetProjectId);
-      } catch (refreshError) {
-        console.error(refreshError);
-      }
-    } finally {
-      spawning.current.delete(operation);
-    }
-  };
-
-  /* ----- 노드 활성화 ----- */
-  const activateNodeLocal = async (meta: NodeMeta): Promise<NodeMeta | undefined> => {
-    const targetProjectId = projectIdRef.current;
-    try {
-      await apiActivateNode(targetProjectId, Number(meta.id));
-      const refreshed = await refreshNodes(targetProjectId);
-      return refreshed?.find((node) => node.id === meta.id);
-    } catch (e) {
-      console.error(e);
-      if (targetProjectId !== projectIdRef.current) return undefined;
-      await resyncNodes();
-      return undefined;
-    }
-  };
+  }, [highlightTag, nodesRef]);
+  const { handleAddTag, handleRemoveTag, spawnChildren, activateNodeLocal } =
+    useGraphActions(data, ctxNodeId, visibleRef);
 
   /* ───── 헬퍼 ───── */
   // const isNumericId = (s: string) => /^\d+$/.test(s);
@@ -480,6 +195,8 @@ export default function Graph({ projectId }: GraphProps) {
     const cur = nodesRef.current.find((n) => n.id === oldId);
     if (!cur || !visibleRef.current.has(oldId)) return;
     const targetProjectId = projectIdRef.current;
+    const scope = getScope();
+    if (!scope.isCurrent()) return;
 
     /* 1) AI GHOST (서버에 이미 있음) → 바로 activate */
     if (cur.status === "GHOST") {
@@ -494,15 +211,15 @@ export default function Graph({ projectId }: GraphProps) {
             pos_x: cur.pos_x,
             pos_y: cur.pos_y,
             expected_version: cur.version,
-          });
-          if (targetProjectId !== projectIdRef.current) return;
+          }, scope.signal);
+          if (!scope.isCurrent()) return;
 
           applyAuthoritativePatchResponse(saved);
           const active = await activateNodeLocal(cur);
           if (active) await spawnChildren(active);
         } catch (err) {
           console.error(err);
-          if (targetProjectId !== projectIdRef.current) return;
+          if (!scope.isCurrent()) return;
           await resyncNodes();
         }
       } else {
@@ -523,8 +240,8 @@ export default function Graph({ projectId }: GraphProps) {
       const saved = await updateNode(targetProjectId, Number(cur.id), {
         content: newLabel,
         expected_version: cur.version,
-      });
-      if (targetProjectId !== projectIdRef.current) return;
+      }, scope.signal);
+      if (!scope.isCurrent()) return;
       const updated = applyAuthoritativePatchResponse(saved);
 
       /* ✅ 내용이 바뀐 첫 클릭이라면 spawnChildren */
@@ -534,7 +251,7 @@ export default function Graph({ projectId }: GraphProps) {
 
     } catch (err) {
       console.error(err);
-      if (targetProjectId !== projectIdRef.current) return;
+      if (!scope.isCurrent()) return;
       await resyncNodes(() => {
         const restored = updateLocalNode(cur.id, (node) => ({
           ...node,
@@ -648,6 +365,8 @@ export default function Graph({ projectId }: GraphProps) {
       const current = nodesRef.current.find((n) => n.id === String(id));
       if (!current || !visibleRef.current.has(String(id))) return;
       const targetProjectId = projectIdRef.current;
+    const scope = getScope();
+    if (!scope.isCurrent()) return;
       const previousPosition = {
         x: current.pos_x,
         y: current.pos_y,
@@ -658,12 +377,12 @@ export default function Graph({ projectId }: GraphProps) {
           pos_x: pos.x,
           pos_y: pos.y,
           expected_version: current.version,
-        });
-        if (targetProjectId !== projectIdRef.current) return;
+        }, scope.signal);
+        if (!scope.isCurrent()) return;
         applyAuthoritativePatchResponse(saved);
       } catch (err) {
         console.error("노드 위치 업데이트 실패", err);
-        if (targetProjectId !== projectIdRef.current) return;
+        if (!scope.isCurrent()) return;
         await resyncNodes(() => {
           const restored = updateLocalNode(String(id), (localNode) => ({
             ...localNode,
@@ -751,6 +470,7 @@ export default function Graph({ projectId }: GraphProps) {
 };
 
   /* ----- 렌더 ----- */
+  if (data.accessError) return <div role="alert" className="p-6">{data.accessError}</div>;
   return (
     <div className="relative h-full w-full">
       <GraphExplorer explorer={explorer} tags={tags} loaded={loaded} onFocus={() => undefined} />
@@ -863,11 +583,13 @@ export default function Graph({ projectId }: GraphProps) {
           if (!parent || !view.visible.has(parent.id)) return;
           const content = window.prompt("새 자식 노드의 내용을 입력하세요");
           if (!content?.trim()) return;
+          const scope = getScope();
+          if (!scope.isCurrent()) return;
           try {
             await createNode(projectId, { content, parent_id: Number(parent.id), depth: parent.depth + 1,
-              pos_x: parent.pos_x + 180, pos_y: parent.pos_y + 120 });
+              pos_x: parent.pos_x + 180, pos_y: parent.pos_y + 120 }, undefined, scope.signal);
             await refreshNodes(projectId);
-          } catch { window.alert("노드를 만들지 못했어요. 변경 기록과 연결 상태를 확인해 주세요."); }
+          } catch { if (!scope.isCurrent()) return; window.alert("노드를 만들지 못했어요. 변경 기록과 연결 상태를 확인해 주세요."); }
         }}
       />
     </div>

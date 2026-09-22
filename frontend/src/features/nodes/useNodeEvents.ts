@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { apiClient } from "@/lib/apiClient";
 
 /** Invalidation reloads authorized state; duplicate events never append duplicate nodes. */
 export function useNodeEvents(projectId: number, reload: (projectId: number) => Promise<unknown>) {
+  const [accessError, setAccessError] = useState<{ projectId: number; message: string } | null>(null);
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) return;
@@ -40,11 +41,24 @@ export function useNodeEvents(projectId: number, reload: (projectId: number) => 
       currentSocket.onmessage = (event) => {
         try {
           const message = JSON.parse(event.data);
+          if (message.type === "ping") { currentSocket.send("pong"); return; }
           if (["node.created", "node.updated", "node.deleted", "tags.updated", "resync.required"].includes(message.type)) invalidate();
         } catch { /* Ignore unrelated protocol messages. */ }
       };
       currentSocket.onclose = (event) => {
-        if (stopped || event.code === 4401 || event.code === 4403) return;
+        if (stopped) return;
+        if (event.code === 4401 || event.code === 4403) {
+          stopped = true;
+          clearInterval(reconcile);
+          if (refresh) clearTimeout(refresh);
+          if (event.code === 4401 && localStorage.getItem("token") === token) {
+            localStorage.removeItem("token");
+            window.location.replace("/login?expired=1");
+          } else {
+            setAccessError({ projectId, message: "프로젝트 접근 권한이 없거나 삭제되었습니다. 프로젝트 목록으로 돌아가 주세요." });
+          }
+          return;
+        }
         retry = setTimeout(connect, delay);
         delay = Math.min(delay * 2, 10000);
       };
@@ -61,4 +75,5 @@ export function useNodeEvents(projectId: number, reload: (projectId: number) => 
       socket?.close();
     };
   }, [projectId, reload]);
+  return accessError?.projectId === projectId ? accessError.message : null;
 }

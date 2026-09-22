@@ -1,0 +1,6 @@
+# Adopt an existing PostgreSQL 15 volume without copying or deleting its data.
+# Always combine with the root docker-compose.yml; see docs/LOCAL_DEVELOPMENT.md.
+volumes:
+  db-data:
+    external: true
+    name: ${BRAINNET_DB_VOLUME:?Set BRAINNET_DB_VOLUME to the existing PostgreSQL volume name}

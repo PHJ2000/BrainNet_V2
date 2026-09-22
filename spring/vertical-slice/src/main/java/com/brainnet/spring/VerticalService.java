@@ -71,11 +71,15 @@ class VerticalService {
     }
 
     private void requireMember(long projectId, long userId) {
-        Integer member = jdbc.queryForObject(
-                "SELECT count(*) FROM project_user_role WHERE project_id=? AND user_id=?",
-                Integer.class, projectId, userId);
-        if (member == null || member == 0) {
+        List<Boolean> projects = jdbc.query(
+                "SELECT p.is_deleted FROM project_user_role r JOIN project p ON p.id=r.project_id "
+                        + "WHERE r.project_id=? AND r.user_id=?",
+                (rs, row) -> rs.getBoolean("is_deleted"), projectId, userId);
+        if (projects.isEmpty()) {
             throw new ApiException(HttpStatus.FORBIDDEN, "FORBIDDEN", "Not a project member");
+        }
+        if (projects.getFirst()) {
+            throw new ApiException(HttpStatus.NOT_FOUND, "NOT_FOUND", "Project not found");
         }
     }
 

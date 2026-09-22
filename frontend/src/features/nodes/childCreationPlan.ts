@@ -48,6 +48,7 @@ export async function runChildCreationPlan(
         }
       }
     }
+    if (!isCurrent()) return false;
     await send.regular(child.payload, child.key);
     child.done = true;
   }

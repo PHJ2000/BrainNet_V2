@@ -1,14 +1,15 @@
 # backend/app/models/tag.py
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional
+from app.models.fields import StoredTextModel, TAG_NAME_MAX, TAG_COLOR_MAX
 
-class TagCreate(BaseModel):
-    name: str
-    color: Optional[str] = None
+class TagCreate(StoredTextModel):
+    name: str = Field(max_length=TAG_NAME_MAX)
+    color: Optional[str] = Field(default=None, max_length=TAG_COLOR_MAX)
 
-class TagUpdate(BaseModel):
-    name: Optional[str] = None
-    color: Optional[str] = None
+class TagUpdate(StoredTextModel):
+    name: Optional[str] = Field(default=None, max_length=TAG_NAME_MAX)
+    color: Optional[str] = Field(default=None, max_length=TAG_COLOR_MAX)
 
 class TagOut(BaseModel):
     id: int

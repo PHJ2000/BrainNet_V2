@@ -1,6 +1,6 @@
 # backend/app/routers/tags.py
 
-import uuid  # uuid는 태그 생성 시 랜덤 ID 대신 자동 증가를 쓰므로 생략 가능
+import time
 from typing import List, Dict, Any
 
 from fastapi import APIRouter, Depends, Path, HTTPException, status
@@ -9,12 +9,15 @@ from sqlalchemy import select, delete, func
 
 from app.models.tag import TagCreate, TagUpdate, TagOut
 from app.core.security import get_current_user_id as _uid
-from app.utils.helpers import ensure_member as _m, ensure_owner as _o
+from app.utils.helpers import ensure_member as _m
 from app.db.models.tag import Tag as TagORM
 from app.db.models.tag_node import TagNode as TagNodeORM
 from app.db.models.node import Node as NodeORM
 from app.db.session import AsyncSessionLocal
 from app.services.outbox import append_event
+from app.core.errors import error_detail
+from app.db.models.tag_summary import TagSummary
+from app.db.models.history import ProjectHistory
 
 
 router = APIRouter(prefix="/projects/{project_id}/tags", tags=["Tags"])
@@ -220,12 +223,20 @@ async def delete_tag(
 
     # (1) ORM에서 태그 조회 & 삭제
     result = await db.execute(
-        select(TagORM).where(TagORM.id == tag_id, TagORM.project_id == project_id)
+        select(TagORM).where(TagORM.id == tag_id, TagORM.project_id == project_id).with_for_update()
     )
     tag = result.scalar_one_or_none()
     if not tag:
         raise HTTPException(status_code=404, detail="Tag not found")
 
+    # Match vote confirmation's summary locks before checking retained history.
+    summaries = (await db.execute(select(TagSummary.id).where(
+        TagSummary.tag_id == tag_id
+    ).order_by(TagSummary.id).with_for_update())).scalars().all()
+    if summaries and (await db.execute(select(ProjectHistory.id).where(
+        ProjectHistory.tag_summary_id.in_(summaries)
+    ).limit(1))).first():
+        raise HTTPException(409, error_detail("TAG_HAS_HISTORY", "A tag with confirmed history cannot be deleted"))
     await db.delete(tag)
     append_event(db, project_id, project_id, "tags.updated")
     await db.commit()
@@ -312,7 +323,6 @@ async def attach_tag(
     print(f"타이밍: 권한:{t1-t0:.3f}s, 태그:{t2-t1:.3f}s, 노드:{t3-t2:.3f}s, 존재확인:{t4-t3:.3f}s, 자손수집:{t5-t4:.3f}s, 조희:{t6-t5:.3f}s, 연결:{t7-t6:.3f} 총합:{t7-t0:.3f}s")
     return {"tag_id": tag_id, "node_id": node_id, "status": "attached"}
 
-import time
 # ── 태그-노드 연결 해제 (detach) ────────────────────────────────────
 @router.delete(
     "/{tag_id}/nodes/{node_id}",

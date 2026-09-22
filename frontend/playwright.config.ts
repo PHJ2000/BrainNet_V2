@@ -6,5 +6,5 @@ export default defineConfig({
   fullyParallel: false,
   workers: 1,
   retries: 0,
-  use: { baseURL: "http://localhost:18080", browserName: "chromium", viewport: { width: 1440, height: 1000 } },
+  use: { baseURL: process.env.PLAYWRIGHT_BASE_URL || "http://localhost:18080", browserName: "chromium", viewport: { width: 1440, height: 1000 } },
 });

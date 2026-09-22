@@ -7,10 +7,12 @@ import { Plus } from "lucide-react";
 import { useState } from "react";
 import type { Project } from "@/types/api";
 import ProjectFormModal from "./ProjectFormModal";
+import JoinProjectDialog from "@/features/projects/JoinProjectDialog";
 
 export default function Sidebar() {
   const { data: projects = [], isLoading } = useProjects();
   const [modalOpen, setModalOpen] = useState(false);
+  const [joinOpen, setJoinOpen] = useState(false);
 
   return (
     <div className="flex flex-col h-full p-4">
@@ -40,10 +42,14 @@ export default function Sidebar() {
           <Plus size={18} className="mr-2" />
           새 프로젝트
         </button>
+        <button onClick={() => setJoinOpen(true)} className="mt-2 w-full rounded-md border border-slate-300 py-2 text-sm text-slate-700 hover:bg-slate-50">초대 코드로 참여</button>
       </div>
+
+      <button onClick={() => { localStorage.removeItem("token"); window.location.replace("/login"); }} className="mt-4 border-t border-slate-200 pt-3 text-left text-sm text-slate-500 hover:text-slate-900">로그아웃</button>
 
       {/* 모달 */}
       {modalOpen && <ProjectFormModal onClose={() => setModalOpen(false)} />}
+      {joinOpen && <JoinProjectDialog onClose={() => setJoinOpen(false)} />}
     </div>
   );
 }

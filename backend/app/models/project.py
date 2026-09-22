@@ -2,13 +2,14 @@
 from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime
+from app.models.fields import StoredTextModel, PROJECT_NAME_MAX
 
-class ProjectCreate(BaseModel):
-    name: str = Field(..., example="새 프로젝트")
+class ProjectCreate(StoredTextModel):
+    name: str = Field(..., min_length=1, max_length=PROJECT_NAME_MAX, example="새 프로젝트")
     description: Optional[str] = None
 
-class ProjectUpdate(BaseModel):
-    name: Optional[str] = None
+class ProjectUpdate(StoredTextModel):
+    name: Optional[str] = Field(default=None, min_length=1, max_length=PROJECT_NAME_MAX)
     description: Optional[str] = None
 
 class ProjectOut(BaseModel):

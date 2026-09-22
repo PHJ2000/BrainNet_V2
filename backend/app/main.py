@@ -7,7 +7,9 @@ from app.routers import (
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.errors import install_error_handlers
 from app.core.trace import TraceIdMiddleware
-from app.core.config import bool_env
+from app.core.config import bool_env, allowed_origins
+from app.core.request_limits import RequestLimits
+from app.core.log_redaction import install_log_redaction
 from app.services.node_events import NodeEventBridge
 from app.services.ai_provider import close_ai_client
 from app.services.node_admission import NodeCreationAdmission
@@ -33,6 +35,7 @@ async def lifespan(_app: FastAPI):
 
 
 app = FastAPI(title="BrainShare API", version="0.2.0", lifespan=lifespan)
+install_log_redaction()
 install_error_handlers(app)
 
 
@@ -70,12 +73,14 @@ async def metrics():
                              media_type="text/plain; version=0.0.4")
 
 # ✅ CORS 설정
+app.add_middleware(RequestLimits)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # 또는 ["http://localhost:3000"] (보안 강화를 원할 경우)
-    allow_credentials=True,
+    allow_origins=allowed_origins(),
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["X-Trace-Id", "Retry-After"],
 )
 app.add_middleware(TraceIdMiddleware)
 

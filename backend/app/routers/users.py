@@ -3,7 +3,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from typing import List, Dict, Any
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func
+from sqlalchemy import select, func, and_
 
 from app.models.user import UserRead  # Pydantic
 from app.db.models.user import User    # ORM
@@ -39,52 +39,18 @@ async def my_tag_summaries(
     uid: str = Depends(_uid),
     db: AsyncSession = Depends(get_db),
 ):
-    """
-    - 사용자가 속한 모든 프로젝트를 ProjectUserRole에서 조회
-    - 각 프로젝트별로 Tag 테이블을 조회
-    - TagNode 매핑을 통해 '이 태그에 속한 노드들'을 조회
-    - Node.author_id == uid 인 개수를 세서 nodes_contributed로 반환
-    """
-    # 1) 이 사용자가 속한 프로젝트 ID 목록
-    projects_result = await db.execute(
-        select(ProjectUserRole.project_id).where(ProjectUserRole.user_id == int(uid))
-    )
-    project_ids = [pid for (pid,) in projects_result.all()]
-
-    summaries: List[Dict[str, Any]] = []
-    for pid in project_ids:
-        # 2) 프로젝트별 태그
-        tags_result = await db.execute(
-            select(Tag).where(Tag.project_id == pid)
-        )
-        tags = tags_result.scalars().all()
-
-        for tag in tags:
-            # 3) 이 태그에 연결된 모든 node_id 조회 (TagNode)
-            node_ids_result = await db.execute(
-                select(TagNode.node_id).where(TagNode.tag_id == tag.id)
-            )
-            node_ids_for_tag = [nid for (nid,) in node_ids_result.all()]
-
-            if not node_ids_for_tag:
-                contributed_count = 0
-            else:
-                # 4) 이 사용자가 작성한 노드 중, 위 node_ids_for_tag에 속하는 것만 카운트
-                contrib_nodes_result = await db.execute(
-                    select(func.count(Node.id)).where(
-                        Node.id.in_(node_ids_for_tag),
-                        Node.author_id == uid
-                    )
-                )
-                contributed_count = contrib_nodes_result.scalar_one()
-
-            summaries.append({
-                "project_id": pid,
-                "tag_id": tag.id,
-                "tag_name": tag.name,
-                # Tag 모델에 summary 컬럼이 있으면 사용, 없으면 빈 문자열로 처리
-                "summary": getattr(tag, "summary", "") or "",
-                "nodes_contributed": contributed_count,
-            })
-
-    return summaries
+    """Return every visible tag, including zero-contribution tags, in one query."""
+    rows = (await db.execute(
+        select(Tag.project_id, Tag.id.label("tag_id"), Tag.name.label("tag_name"),
+               func.count(Node.id).label("nodes_contributed"))
+        .join(Project, Project.id == Tag.project_id)
+        .join(ProjectUserRole, and_(ProjectUserRole.project_id == Project.id,
+                                   ProjectUserRole.user_id == int(uid)))
+        .outerjoin(TagNode, TagNode.tag_id == Tag.id)
+        .outerjoin(Node, and_(Node.id == TagNode.node_id, Node.author_id == int(uid),
+                             Node.project_id == Tag.project_id))
+        .where(Project.is_deleted.is_(False))
+        .group_by(Tag.project_id, Tag.id, Tag.name)
+        .order_by(Tag.project_id, Tag.id)
+    )).mappings().all()
+    return [{**row, "summary": ""} for row in rows]

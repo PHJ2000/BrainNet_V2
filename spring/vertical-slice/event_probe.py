@@ -18,6 +18,9 @@ async def receive_type(socket, expected):
     async with asyncio.timeout(10):
         while True:
             message = json.loads(await socket.recv())
+            if message.get("type") == "ping":
+                await socket.send("pong")
+                continue
             if message.get("type") == expected:
                 return message
 

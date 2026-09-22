@@ -2,7 +2,7 @@ import axios from "axios";
 import { v4 as uuid } from "uuid";
 
 export function isUncertainCreation(error: unknown): boolean {
-  return axios.isAxiosError(error) && (!error.response ||
+  return !axios.isCancel(error) && axios.isAxiosError(error) && (!error.response ||
     (error.response.status === 409 && error.response.data?.code === "IDEMPOTENCY_IN_PROGRESS"));
 }
 

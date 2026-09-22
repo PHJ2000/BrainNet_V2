@@ -317,6 +317,9 @@ class VerticalSliceIntegrationTest {
         HttpResponse<String> deleted = request("GET", "/projects/2", bearer(7), null, "deleted-project");
         assertThat(deleted.statusCode()).isEqualTo(404);
         assertThat(deleted.body()).contains("\"code\":\"NOT_FOUND\"");
+        HttpResponse<String> deletedNode = request("GET", "/projects/2/nodes/11", bearer(7), null, null);
+        assertThat(deletedNode.statusCode()).isEqualTo(404);
+        assertThat(deletedNode.body()).contains("Project not found");
 
         HttpResponse<String> emptyPatch = request("PATCH", "/projects/1/nodes/11", bearer(7), "{}", "empty-patch");
         assertThat(emptyPatch.statusCode()).isEqualTo(422);
@@ -326,8 +329,7 @@ class VerticalSliceIntegrationTest {
                 .contains("\"type\":\"value_error\"")
                 .contains("\"loc\":[\"body\"]")
                 .contains("Value error, at least one node field must be provided")
-                .contains("\"input\":{}")
-                .contains("\"ctx\":{\"error\":{}");
+                .doesNotContain("\"input\":", "\"ctx\":");
 
         HttpResponse<String> negativeVersion = request("PATCH", "/projects/1/nodes/11", bearer(7),
                 "{\"expected_version\":-1,\"content\":\"invalid\"}", "negative-version");
@@ -337,8 +339,7 @@ class VerticalSliceIntegrationTest {
                 .contains("\"type\":\"greater_than_equal\"")
                 .contains("\"loc\":[\"body\",\"expected_version\"]")
                 .contains("Input should be greater than or equal to 0")
-                .contains("\"input\":-1")
-                .contains("\"ctx\":{\"ge\":0}");
+                .doesNotContain("\"input\":", "\"ctx\":");
     }
 
     @Test

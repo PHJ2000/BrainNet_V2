@@ -17,5 +17,6 @@ spring/vertical-slice/target
 frontend/.test-dist/
 frontend/test-results/
 frontend/playwright-report/
+deploy/validation-logs/
 experiments/runtime-nodes/results/**/soak-progress.json
 experiments/runtime-nodes/results/**/completed
