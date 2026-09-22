@@ -357,7 +357,7 @@ export default function Graph({ projectId, readOnly = false, aiEnabled = false }
   }, [explorer.focus, view.visible]);
 
   const handleSaveImage = () => {
-  if (!cyInstance.current) return;
+  if (!cyInstance.current || !view.visible.size) return;
   const blob = cyInstance.current.png({ output: "blob", bg: "white", scale: 2 });
 
   if (blob instanceof Blob) {
@@ -454,6 +454,8 @@ export default function Graph({ projectId, readOnly = false, aiEnabled = false }
       textTransform: "uppercase",
     }}
     onClick={handleSaveImage}
+    disabled={!view.visible.size}
+    title={view.visible.size ? "현재 그래프 이미지 저장" : "표시할 노드가 없습니다"}
   >
     SAVE
   </button>

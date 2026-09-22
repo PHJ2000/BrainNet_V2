@@ -52,6 +52,7 @@ test("search, OR tags, collapse, IME and remote tag events share one display mod
     await search.focus(); await expect(search).toBeFocused();
     await search.fill("없는 내용");
     await expect(panel).toContainText("조건에 맞는 노드가 없어요.");
+    await expect(pages[0].getByRole("button", { name: "SAVE", exact: true })).toBeDisabled();
     expect((await (await request.get(`/projects/${p.id}/nodes`, { headers })).json()).length).toBe(3);
   } finally { await Promise.allSettled(contexts.map(c => c.close())); }
 });
