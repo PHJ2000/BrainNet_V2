@@ -19,7 +19,7 @@ try {
     )
     foreach ($arm in $arms) {
         $path = Join-Path $worktrees $arm.name
-        & git worktree add -b $arm.branch $path $baseCommit
+        & git worktree add -b $arm.branch $path $baseCommit | Out-Null
         if ($LASTEXITCODE -ne 0) { throw "Failed to create worktree: $($arm.name)" }
         $arm.path = $path
     }
