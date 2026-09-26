@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "accepted": { "type": "boolean" },
+    "summary": { "type": "string" },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "severity": { "type": "string", "enum": ["blocking", "major", "minor"] },
+          "path": { "type": "string" },
+          "issue": { "type": "string" }
+        },
+        "required": ["severity", "path", "issue"]
+      }
+    },
+    "validation_evidence": { "type": "array", "items": { "type": "string" } }
+  },
+  "required": ["accepted", "summary", "findings", "validation_evidence"]
+}

@@ -18,6 +18,9 @@ try {
     if ($LASTEXITCODE -ne 0 -or -not $baseCommit) { throw "Cannot resolve base ref: $BaseRef" }
     if (Test-Path -LiteralPath $runRoot) { throw "Run already exists: $runRoot" }
     New-Item -ItemType Directory -Path $worktrees -Force | Out-Null
+    $pricingSource = Join-Path $repo 'experiments/codex-astra-vs-6-luna/api-pricing.json'
+    $pricingSnapshot = Join-Path $runRoot 'api-pricing.json'
+    Copy-Item -LiteralPath $pricingSource -Destination $pricingSnapshot
     $arms = @(
         @{ name = 'solo'; branch = "experiment/$RunId-astra-solo" },
         @{ name = 'multi'; branch = "experiment/$RunId-astra-6-luna" }
@@ -29,16 +32,19 @@ try {
         $arm.path = $path
     }
     $manifest = [ordered]@{
-        schema = 1
+        schema = 2
         run_id = $RunId
         created_at = (Get-Date).ToString('o')
         base_commit = $baseCommit
         task_sha256 = Get-NormalizedTextSha256 (Join-Path $repo 'experiments/codex-astra-vs-6-luna/TASK.md')
         root_model = 'gpt-6-astra'
-        root_reasoning = 'max'
+        root_reasoning = 'high'
         subagent_model = 'gpt-6-luna'
         subagent_reasoning = 'max'
         subagent_count = 6
+        collaboration_contract = 'astra_plans_and_reviews_luna_implements'
+        pricing_snapshot = 'api-pricing.json@2026-09-26'
+        pricing_sha256 = (Get-FileHash -LiteralPath $pricingSnapshot -Algorithm SHA256).Hash.ToLowerInvariant()
         arms = $arms
     }
     $manifest | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $runRoot 'manifest.json') -Encoding utf8

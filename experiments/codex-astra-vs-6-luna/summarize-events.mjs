@@ -2,10 +2,10 @@ import fs from "node:fs";
 
 const files = process.argv.slice(2);
 if (!files.length) throw new Error("Usage: node summarize-events.mjs <events.jsonl> [...]");
-const totals = { input_tokens: 0, cached_input_tokens: 0, output_tokens: 0, reasoning_tokens: 0 };
+const totals = { input_tokens: 0, cached_input_tokens: 0, cache_write_input_tokens: 0, output_tokens: 0, reasoning_tokens: 0 };
 let malformed = 0;
 for (const file of files) {
-  const maxima = { input_tokens: 0, cached_input_tokens: 0, output_tokens: 0, reasoning_tokens: 0 };
+  const maxima = { input_tokens: 0, cached_input_tokens: 0, cache_write_input_tokens: 0, output_tokens: 0, reasoning_tokens: 0 };
   function visit(value) {
     if (!value || typeof value !== "object") return;
     const usage = value.usage;
@@ -13,6 +13,7 @@ for (const file of files) {
       const candidate = {
         input_tokens: Number(usage.input_tokens ?? 0),
         cached_input_tokens: Number(usage.cached_input_tokens ?? usage.input_tokens_details?.cached_tokens ?? 0),
+        cache_write_input_tokens: Number(usage.cache_write_input_tokens ?? usage.input_tokens_details?.cache_write_tokens ?? 0),
         output_tokens: Number(usage.output_tokens ?? 0),
         reasoning_tokens: Number(usage.reasoning_tokens ?? usage.reasoning_output_tokens ?? usage.output_tokens_details?.reasoning_tokens ?? 0),
       };

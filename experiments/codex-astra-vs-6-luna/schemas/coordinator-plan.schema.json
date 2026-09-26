@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "strategy": { "type": "string" },
+    "assignments": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "agent_index": { "type": "integer", "minimum": 1, "maximum": 6 },
+          "title": { "type": "string" },
+          "objective": { "type": "string" },
+          "owned_paths": { "type": "array", "items": { "type": "string" } },
+          "acceptance_checks": { "type": "array", "items": { "type": "string" } }
+        },
+        "required": ["agent_index", "title", "objective", "owned_paths", "acceptance_checks"]
+      }
+    }
+  },
+  "required": ["strategy", "assignments"]
+}

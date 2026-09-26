@@ -12,8 +12,11 @@ try {
     foreach ($slug in @('gpt-6-astra', 'gpt-6-luna')) {
         $model = $catalog | Where-Object slug -eq $slug
         if (-not $model) { throw "Model unavailable: $slug" }
-        if ('max' -notin $model.supported_reasoning_levels.effort) { throw "Model does not expose max reasoning: $slug" }
     }
-    [pscustomobject]@{ codex = $version; login = ($login -join ' '); astra = 'max'; luna = 'max'; orchestration = 'six pinned CLI sessions' } |
+    $astra = $catalog | Where-Object slug -eq 'gpt-6-astra'
+    $luna = $catalog | Where-Object slug -eq 'gpt-6-luna'
+    if ('high' -notin $astra.supported_reasoning_levels.effort) { throw 'GPT-6 Astra does not expose high reasoning.' }
+    if ('max' -notin $luna.supported_reasoning_levels.effort) { throw 'GPT-6 Luna does not expose max reasoning.' }
+    [pscustomobject]@{ codex = $version; login = ($login -join ' '); astra = 'high'; luna = 'max'; orchestration = 'Astra coordinator plus six Luna implementers' } |
         ConvertTo-Json
 } finally { Pop-Location }
