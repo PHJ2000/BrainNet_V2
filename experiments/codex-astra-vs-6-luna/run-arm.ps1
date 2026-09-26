@@ -45,7 +45,7 @@ function Invoke-CodexStep {
     $reasoningConfig = 'model_reasoning_effort="{0}"' -f $Reasoning
     $args = [Collections.Generic.List[string]]@('-a','never','--disable','multi_agent','exec')
     if ($ResumeThreadId) {
-        $args.Add('resume'); $args.Add('--ignore-user-config')
+        $args.Add('resume'); $args.Add('--ignore-user-config'); $args.Add('--ignore-rules')
         $args.Add('-m'); $args.Add($Model)
         $args.Add('-c'); $args.Add($reasoningConfig)
         $args.Add('--json'); $args.Add('-o'); $args.Add((Join-Path $stepOutput 'final.txt'))
@@ -53,7 +53,7 @@ function Invoke-CodexStep {
         $args.Add($ResumeThreadId); $args.Add('-')
     } else {
         foreach ($arg in @(
-            '--ignore-user-config','-C',$worktree,'-m',$Model,'-c',$reasoningConfig,
+            '--ignore-user-config','--ignore-rules','-C',$worktree,'-m',$Model,'-c',$reasoningConfig,
             '-s',$Sandbox,'--json','-o',(Join-Path $stepOutput 'final.txt')
         )) { $args.Add($arg) }
         if ($OutputSchema) { $args.Add('--output-schema'); $args.Add($OutputSchema) }
@@ -107,6 +107,7 @@ function Invoke-CodexStep {
     $stepMeta | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $stepOutput 'step.json') -Encoding utf8
     $completedSteps.Add([pscustomobject]$stepMeta)
     if ($stepMeta.exit_code -ne 0) { throw "Codex step $Name failed with exit code $($stepMeta.exit_code). See $stepOutput" }
+    if ($stderr -match 'blocked by policy') { throw "Codex step $Name was blocked by an execution policy. See $stepOutput" }
     if (-not $threadId) { throw "Codex step $Name did not emit thread.started. See $eventsPath" }
     return [pscustomobject]@{
         final = Get-Content -Raw -LiteralPath (Join-Path $stepOutput 'final.txt')
@@ -147,6 +148,7 @@ try {
         $reviewResult = $review.final | ConvertFrom-Json
         $coordinatorAccepted = [bool]$reviewResult.accepted
     }
+    if (-not (& git -C $worktree status --porcelain)) { throw "$Arm completed without any implementation diff." }
 } catch {
     $failure = $_
 } finally {

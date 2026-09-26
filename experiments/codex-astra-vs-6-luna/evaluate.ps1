@@ -27,7 +27,8 @@ foreach ($arm in @('solo','multi')) {
     $committedDiffCheck = & git -C $path diff --check "$($manifest.base_commit)...HEAD" 2>&1
     $committedDiffExit = $LASTEXITCODE
     $diffExit = if ($workingDiffExit -ne 0 -or $committedDiffExit -ne 0) { 1 } else { 0 }
-    $stat = (& git -C $path diff --shortstat $manifest.base_commit).Trim()
+    $statOutput = & git -C $path diff --shortstat $manifest.base_commit
+    $stat = if ($null -eq $statOutput) { '' } else { ([string]$statOutput).Trim() }
     $files = @(& git -C $path diff --name-only $manifest.base_commit)
     $validationSeconds = $null; $validationExit = $null
     if ($Full) {
