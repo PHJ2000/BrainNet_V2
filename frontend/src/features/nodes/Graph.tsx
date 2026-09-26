@@ -700,6 +700,18 @@ export default function Graph({ projectId }: GraphProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const handleFitView = () => {
+    const cy = cyInstance.current;
+    if (!cy || cy.nodes().empty()) return;
+    cy.resize();
+    cy.fit(cy.elements(), 64);
+    // Keep a small map readable without magnifying a single node to fill the screen.
+    if (cy.zoom() > 1) {
+      cy.zoom(1);
+      cy.center();
+    }
+  };
+
   const handleSaveImage = () => {
   if (!cyInstance.current) return;
   const blob = cyInstance.current.png({ output: "blob", bg: "white", scale: 2 });
@@ -716,7 +728,7 @@ export default function Graph({ projectId }: GraphProps) {
 
   /* ----- 렌더 ----- */
   return (
-    <>
+    <div className="relative h-full w-full">
       <div
         ref={cyRef}
         data-testid="idea-graph"
@@ -729,6 +741,15 @@ export default function Graph({ projectId }: GraphProps) {
       <ul className="sr-only" aria-label="그래프 노드">
         {nodes.map((node) => <li key={node.id} data-node-id={node.id}>{node.label}</li>)}
       </ul>
+      <button
+        type="button"
+        onClick={handleFitView}
+        disabled={nodes.length === 0}
+        title="모든 노드가 화면에 보이도록 확대·축소와 위치를 맞춥니다"
+        className="absolute right-4 top-4 z-10 rounded-lg border border-gray-200 bg-white/95 px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        전체 보기
+      </button>
       {/* 플로팅 버튼 */}
       <button
         style={{
@@ -817,7 +838,7 @@ export default function Graph({ projectId }: GraphProps) {
         onAdd={handleAddTag}
         onRemove={handleRemoveTag}
       />
-    </>
+    </div>
   );
 
 }
