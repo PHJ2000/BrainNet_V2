@@ -6,6 +6,11 @@ $ErrorActionPreference = 'Stop'
 $repo = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
 $runRoot = Join-Path $repo ".tools/model-comparison/$RunId"
 $worktrees = Join-Path $runRoot 'worktrees'
+function Get-NormalizedTextSha256([string]$Path) {
+    $normalized = [IO.File]::ReadAllText($Path).Replace("`r`n", "`n").Replace("`r", "`n")
+    $bytes = [Text.UTF8Encoding]::new($false).GetBytes($normalized)
+    return [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes)).ToLowerInvariant()
+}
 Push-Location $repo
 try {
     if (& git status --porcelain) { throw 'Prepare from a clean worktree so both arms receive identical input.' }
@@ -28,7 +33,7 @@ try {
         run_id = $RunId
         created_at = (Get-Date).ToString('o')
         base_commit = $baseCommit
-        task_sha256 = (Get-FileHash (Join-Path $repo 'experiments/codex-astra-vs-6-luna/TASK.md') -Algorithm SHA256).Hash.ToLowerInvariant()
+        task_sha256 = Get-NormalizedTextSha256 (Join-Path $repo 'experiments/codex-astra-vs-6-luna/TASK.md')
         root_model = 'gpt-6-astra'
         root_reasoning = 'max'
         subagent_model = 'gpt-6-luna'

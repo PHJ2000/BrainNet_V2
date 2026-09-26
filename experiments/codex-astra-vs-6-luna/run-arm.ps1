@@ -16,7 +16,9 @@ if ((& git -C $worktree rev-parse HEAD).Trim() -ne $manifest.base_commit) { thro
 if (& git -C $worktree status --porcelain) { throw "$Arm worktree is not clean before execution." }
 $experimentRoot = Join-Path $worktree 'experiments/codex-astra-vs-6-luna'
 $taskPath = Join-Path $experimentRoot 'TASK.md'
-$taskHash = (Get-FileHash -LiteralPath $taskPath -Algorithm SHA256).Hash.ToLowerInvariant()
+$normalizedTask = [IO.File]::ReadAllText($taskPath).Replace("`r`n", "`n").Replace("`r", "`n")
+$taskBytes = [Text.UTF8Encoding]::new($false).GetBytes($normalizedTask)
+$taskHash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($taskBytes)).ToLowerInvariant()
 if ($taskHash -ne $manifest.task_sha256) { throw 'TASK.md no longer matches the prepared manifest.' }
 
 $output = Join-Path $runRoot $Arm
