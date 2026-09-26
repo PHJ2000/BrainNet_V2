@@ -29,6 +29,21 @@ $started = Get-Date
 $deadline = $started.AddMinutes($TimeoutMinutes)
 $completedSteps = [Collections.Generic.List[object]]::new()
 
+function Get-WorktreeFingerprint {
+    $parts = [Collections.Generic.List[string]]::new()
+    $parts.Add((& git -C $worktree status --porcelain | Out-String))
+    $parts.Add((& git -C $worktree diff --binary HEAD | Out-String))
+    foreach ($relativePath in @(& git -C $worktree ls-files --others --exclude-standard | Sort-Object)) {
+        $fullPath = Join-Path $worktree $relativePath
+        $hash = if (Test-Path -LiteralPath $fullPath -PathType Leaf) {
+            (Get-FileHash -LiteralPath $fullPath -Algorithm SHA256).Hash.ToLowerInvariant()
+        } else { '<non-file>' }
+        $parts.Add("$relativePath=$hash")
+    }
+    $bytes = [Text.UTF8Encoding]::new($false).GetBytes(($parts -join "`n"))
+    return [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($bytes)).ToLowerInvariant()
+}
+
 function Invoke-CodexStep {
     param(
         [Parameter(Mandatory)][string]$Name,
@@ -42,10 +57,12 @@ function Invoke-CodexStep {
     if (($deadline - (Get-Date)).TotalMilliseconds -le 0) { throw "Arm timeout reached before step: $Name" }
     $stepOutput = Join-Path $stepsRoot $Name
     New-Item -ItemType Directory -Path $stepOutput -Force | Out-Null
+    $readOnlyFingerprint = if ($Sandbox -eq 'read-only') { Get-WorktreeFingerprint } else { $null }
     $reasoningConfig = 'model_reasoning_effort="{0}"' -f $Reasoning
-    $args = [Collections.Generic.List[string]]@('-a','never','--disable','multi_agent','exec')
+    $args = [Collections.Generic.List[string]]@('--disable','multi_agent','exec')
     if ($ResumeThreadId) {
-        $args.Add('resume'); $args.Add('--ignore-user-config'); $args.Add('--ignore-rules')
+        $args.Add('resume'); $args.Add('--dangerously-bypass-approvals-and-sandbox')
+        $args.Add('--ignore-user-config'); $args.Add('--ignore-rules')
         $args.Add('-m'); $args.Add($Model)
         $args.Add('-c'); $args.Add($reasoningConfig)
         $args.Add('--json'); $args.Add('-o'); $args.Add((Join-Path $stepOutput 'final.txt'))
@@ -53,8 +70,9 @@ function Invoke-CodexStep {
         $args.Add($ResumeThreadId); $args.Add('-')
     } else {
         foreach ($arg in @(
-            '--ignore-user-config','--ignore-rules','-C',$worktree,'-m',$Model,'-c',$reasoningConfig,
-            '-s',$Sandbox,'--json','-o',(Join-Path $stepOutput 'final.txt')
+            '--dangerously-bypass-approvals-and-sandbox','--ignore-user-config','--ignore-rules',
+            '-C',$worktree,'-m',$Model,'-c',$reasoningConfig,
+            '--json','-o',(Join-Path $stepOutput 'final.txt')
         )) { $args.Add($arg) }
         if ($OutputSchema) { $args.Add('--output-schema'); $args.Add($OutputSchema) }
         $args.Add('-')
@@ -108,6 +126,9 @@ function Invoke-CodexStep {
     $completedSteps.Add([pscustomobject]$stepMeta)
     if ($stepMeta.exit_code -ne 0) { throw "Codex step $Name failed with exit code $($stepMeta.exit_code). See $stepOutput" }
     if ($stderr -match 'blocked by policy') { throw "Codex step $Name was blocked by an execution policy. See $stepOutput" }
+    if ($Sandbox -eq 'read-only' -and (Get-WorktreeFingerprint) -ne $readOnlyFingerprint) {
+        throw "Read-only coordinator step $Name changed the worktree. The experiment is invalid."
+    }
     if (-not $threadId) { throw "Codex step $Name did not emit thread.started. See $eventsPath" }
     return [pscustomobject]@{
         final = Get-Content -Raw -LiteralPath (Join-Path $stepOutput 'final.txt')

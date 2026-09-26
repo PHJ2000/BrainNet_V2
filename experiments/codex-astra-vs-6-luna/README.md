@@ -6,7 +6,7 @@
 - `multi`: GPT-6 Astra `high` 한 명이 계획·업무 배분·최종 검토만 수행하고, GPT-6 Luna `max` 6명이 모든 구현·수정·검증 수행
 - 공통: 같은 `TASK.md`, workspace-write sandbox, 승인 없음, 커밋·푸시·개인 DB 변경 금지
 
-[공식 모델 선택 문서](https://developers.openai.com/api/docs/guides/model-selection)는 Astra를 복잡한 종합 작업, Luna를 범위가 명확한 작업에 권장한다. 멀티 arm에서는 Astra가 저장소를 읽고 구조화된 여섯 개 작업을 만든다. 호스트가 그 계획을 Luna 세션 여섯 개에 순서대로 전달하고, 마지막 Luna가 누적 변경을 통합·수정·검증한다. 같은 Astra 세션은 변경된 결과를 읽고 최종 합격 여부만 판정한다. Astra 단계는 read-only sandbox이며 제품 코드를 작성하지 않는다.
+[공식 모델 선택 문서](https://developers.openai.com/api/docs/guides/model-selection)는 Astra를 복잡한 종합 작업, Luna를 범위가 명확한 작업에 권장한다. 멀티 arm에서는 Astra가 저장소를 읽고 구조화된 여섯 개 작업을 만든다. 호스트가 그 계획을 Luna 세션 여섯 개에 순서대로 전달하고, 마지막 Luna가 누적 변경을 통합·수정·검증한다. 같은 Astra 세션은 변경된 결과를 읽고 최종 합격 여부만 판정한다. 중첩 CLI는 상위 Codex 실행 정책을 피하기 위해 자동화용 sandbox 우회 모드로 실행하지만, Astra 단계 전후의 Git diff와 untracked 파일 해시를 호스트가 비교한다. Astra가 worktree를 변경하면 즉시 실험을 무효 처리한다.
 
 이 구조는 서로 다른 모델을 확실히 고정하고 실제 생성된 세션 ID를 검증한다. 멀티 arm의 성공 조건은 Astra 세션 1개·Astra turn 2개·서로 다른 Luna 세션 6개다.
 
