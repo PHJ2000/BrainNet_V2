@@ -17,10 +17,11 @@ AI로 아이디어를 확장하고 마인드맵으로 정리하는 웹 애플리
 | 이미지 내보내기 | `SAVE` 버튼으로 `graph.png` 다운로드 |
 | 실시간 갱신 | WebSocket 이벤트를 받으면 노드를 다시 조회하고, 재연결·주기적 조회로 상태 복구 |
 | 요청 안정성 | 생성 재시도의 중복 방지, 버전 기반 수정 충돌 감지, 일반·AI 생성의 별도 동시 실행 제한 |
+| 백엔드 관리 API | 노드 내용 이력·복원, 활동 기록, 하위 트리 지표, 멤버 목록·강퇴·탈퇴·소유권 이전 |
 
 개인 브레인스토밍 화면을 중심으로 구현되어 있습니다. 백엔드에는 소유자 초대·메일 발송·일회성 토큰 참여와 태그 요약 생성·투표·확정 API가 있습니다. 초대·참여·요약·투표 UI는 아직 없습니다. 로컬 Compose의 초대 메일은 외부로 발송하지 않고 [Mailpit 로컬 메일함](http://localhost:18025)에 저장합니다. API 사용법은 [백엔드 협업 흐름](docs/backend-collaboration.md)을 참고합니다.
 
-히스토리·투표 조회 및 처리 API도 있지만, 현재 웹 화면에는 히스토리 복원이나 투표 UI가 없습니다. 히스토리를 마인드맵 전체 스냅샷의 되돌리기 기능으로 설명하지 않습니다.
+히스토리·투표 조회 및 처리 API도 있지만, 현재 웹 화면에는 노드 이력·복원·활동·지표·멤버 관리·투표 UI가 없습니다. 노드 내용 복원은 새 버전으로 내용을 되돌리는 API이며, 마인드맵 전체나 삭제된 노드의 복원은 아닙니다. 사용법과 범위는 [백엔드 관리 API](docs/backend-operations.md)를 참고합니다.
 
 ## 구성
 
@@ -202,6 +203,9 @@ NEXT_PUBLIC_API_BASE_URL=http://localhost:18000 npm run build
 | 태그 | `/projects/{project_id}/tags` |
 | 태그 요약 | `POST/GET /projects/{project_id}/tags/{tag_id}/summary`, `GET /projects/{project_id}/tags/{tag_id}/summaries` |
 | 투표·히스토리 | `/projects/{project_id}/tags/{tag_id}/vote`, `/projects/{project_id}/votes/confirm`, `/projects/{project_id}/history` |
+| 노드 내용 이력·복원 | `GET /projects/{p}/nodes/{n}/versions`, `POST /projects/{p}/nodes/{n}/versions/{v}/restore` |
+| 활동·지표 | `GET /projects/{p}/activities`, `GET /projects/{p}/metrics`, `GET /projects/{p}/nodes/{n}/metrics` |
+| 멤버 관리 | `GET /projects/{p}/members`, `PATCH/DELETE /projects/{p}/members/{user_id}`, `DELETE /projects/{p}/members/me` |
 | 실시간 이벤트 | `WS /projects/{project_id}/ws?token=...` |
 | 상태 확인 | `GET /health`, `GET /health/events`, `GET /metrics` |
 

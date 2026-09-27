@@ -1,7 +1,7 @@
 # 백엔드 초대·요약·투표
 
 Spring REST에서 제공한다. 기존 DB의 `invite_token`, `tag_summary`, `vote`,
-`project_history`를 사용하므로 추가 스키마 마이그레이션은 없다.
+`project_history`를 사용한다. 후속 [백엔드 관리 기능](backend-operations.md)은 별도 Alembic 마이그레이션을 포함한다.
 프론트엔드 초대·참여·투표 UI는 별도 작업이다.
 
 ## 로컬 메일

@@ -17,9 +17,10 @@ class TagSummaryService {
     private final JdbcTemplate jdbc;
     private final ProjectService projects;
     private final TagService tags;
+    private final ActivityService activity;
 
-    TagSummaryService(JdbcTemplate jdbc, ProjectService projects, TagService tags) {
-        this.jdbc = jdbc; this.projects = projects; this.tags = tags;
+    TagSummaryService(JdbcTemplate jdbc, ProjectService projects, TagService tags, ActivityService activity) {
+        this.jdbc = jdbc; this.projects = projects; this.tags = tags; this.activity = activity;
     }
 
     private Summary view(ResultSet rs, int row) throws SQLException {
@@ -59,7 +60,9 @@ class TagSummaryService {
         // Repeated generation with unchanged content reuses the same snapshot.
         var current = jdbc.query("SELECT * FROM tag_summary WHERE tag_id=? ORDER BY id DESC LIMIT 1", this::view, tagId);
         if (!current.isEmpty() && current.getFirst().summary_text().equals(text)) return current.getFirst();
-        return jdbc.queryForObject("INSERT INTO tag_summary(tag_id,summary_text,created_at) VALUES (?,?,now()) RETURNING *",
+        var summary = jdbc.queryForObject("INSERT INTO tag_summary(tag_id,summary_text,created_at) VALUES (?,?,now()) RETURNING *",
                 this::view, tagId, text);
+        activity.append(projectId, userId, "SUMMARY_CREATE", java.util.Map.of("tag_id", tagId, "summary_id", summary.id()));
+        return summary;
     }
 }

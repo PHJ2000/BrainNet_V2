@@ -18,7 +18,7 @@ from app.utils.ws_manager import WS_CONNECTIONS, broadcast
 
 logger = logging.getLogger(__name__)
 CHANNEL = "brainnet_node_created"
-EVENT_TYPES = ("node.created", "node.updated", "node.deleted", "vote:cast", "vote:confirmed")
+EVENT_TYPES = ("node.created", "node.updated", "node.deleted", "vote:cast", "vote:confirmed", "membership.changed", "project.deleted")
 
 
 async def publish_batch(connection: asyncpg.Connection) -> int:

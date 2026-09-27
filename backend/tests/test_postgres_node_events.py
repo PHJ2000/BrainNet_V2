@@ -8,6 +8,7 @@ from app.models.node import NodeCreate
 from app.services.node_events import CHANNEL, publish_batch
 from test_postgres_node_idempotency import setup_tree, create
 from test_postgres_node_concurrency import POSTGRES_URL
+from app.utils import ws_manager
 
 pytestmark = [
     pytest.mark.asyncio(loop_scope="session"),
@@ -52,3 +53,40 @@ async def test_publish_is_atomic_and_reaches_two_independent_listeners():
         await writer.close()
         for connection in listeners:
             await connection.close()
+
+
+@pytest.mark.parametrize("revocation", ["membership", "project"])
+async def test_live_membership_changes_stop_existing_socket_delivery(revocation):
+    actor, project, _, _ = await setup_tree()
+
+    class Socket:
+        def __init__(self):
+            self.messages = []
+            self.closed = None
+
+        async def accept(self):
+            pass
+
+        async def send_json(self, message):
+            self.messages.append(message)
+
+        async def close(self, code):
+            self.closed = code
+
+    socket = Socket()
+    connection = await asyncpg.connect(POSTGRES_URL)
+    try:
+        await ws_manager.connect(project, socket, actor)
+        await ws_manager.broadcast(project, {"type": "before"})
+        assert socket.messages == [{"type": "before"}]
+        if revocation == "membership":
+            await connection.execute("DELETE FROM project_user_role WHERE project_id=$1 AND user_id=$2", project, actor)
+        else:
+            await connection.execute("UPDATE project SET is_deleted=true WHERE id=$1", project)
+        await ws_manager.broadcast(project, {"type": "vote:cast", "voter_id": actor})
+        assert socket.closed == 4403
+        assert socket.messages == [{"type": "before"}]
+        assert socket not in ws_manager.WS_USERS
+    finally:
+        ws_manager.disconnect(project, socket)
+        await connection.close()

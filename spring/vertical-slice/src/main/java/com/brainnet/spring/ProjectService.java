@@ -20,7 +20,13 @@ class ProjectService {
     record Create(@NotNull @Size(max = 120) String name, String description) {}
     record Patch(@Size(max = 120) String name, String description) {}
     private final JdbcTemplate jdbc;
-    ProjectService(JdbcTemplate jdbc) { this.jdbc = jdbc; }
+    private final ProjectAccessService access;
+    private final ActivityService activity;
+    private final NodeHistoryService history;
+    private final NodeOutboxService outbox;
+    ProjectService(JdbcTemplate jdbc, ProjectAccessService access, ActivityService activity, NodeHistoryService history, NodeOutboxService outbox) {
+        this.jdbc = jdbc; this.access = access; this.activity = activity; this.history = history; this.outbox = outbox;
+    }
 
     // Call within a transaction. Serializes invitation and voting lifecycle changes with deletion.
     void lockActive(long projectId) {
@@ -35,6 +41,7 @@ class ProjectService {
     }
 
     ProjectView requireOwner(long projectId, long userId) {
+        access.owner(projectId, userId);
         var projects = jdbc.query("SELECT * FROM project WHERE id=? AND is_deleted=false", this::view, projectId);
         if (projects.isEmpty()) throw new ApiException(HttpStatus.NOT_FOUND, "NOT_FOUND", "Project not found");
         if (jdbc.queryForObject("SELECT count(*) FROM project_user_role WHERE project_id=? AND user_id=? AND role='OWNER'",
@@ -46,7 +53,7 @@ class ProjectService {
 
     List<ProjectView> list(long userId, boolean owned) {
         return jdbc.query("SELECT p.* FROM project p JOIN project_user_role m ON m.project_id=p.id "
-                + "WHERE m.user_id=?" + (owned ? " AND p.owner_id=m.user_id" : "") + " ORDER BY p.id", this::view, userId);
+                + "WHERE m.user_id=? AND p.is_deleted=false" + (owned ? " AND p.owner_id=m.user_id" : "") + " ORDER BY p.id", this::view, userId);
     }
 
     @Transactional
@@ -54,25 +61,33 @@ class ProjectService {
         long id = jdbc.queryForObject("INSERT INTO project(owner_id,name,description,is_deleted,created_at,updated_at) "
                 + "VALUES (?,?,?,false,now(),now()) RETURNING id", Long.class, userId, body.name(), body.description());
         jdbc.update("INSERT INTO project_user_role(project_id,user_id,role,invited_at) VALUES (?,?,'OWNER',now())", id, userId);
-        jdbc.update("INSERT INTO node(project_id,author_id,content,state,depth,order_index,pos_x,pos_y,created_at,updated_at,version) "
-                + "VALUES (?,?,'주제를 입력하세요','ACTIVE',0,0,800,400,now(),now(),0)", id, userId);
+        long root = jdbc.queryForObject("INSERT INTO node(project_id,author_id,content,state,depth,order_index,pos_x,pos_y,created_at,updated_at,version) "
+                + "VALUES (?,?,'주제를 입력하세요','ACTIVE',0,0,800,400,now(),now(),0) RETURNING id", Long.class, id, userId);
+        history.snapshot(root, userId);
+        activity.append(id, userId, "PROJECT_CREATE", Map.of("root_node_id", root));
+        activity.append(id, userId, "NODE_CREATE", Map.of("node_id", root));
         return jdbc.queryForObject("SELECT * FROM project WHERE id=?", this::view, id);
     }
 
     @Transactional
     public ProjectView update(long projectId, long userId, Patch body) {
+        lockActive(projectId);
         requireOwner(projectId, userId);
         if (body.name() != null || body.description() != null) {
             jdbc.update("UPDATE project SET name=coalesce(?,name),description=coalesce(?,description),updated_at=now() WHERE id=?",
                     body.name(), body.description(), projectId);
+            activity.append(projectId, userId, "PROJECT_UPDATE", Map.of());
         }
         return jdbc.queryForObject("SELECT * FROM project WHERE id=?", this::view, projectId);
     }
 
     @Transactional
     public void delete(long projectId, long userId) {
+        lockActive(projectId);
         requireOwner(projectId, userId);
         jdbc.update("UPDATE project SET is_deleted=true,updated_at=now() WHERE id=?", projectId);
+        activity.append(projectId, userId, "PROJECT_DELETE", Map.of());
+        outbox.append(projectId, projectId, "project.deleted", Map.of());
     }
 
     Map<String, Object> summary(long projectId, long userId) {
