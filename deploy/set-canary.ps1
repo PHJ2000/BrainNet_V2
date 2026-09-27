@@ -5,8 +5,7 @@ $mapPath = Join-Path $PSScriptRoot 'routing/canary.map'
 $original = [IO.File]::ReadAllText($mapPath)
 $configuration = "# Generated project allowlist; empty means FastAPI rollback.`n"
 if ($AllRest) {
-    $configuration += '"~^.*:/projects/[0-9]+/(ws|invite)/?$" fastapi;' + "`n"
-    $configuration += '"~^.*:/projects/join/?$" fastapi;' + "`n"
+    $configuration += '"~^.*:/projects/[0-9]+/ws/?$" fastapi;' + "`n"
     $configuration += '"~^.*:/(auth|users|projects)(/|$)" spring;' + "`n"
 } elseif ($ProjectIds.Count) {
     $ids = ($ProjectIds | Sort-Object -Unique) -join '|'

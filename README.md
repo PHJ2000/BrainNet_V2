@@ -18,7 +18,7 @@ AI로 아이디어를 확장하고 마인드맵으로 정리하는 웹 애플리
 | 실시간 갱신 | WebSocket 이벤트를 받으면 노드를 다시 조회하고, 재연결·주기적 조회로 상태 복구 |
 | 요청 안정성 | 생성 재시도의 중복 방지, 버전 기반 수정 충돌 감지, 일반·AI 생성의 별도 동시 실행 제한 |
 
-개인 브레인스토밍 사용을 중심으로 구현되어 있습니다. WebSocket과 프로젝트 멤버십 코드는 있지만 완성된 다중 사용자 협업 서비스는 아닙니다. 초대 API는 토큰 저장·메일 발송이 생략되어 있고, 참여 API는 프로젝트 ID가 `1`로 고정된 예시 구현입니다.
+개인 브레인스토밍 화면을 중심으로 구현되어 있습니다. 백엔드에는 소유자 초대·메일 발송·일회성 토큰 참여와 태그 요약 생성·투표·확정 API가 있습니다. 초대·참여·요약·투표 UI는 아직 없습니다. 로컬 Compose의 초대 메일은 외부로 발송하지 않고 [Mailpit 로컬 메일함](http://localhost:18025)에 저장합니다. API 사용법은 [백엔드 협업 흐름](docs/backend-collaboration.md)을 참고합니다.
 
 히스토리·투표 조회 및 처리 API도 있지만, 현재 웹 화면에는 히스토리 복원이나 투표 UI가 없습니다. 히스토리를 마인드맵 전체 스냅샷의 되돌리기 기능으로 설명하지 않습니다.
 
@@ -35,7 +35,7 @@ nginx ── REST ── Java 25 / Spring ── OpenAI API
 ```
 
 - **프론트엔드:** Next.js, React, TypeScript, Tailwind CSS, Cytoscape.js, TanStack Query.
-- **백엔드:** Java 25, Spring MVC, JDBC, JWT 인증. FastAPI는 WebSocket·outbox 전달 및 기존 초대·참여 예시 API를 담당합니다.
+- **백엔드:** Java 25, Spring MVC, JDBC, JWT 인증. 초대·참여·태그 요약도 Spring이 담당하며, FastAPI는 WebSocket·outbox 전달을 담당합니다. 기존 Python 초대·참여 경로는 `410`으로 차단됩니다.
 - **데이터베이스:** PostgreSQL 15. 백엔드 시작 시 DB 준비를 기다리고 `alembic upgrade head`를 실행합니다.
 - **Spring:** `spring/vertical-slice`가 인증·사용자·프로젝트·노드·태그·투표·히스토리 REST API를 담당합니다. 로컬 앱과 개발 Compose의 기본 REST 경로는 Spring입니다. Alembic은 FastAPI 시작 단계에서 실행하며 Spring은 완료 후 시작합니다.
 
@@ -196,9 +196,11 @@ NEXT_PUBLIC_API_BASE_URL=http://localhost:18000 npm run build
 | 인증 | `POST /auth/register`, `POST /auth/login` |
 | 사용자 | `GET /users/me`, `GET /users/me/tag-summaries` |
 | 프로젝트 | `/projects`, `/projects/{project_id}` |
+| 초대·참여 | `POST /projects/{project_id}/invite?email=...`, `POST /projects/join?token=...` |
 | 노드 | `/projects/{project_id}/nodes`, `/projects/{project_id}/nodes/{node_id}` |
 | 노드 활성화 | `POST /projects/{project_id}/nodes/{node_id}/activate`, `/deactivate` |
 | 태그 | `/projects/{project_id}/tags` |
+| 태그 요약 | `POST/GET /projects/{project_id}/tags/{tag_id}/summary`, `GET /projects/{project_id}/tags/{tag_id}/summaries` |
 | 투표·히스토리 | `/projects/{project_id}/tags/{tag_id}/vote`, `/projects/{project_id}/votes/confirm`, `/projects/{project_id}/history` |
 | 실시간 이벤트 | `WS /projects/{project_id}/ws?token=...` |
 | 상태 확인 | `GET /health`, `GET /health/events`, `GET /metrics` |
@@ -207,7 +209,7 @@ NEXT_PUBLIC_API_BASE_URL=http://localhost:18000 npm run build
 
 ## 검증 상태
 
-이번 REST 전환의 구현 범위, 검증 방법과 롤백은 [REST 전환 문서](docs/migration/rest-migration.md)에 정리했습니다. WebSocket·Alembic과 예시 초대·참여 API는 Python에 남아 있습니다.
+이번 REST 전환의 구현 범위, 검증 방법과 롤백은 [REST 전환 문서](docs/migration/rest-migration.md)에 정리했습니다. WebSocket·outbox 전달·Alembic은 Python에 남아 있습니다. 새 협업 API의 계약은 [백엔드 협업 흐름](docs/backend-collaboration.md)에 정리했습니다.
 
 저장소의 [2026-09-12 후속 수정 보고서](docs/PERFORMANCE_FIX_2026-09-12.md)에는 다음 결과가 기록되어 있습니다. 이는 해당 시점의 검증 기록이며, 새 환경에서의 실행 성공을 보장하는 결과는 아닙니다.
 

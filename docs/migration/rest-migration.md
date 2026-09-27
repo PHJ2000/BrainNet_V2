@@ -11,6 +11,7 @@ DB 마이그레이션 완료 후 Spring을 시작한다.
 | 프로젝트 | 목록·owned 필터, 생성, 상세, PATCH/PUT, 소프트 삭제, 요약 |
 | 노드 | 목록·태그 필터, 일반/AI 생성, 단건 조회, 버전 수정, 하위 트리 삭제·활성화·비활성화 |
 | 태그 | CRUD, 하위 트리 부착·제거 |
+| 협업 | 초대 메일·토큰 저장/검증·참여, 태그 요약 생성·조회 |
 | 투표·히스토리 | 투표, 확정, 히스토리 목록·상세 |
 
 프로젝트 생성은 프로젝트·OWNER 멤버십·ACTIVE 루트를 한 트랜잭션에서 저장한다.
@@ -23,8 +24,8 @@ DB 마이그레이션 완료 후 Spring을 시작한다.
 
 - `/projects/{id}/ws`, outbox 발행·구독, `/health/events`, `/metrics`: ADR-004의 경계 유지.
 - Alembic: 공유 DB의 유일한 스키마 마이그레이션 도구.
-- `/projects/{id}/invite`, `/projects/join`: 원래부터 토큰 저장·검증이 없는 예시 구현.
-  Java로 옮기면서 완성된 협업 기능처럼 취급하지 않는다.
+- 기존 Python `/projects/{id}/invite`, `/projects/join`은 `410 INVITATIONS_REQUIRE_SPRING`으로 차단한다.
+  실제 초대·참여는 Spring에서 제공한다. [협업 API 계약](../backend-collaboration.md)을 참고한다.
 - `/docs`, `/redoc`, `/openapi.json`: FastAPI가 제공하는 호환 계약 참고 문서.
 
 일반·AI 생성은 각각 `NODE_CREATE_*`, `NODE_AI_CREATE_*` 설정으로 동시 실행과 대기열을 제한한다.
@@ -64,11 +65,16 @@ nginx 교체 전 진행 중인 쓰기 요청이 끝난 뒤 새 소유자로 트�
 
 별도 검증 Compose에서는 `./deploy/set-canary.ps1 -ProjectIds 1`이 프로젝트 1의
 전체 노드 경로를 전환한다. `-AllRest`는 인증·사용자·프로젝트 REST 전체를 전환한다.
-인수 없이 실행하면 FastAPI로 롤백한다. WebSocket과 예시 초대·참여 경로는 항상 FastAPI다.
+인수 없이 실행하면 FastAPI로 롤백한다. WebSocket은 항상 FastAPI다.
+새 초대·참여·요약 생성 API는 Spring 전용이다. FastAPI 롤백에서는 초대·참여가 410,
+요약 생성·스냅샷 조회가 404를 반환한다. 잘못된 토큰으로 가입되던 예시 동작은 복구하지 않는다.
+투표 진행 중에는 Spring을 유지해야 요약 생성과 투표의 프로젝트 잠금 계약을 보장할 수 있다.
 
 ## 검증
 
-- PostgreSQL 15 Testcontainers 통합 테스트: 기존 19개 + 새 REST 테스트 9개 + 생성 제한 테스트 3개, 총 31개 통과.
+- 로컬 Spring 테스트: 기존 19개 + REST·협업 테스트 17개 + 생성 제한 테스트 3개, 총 39개 통과.
+  협업 테스트는 별도 PostgreSQL 15와 Mailpit에서 토큰 검증·동시 수락·SMTP 수신·요약/투표 연결을 확인한다.
+- Python 초대 경로 차단·인증 관련 9개 테스트 통과. Compose 3종과 nginx 설정 검증 통과.
 - 새 테스트는 Alembic head SQL의 실제 FK·enum·NOT NULL·unique 제약을 사용한다.
 - 검증 항목: bcrypt 로그인, JWT 보호, 생성 트랜잭션 롤백, 소유자/멤버 권한,
   노드 상태·버전·삭제·outbox, 루트 충돌 롤백, 태그 상속·프로젝트 격리,

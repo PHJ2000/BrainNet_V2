@@ -12,6 +12,8 @@ x-backend-env: &backend-env
   OPENAI_TIMEOUT_SECONDS: "2"
 
 services:
+  mailpit:
+    image: axllent/mailpit:v1.20
   db:
     image: postgres:15-alpine
     environment:
@@ -51,6 +53,8 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/brainnet_test
       SPRING_DATASOURCE_USERNAME: brainnet_test
       SPRING_DATASOURCE_PASSWORD: brainnet_test
+      SMTP_HOST: mailpit
+      SMTP_PORT: "1025"
       OPENAI_API_KEY: local-provider-only
       OPENAI_API_URL: http://provider:8090/v1/chat/completions
       OPENAI_TIMEOUT_SECONDS: "2"

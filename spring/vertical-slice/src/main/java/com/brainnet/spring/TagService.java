@@ -17,10 +17,14 @@ class TagService {
     record Create(@NotNull @Size(max = 80) String name, @Size(max = 7) String color) {}
     record Patch(@Size(max = 80) String name, @Size(max = 7) String color) {}
     record View(long id, long project_id, String name, String color, long node_count) {}
-    private static final String SELECT = "SELECT t.*,(SELECT count(*) FROM tag_node WHERE tag_id=t.id) node_count FROM tag t ";
+    private static final String SELECT = "SELECT t.*,(SELECT count(*) FROM tag_node WHERE tag_id=t.id) node_count "
+            + "FROM tag t JOIN project p ON p.id=t.project_id AND p.is_deleted=false ";
     private final JdbcTemplate jdbc;
     private final VerticalService nodes;
-    TagService(JdbcTemplate jdbc, VerticalService nodes) { this.jdbc = jdbc; this.nodes = nodes; }
+    private final ProjectService projects;
+    TagService(JdbcTemplate jdbc, VerticalService nodes, ProjectService projects) {
+        this.jdbc = jdbc; this.nodes = nodes; this.projects = projects;
+    }
 
     private View view(ResultSet rs, int row) throws SQLException {
         return new View(rs.getLong("id"), rs.getLong("project_id"), rs.getString("name"), rs.getString("color"), rs.getLong("node_count"));
@@ -55,7 +59,13 @@ class TagService {
 
     @Transactional
     public void delete(long projectId, long tagId, long userId) {
+        projects.lockActive(projectId);
         get(projectId, tagId, userId);
+        if (jdbc.queryForObject("SELECT count(*) FROM tag_summary s WHERE s.tag_id=? AND "
+                + "(EXISTS (SELECT 1 FROM vote v WHERE v.tag_summary_id=s.id) "
+                + "OR EXISTS (SELECT 1 FROM project_history h WHERE h.tag_summary_id=s.id))", Long.class, tagId) > 0) {
+            throw new ApiException(HttpStatus.CONFLICT, "TAG_IN_USE", "Tag is referenced by votes or decision history");
+        }
         jdbc.update("DELETE FROM tag WHERE id=?", tagId);
     }
 

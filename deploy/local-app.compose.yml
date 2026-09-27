@@ -1,6 +1,9 @@
 name: brainnet-local
 
 services:
+  mailpit:
+    image: axllent/mailpit:v1.20
+    ports: ["127.0.0.1:18025:8025"]
   db:
     image: postgres:15
     environment:
@@ -39,10 +42,13 @@ services:
       SPRING_DATASOURCE_USERNAME: brainnet_local
       SPRING_DATASOURCE_PASSWORD: ${BRAINNET_LOCAL_DB_PASSWORD}
       OPENAI_API_KEY: ""
+      SMTP_HOST: mailpit
+      SMTP_PORT: "1025"
     cpus: 2
     mem_limit: 1g
     depends_on:
       backend: {condition: service_healthy}
+      mailpit: {condition: service_started}
     healthcheck:
       test: [CMD, curl, -fsS, http://localhost:8080/health]
       interval: 3s
