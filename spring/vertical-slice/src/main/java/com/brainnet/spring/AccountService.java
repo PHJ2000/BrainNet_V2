@@ -85,9 +85,11 @@ class AccountService {
     }
 
     List<Map<String, Object>> summaries(long userId) {
-        return jdbc.queryForList("SELECT t.project_id,t.id AS tag_id,t.name AS tag_name,'' AS summary,"
+        return jdbc.queryForList("SELECT t.project_id,t.id AS tag_id,t.name AS tag_name,"
+                + "coalesce((SELECT s.summary_text FROM tag_summary s WHERE s.tag_id=t.id ORDER BY s.id DESC LIMIT 1),'') AS summary,"
                 + "count(n.id) FILTER (WHERE n.author_id=?) AS nodes_contributed "
                 + "FROM tag t JOIN project_user_role m ON m.project_id=t.project_id AND m.user_id=? "
+                + "JOIN project p ON p.id=t.project_id AND p.is_deleted=false "
                 + "LEFT JOIN tag_node tn ON tn.tag_id=t.id LEFT JOIN node n ON n.id=tn.node_id "
                 + "GROUP BY t.id ORDER BY t.project_id,t.id", userId, userId);
     }

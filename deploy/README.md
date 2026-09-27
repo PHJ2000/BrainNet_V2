@@ -16,7 +16,7 @@
 
 이 구성은 `brainnet-local` 프로젝트와 `brainnet-local_local-db` 영속 볼륨을 사용한다. 기존 `brainnet` 컨테이너의 데이터나 아래 검증용 DB를 수정하지 않는다. 초기 DB는 비어 있으므로 웹에서 회원가입하고 프로젝트를 만든다. `.env.local`은 볼륨의 DB 비밀번호와 짝이므로 보관한다. 3000/18000은 이 PC에서만 열고 DB 포트는 호스트에 공개하지 않는다.
 
-이 로컬 프로필은 AI API 키를 비워 둔다. 일반 기능은 사용할 수 있고 실제 AI 생성은 비활성 상태다. 유료 AI API 검증은 수행하지 않았다. 기본 REST API는 Java 25 / Spring으로 연결한다. FastAPI는 Alembic 실행, WebSocket·outbox 전달과 예시 초대·참여 API를 맡는다. `/docs`는 FastAPI의 호환 계약 문서다. REST 전체 롤백은 `.env.local`에 `BRAINNET_REST_UPSTREAM=backend`를 설정하고 같은 시작 명령을 다시 실행한다. DB와 볼륨은 유지한다. 상세 범위는 [REST 전환 문서](../docs/migration/rest-migration.md)를 참고한다.
+이 로컬 프로필은 AI API 키를 비워 둔다. 일반 기능과 로컬 발췌 요약은 사용할 수 있고 실제 AI 생성은 비활성 상태다. 유료 AI API 검증은 수행하지 않았다. 기본 REST API와 초대·참여·태그 요약은 Java 25 / Spring으로 연결한다. 초대 메일은 외부로 전송하지 않고 `http://localhost:18025`의 Mailpit 로컬 메일함에 저장한다. FastAPI는 Alembic 실행과 WebSocket·outbox 전달을 맡는다. `/docs`는 FastAPI의 호환 계약 문서이며 새 협업 API는 [별도 문서](../docs/backend-collaboration.md)를 참고한다. REST 전체 롤백은 `.env.local`에 `BRAINNET_REST_UPSTREAM=backend`를 설정하고 같은 시작 명령을 다시 실행한다. DB와 볼륨은 유지하지만 새 협업 기능은 Spring 전용이며 Python 초대·참여는 410으로 차단한다. 상세 범위는 [REST 전환 문서](../docs/migration/rest-migration.md)를 참고한다.
 
 ## 전용 Docker에서 전환·롤백 검증
 

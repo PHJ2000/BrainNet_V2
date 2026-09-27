@@ -78,6 +78,7 @@ class ApiExceptionHandler {
     }
 
     @ExceptionHandler({org.springframework.web.method.annotation.MethodArgumentTypeMismatchException.class,
+            org.springframework.web.method.annotation.HandlerMethodValidationException.class,
             org.springframework.web.bind.MissingServletRequestParameterException.class})
     ResponseEntity<?> invalidParameter(Exception ex, HttpServletRequest request) {
         return validationResponse("Request validation failed", request, null);

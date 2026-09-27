@@ -31,8 +31,8 @@ SPRING_DATASOURCE_USERNAME
 SPRING_DATASOURCE_PASSWORD
 ```
 
-Local verification (Docker is required for the Testcontainers PostgreSQL
-integration test):
+Local verification (Docker is required for the Testcontainers PostgreSQL and
+Mailpit integration tests; mail is captured locally):
 
 ```bash
 docker run --rm \

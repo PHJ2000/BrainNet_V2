@@ -22,6 +22,12 @@ class ProjectService {
     private final JdbcTemplate jdbc;
     ProjectService(JdbcTemplate jdbc) { this.jdbc = jdbc; }
 
+    // Call within a transaction. Serializes invitation and voting lifecycle changes with deletion.
+    void lockActive(long projectId) {
+        var ids = jdbc.queryForList("SELECT id FROM project WHERE id=? AND is_deleted=false FOR UPDATE", Long.class, projectId);
+        if (ids.isEmpty()) throw new ApiException(HttpStatus.NOT_FOUND, "NOT_FOUND", "Project not found");
+    }
+
     private ProjectView view(ResultSet rs, int row) throws SQLException {
         return new ProjectView(rs.getLong("id"), rs.getString("name"), rs.getString("description"),
                 rs.getLong("owner_id"), timestamp(rs, "created_at"), timestamp(rs, "updated_at"),

@@ -1,5 +1,8 @@
 # docker-compose.yml (루트)
 services:
+  mailpit:
+    image: axllent/mailpit:v1.20
+    ports: ["127.0.0.1:18025:8025"]
   db:
     image: postgres:15
     environment:
@@ -47,11 +50,14 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/brainshare
       SPRING_DATASOURCE_USERNAME: brain
       SPRING_DATASOURCE_PASSWORD: pass
+      SMTP_HOST: mailpit
+      SMTP_PORT: "1025"
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       OPENAI_MODEL: ${OPENAI_MODEL:-gpt-3.5-turbo}
       OPENAI_TIMEOUT_SECONDS: ${OPENAI_TIMEOUT_SECONDS:-30}
     depends_on:
       backend: {condition: service_healthy}
+      mailpit: {condition: service_started}
     healthcheck:
       test: [CMD, curl, -fsS, http://localhost:8080/health]
       interval: 3s

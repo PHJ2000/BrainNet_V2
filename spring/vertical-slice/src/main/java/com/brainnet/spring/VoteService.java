@@ -30,6 +30,7 @@ class VoteService {
 
     @Transactional
     public Vote cast(long projectId, long tagId, long userId) {
+        projects.lockActive(projectId);
         nodes.requireMember(projectId, userId);
         var summaries = jdbc.queryForList("SELECT s.id FROM tag_summary s JOIN tag t ON t.id=s.tag_id "
                 + "WHERE t.project_id=? AND t.id=? ORDER BY s.id DESC LIMIT 1 FOR UPDATE OF s", Long.class, projectId, tagId);
@@ -47,6 +48,7 @@ class VoteService {
 
     @Transactional
     public History confirm(long projectId, Long winningTagId, long userId) {
+        projects.lockActive(projectId);
         projects.requireOwner(projectId, userId);
         var summaries = jdbc.queryForList("SELECT s.id FROM tag_summary s JOIN tag t ON t.id=s.tag_id "
                 + "WHERE t.project_id=? ORDER BY s.id FOR UPDATE OF s", Long.class, projectId);
