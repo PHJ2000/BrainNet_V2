@@ -20,8 +20,9 @@ class VoteService {
     private final VerticalService nodes;
     private final ProjectService projects;
     private final NodeOutboxService outbox;
-    VoteService(JdbcTemplate jdbc, VerticalService nodes, ProjectService projects, NodeOutboxService outbox) {
-        this.jdbc = jdbc; this.nodes = nodes; this.projects = projects; this.outbox = outbox;
+    private final ActivityService activity;
+    VoteService(JdbcTemplate jdbc, VerticalService nodes, ProjectService projects, NodeOutboxService outbox, ActivityService activity) {
+        this.jdbc = jdbc; this.nodes = nodes; this.projects = projects; this.outbox = outbox; this.activity = activity;
     }
 
     private History historyView(ResultSet rs, int row) throws SQLException {
@@ -43,6 +44,7 @@ class VoteService {
                 (rs, row) -> new Vote(rs.getLong("id"), rs.getLong("tag_summary_id"), rs.getLong("voter_id"), timestamp(rs, "created_at")), summary, userId);
         outbox.append(projectId, vote.id(), "vote:cast", Map.of("id", vote.id(), "tag_summary_id", summary,
                 "voter_id", userId, "created_at", vote.created_at().toString()));
+        activity.append(projectId, userId, "VOTE_CAST", Map.of("vote_id", vote.id(), "tag_summary_id", summary));
         return vote;
     }
 
@@ -69,6 +71,7 @@ class VoteService {
         jdbc.update("DELETE FROM vote WHERE tag_summary_id IN (" + placeholders + ")", summaries.toArray());
         outbox.append(projectId, history.id(), "vote:confirmed", Map.of("id", history.id(), "tag_summary_id", chosen,
                 "decided_at", history.decided_at().toString()));
+        activity.append(projectId, userId, "VOTE_CONFIRM", Map.of("history_id", history.id(), "tag_summary_id", chosen));
         return history;
     }
 

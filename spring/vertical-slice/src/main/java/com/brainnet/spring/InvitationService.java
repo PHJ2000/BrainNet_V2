@@ -22,12 +22,14 @@ class InvitationService {
     private final JdbcTemplate jdbc;
     private final ProjectService projects;
     private final InviteMailService mail;
+    private final ActivityService activity;
     private final long expiryHours;
     private final SecureRandom random = new SecureRandom();
 
-    InvitationService(JdbcTemplate jdbc, ProjectService projects, InviteMailService mail,
+    InvitationService(JdbcTemplate jdbc, ProjectService projects, InviteMailService mail, ActivityService activity,
                       @Value("${INVITE_EXPIRY_HOURS:72}") long expiryHours) {
         this.jdbc = jdbc; this.projects = projects; this.mail = mail; this.expiryHours = expiryHours;
+        this.activity = activity;
         if (expiryHours < 1 || expiryHours > 720) throw new IllegalStateException("INVITE_EXPIRY_HOURS must be between 1 and 720");
     }
 
@@ -52,6 +54,7 @@ class InvitationService {
                 (rs, row) -> timestamp(rs, "expires_at"), digest(token), projectId, email, expiryHours);
         // A failed SMTP submission rolls back both a new invitation and a replacement token.
         mail.send(email, projectId, token, expires);
+        activity.append(projectId, userId, "INVITE_SENT", Map.of("expires_at", expires.toString()));
         return new Invitation(token, projectId, email, expires, "smtp");
     }
 
@@ -78,6 +81,7 @@ class InvitationService {
         jdbc.update("INSERT INTO project_user_role(project_id,user_id,role,invited_at,accepted_at) "
                 + "VALUES (?,?,'EDITOR',now(),now()) ON CONFLICT (project_id,user_id) DO NOTHING", projectId, userId);
         jdbc.update("UPDATE invite_token SET accepted_at=now() WHERE token=?", digest);
+        activity.append(projectId, userId, "INVITE_ACCEPT", Map.of());
         return Map.of("project_id", projectId, "status", "joined");
     }
 

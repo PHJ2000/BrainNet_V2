@@ -227,4 +227,46 @@ CREATE INDEX ix_outbox_unpublished ON outbox_event (occurred_at) WHERE published
 
 UPDATE alembic_version SET version_num='9e1c2a7d4b10' WHERE alembic_version.version_num = '4c389bbebfad';
 
+-- Running upgrade 9e1c2a7d4b10 -> c2f4a6b8d010
+
+ALTER TYPE act_type_t ADD VALUE IF NOT EXISTS 'NODE_RESTORE';
+
+ALTER TYPE act_type_t ADD VALUE IF NOT EXISTS 'NODE_ACTIVATE';
+
+ALTER TYPE act_type_t ADD VALUE IF NOT EXISTS 'NODE_DEACTIVATE';
+
+ALTER TYPE act_type_t ADD VALUE IF NOT EXISTS 'PROJECT_CREATE';
+
+ALTER TYPE act_type_t ADD VALUE IF NOT EXISTS 'PROJECT_UPDATE';
+
+ALTER TYPE act_type_t ADD VALUE IF NOT EXISTS 'PROJECT_DELETE';
+
+ALTER TYPE act_type_t ADD VALUE IF NOT EXISTS 'TAG_CREATE';
+
+ALTER TYPE act_type_t ADD VALUE IF NOT EXISTS 'TAG_UPDATE';
+
+ALTER TYPE act_type_t ADD VALUE IF NOT EXISTS 'TAG_DELETE';
+
+ALTER TYPE act_type_t ADD VALUE IF NOT EXISTS 'TAG_REMOVE';
+
+ALTER TYPE act_type_t ADD VALUE IF NOT EXISTS 'VOTE_CONFIRM';
+
+ALTER TYPE act_type_t ADD VALUE IF NOT EXISTS 'SUMMARY_CREATE';
+
+ALTER TYPE act_type_t ADD VALUE IF NOT EXISTS 'MEMBER_REMOVE';
+
+ALTER TYPE act_type_t ADD VALUE IF NOT EXISTS 'MEMBER_LEAVE';
+
+ALTER TYPE act_type_t ADD VALUE IF NOT EXISTS 'MEMBER_ROLE_CHANGE';
+
+CREATE INDEX ix_activity_project_id_id ON activity_log (project_id, id);
+
+CREATE INDEX ix_node_project_parent ON node (project_id, parent_id);
+
+INSERT INTO node_version(node_id,version_no,content,author_id,created_at)
+                  SELECT id,version,content,NULL,updated_at FROM node
+                  ON CONFLICT (node_id,version_no) DO NOTHING;
+
+UPDATE alembic_version SET version_num='c2f4a6b8d010' WHERE alembic_version.version_num = '9e1c2a7d4b10';
+
 COMMIT;

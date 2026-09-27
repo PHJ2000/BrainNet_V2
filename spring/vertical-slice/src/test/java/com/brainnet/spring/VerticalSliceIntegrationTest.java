@@ -113,7 +113,13 @@ class VerticalSliceIntegrationTest {
         jdbc.execute("CREATE TABLE IF NOT EXISTS tag_node (tag_id BIGINT NOT NULL, node_id BIGINT NOT NULL, PRIMARY KEY(tag_id,node_id))");
         jdbc.execute("CREATE TABLE IF NOT EXISTS idempotency_request (id BIGSERIAL PRIMARY KEY, actor_id BIGINT NOT NULL, project_id BIGINT NOT NULL, idempotency_key VARCHAR(128) NOT NULL, request_hash VARCHAR(64) NOT NULL, response_status INT, response_body JSONB, created_at TIMESTAMPTZ NOT NULL DEFAULT now(), expires_at TIMESTAMPTZ NOT NULL, UNIQUE(actor_id,idempotency_key))");
         jdbc.execute("CREATE TABLE IF NOT EXISTS outbox_event (id BIGSERIAL PRIMARY KEY, event_id VARCHAR(36) NOT NULL UNIQUE, aggregate_type VARCHAR(64) NOT NULL, aggregate_id BIGINT NOT NULL, event_type VARCHAR(128) NOT NULL, payload JSONB NOT NULL, occurred_at TIMESTAMPTZ NOT NULL DEFAULT now(), published_at TIMESTAMPTZ, attempt_count INT NOT NULL DEFAULT 0, lease_until TIMESTAMPTZ, last_error TEXT)");
-        jdbc.execute("TRUNCATE outbox_event, idempotency_request, tag_node, tag, node, project_user_role, project");
+        jdbc.execute("DO $$ BEGIN CREATE TYPE act_type_t AS ENUM (" + ActivityService.TYPES.stream().sorted()
+                .map(s -> "'" + s + "'").collect(java.util.stream.Collectors.joining(","))
+                + "); EXCEPTION WHEN duplicate_object THEN NULL; END $$");
+        jdbc.execute("CREATE TABLE IF NOT EXISTS activity_log (id BIGSERIAL PRIMARY KEY,user_id BIGINT,project_id BIGINT,type act_type_t NOT NULL,payload JSON,logged_at TIMESTAMPTZ NOT NULL)");
+        jdbc.execute("CREATE TABLE IF NOT EXISTS node_version (id BIGSERIAL PRIMARY KEY,node_id BIGINT NOT NULL,version_no INT NOT NULL,content TEXT NOT NULL,author_id BIGINT,created_at TIMESTAMPTZ NOT NULL,UNIQUE(node_id,version_no))");
+        jdbc.execute("CREATE TABLE IF NOT EXISTS node_metrics (node_id BIGINT PRIMARY KEY,subtree_size INT NOT NULL,density_score FLOAT NOT NULL,updated_at TIMESTAMPTZ NOT NULL)");
+        jdbc.execute("TRUNCATE node_version, node_metrics, activity_log, outbox_event, idempotency_request, tag_node, tag, node, project_user_role, project");
         jdbc.update("INSERT INTO project(id,owner_id,name,description) VALUES (1,7,'demo','slice')");
         jdbc.update("INSERT INTO project(id,owner_id,name,description,is_deleted) VALUES (2,7,'deleted','slice',true)");
         jdbc.update("INSERT INTO project_user_role(project_id,user_id,role) VALUES (1,7,'OWNER')");

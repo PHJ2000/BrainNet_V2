@@ -173,4 +173,8 @@ def downgrade() -> None:
     op.drop_table('activity_log')
     op.drop_table('project')
     op.drop_table('app_user')
+    # PostgreSQL enum types outlive dropped tables; remove them for a clean base rollback.
+    op.execute('DROP TYPE IF EXISTS node_state_t')
+    op.execute('DROP TYPE IF EXISTS role_t')
+    op.execute('DROP TYPE IF EXISTS act_type_t')
     # ### end Alembic commands ###

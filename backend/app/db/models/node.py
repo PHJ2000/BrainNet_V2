@@ -13,6 +13,7 @@ class NodeStateEnum(enum.Enum):
 class Node(Base):
     __tablename__ = "node"
     __table_args__ = (
+        Index("ix_node_project_parent", "project_id", "parent_id"),
         Index(
             "uq_node_active_root_per_project",
             "project_id",

@@ -8,7 +8,7 @@ FastAPI와 Spring이 같은 DB의 `(actor_id, idempotency_key)`를 사용한다.
 
 처리 중 lease는 `max(120초, provider timeout + 60초)`다. 만료된 claim을 다시 획득하면 DB sequence의 새 id를 받는다. 저장 트랜잭션은 그 id를 잠그고 유효성을 확인하므로, 예전 처리자가 늦게 완료되거나 정리해도 새 claim을 변경할 수 없다. provider 대기 중에는 DB 연결을 점유하지 않는다.
 
-노드·상속 태그·완료 응답·`node.created` Outbox는 하나의 트랜잭션에 저장한다. provider 실패나 저장 실패 시 미완료 claim은 해제한다. 동일 버전 수정과 버전 없는 수정은 각각 409·428로 구분하며 `REQUIRE_NODE_VERSION=true`가 기본값이다. 이전 클라이언트 전환 기간에만 명시적으로 false를 설정할 수 있다.
+노드·상속 태그·완료 응답·`node.created` Outbox는 하나의 트랜잭션에 저장한다. Spring은 노드 내용 이력과 활동 기록도 이 트랜잭션에 포함한다. provider 실패나 저장 실패 시 미완료 claim은 해제한다. 동일 버전 수정과 버전 없는 수정은 각각 409·428로 구분하며 `REQUIRE_NODE_VERSION=true`가 기본값이다. 이전 클라이언트 전환 기간에만 명시적으로 false를 설정할 수 있다.
 
 프론트는 전송 실패, 처리 중 응답, 생성 대기열 포화 응답을 최대 두 번 더 시도한다. AI 일부 생성 후 실패하면 완료된 생성 슬롯과 미완료 요청의 키를 유지한다. provider가 명시적으로 실패한 경우에만 빈 노드로 대체하며, 재시도 중 그 선택을 바꾸지 않는다. 이 동작 상태는 현재 화면의 메모리에 있으며 탭을 새로 고친 뒤까지 보존하는 기능은 포함하지 않는다.
 
@@ -32,6 +32,10 @@ JSON 속성 순서·부동소수점 문자열·한글 인코딩 차이 때문에
 FastAPI worker마다 publisher와 listener가 실행된다. 어느 worker든 미발행 `node.created`, `node.updated`, `node.deleted`, `vote:cast`, `vote:confirmed`를 `FOR UPDATE SKIP LOCKED`로 가져와 `pg_notify`와 `published_at` 갱신을 같은 트랜잭션에서 실행한다. 실패한 트랜잭션은 미발행으로 남아 재시도된다. 생성·수정·삭제·활성 상태 변경·투표와 그 이벤트는 각각 같은 DB 트랜잭션에 저장한다.
 
 알림에는 작은 Outbox 행 id만 담는다. 같은 DB를 구독하는 모든 FastAPI worker가 이벤트를 조회하고 자신의 프로젝트 room에 전달한다. 노드 이벤트는 본문 대신 node_id를 보내며 클라이언트가 인증된 GET으로 현재 상태를 가져온다. 투표 이벤트는 기존 필드에 event_id를 추가한다. worker는 최근 event_id 2,048개를 기억해 중복 알림을 억제한다. 접속자가 없는 worker는 행 조회를 생략하며 새 연결이 DB 상태를 다시 조회한다.
+
+멤버 관리에서는 `membership.changed`, 프로젝트 삭제에서는 `project.deleted`를 같은 outbox로 전달한다.
+모든 이벤트 전송 전에 현재 멤버십·프로젝트 상태·JWT 만료를 확인하고 권한이 없는 소켓을 닫는다.
+유휴 연결도 15초마다 다시 확인한다. 내용 복원과 멤버 관리의 상세 범위는 [백엔드 관리 API](../backend-operations.md)를 참고한다.
 
 PostgreSQL 알림은 커밋 시 전달되고 각 listener가 받지만 연결이 끊긴 동안의 내구성 있는 이벤트 보관을 제공하지 않는다. 그래서 listener 복구와 WebSocket 연결 시 `resync.required`를 보내며, 프론트는 DB 상태를 다시 조회한다. [PostgreSQL NOTIFY](https://www.postgresql.org/docs/15/sql-notify.html), [LISTEN 초기화 순서](https://www.postgresql.org/docs/15/sql-listen.html).
 

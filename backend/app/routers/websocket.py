@@ -1,3 +1,4 @@
+import asyncio
 from fastapi import APIRouter, Query, WebSocket, WebSocketDisconnect
 from jose import JWTError, jwt
 from sqlalchemy import select
@@ -6,7 +7,7 @@ from app.core.security import ALGORITHM, SECRET_KEY
 from app.db.models.project import Project
 from app.db.models.project_user_role import ProjectUserRole
 from app.db.session import AsyncSessionLocal
-from app.utils.ws_manager import connect, disconnect
+from app.utils.ws_manager import connect, disconnect, revalidate
 
 router = APIRouter()
 
@@ -45,11 +46,16 @@ async def project_ws(
             await websocket.close(code=4403)
             return
 
-    await connect(project_id, websocket)
+    await connect(project_id, websocket, user_id, payload.get("exp"))
     try:
         await websocket.send_json({"type": "resync.required"})
         while True:
-            await websocket.receive_text()
+            try:
+                await asyncio.wait_for(websocket.receive_text(), timeout=15)
+            except TimeoutError:
+                pass
+            if not await revalidate(project_id, websocket):
+                return
     except WebSocketDisconnect:
         pass
     finally:

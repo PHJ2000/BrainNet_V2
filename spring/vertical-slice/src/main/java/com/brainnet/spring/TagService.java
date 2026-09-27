@@ -22,8 +22,9 @@ class TagService {
     private final JdbcTemplate jdbc;
     private final VerticalService nodes;
     private final ProjectService projects;
-    TagService(JdbcTemplate jdbc, VerticalService nodes, ProjectService projects) {
-        this.jdbc = jdbc; this.nodes = nodes; this.projects = projects;
+    private final ActivityService activity;
+    TagService(JdbcTemplate jdbc, VerticalService nodes, ProjectService projects, ActivityService activity) {
+        this.jdbc = jdbc; this.nodes = nodes; this.projects = projects; this.activity = activity;
     }
 
     private View view(ResultSet rs, int row) throws SQLException {
@@ -47,6 +48,7 @@ class TagService {
         nodes.requireMember(projectId, userId);
         long id = jdbc.queryForObject("INSERT INTO tag(project_id,name,color) VALUES (?,?,?) RETURNING id",
                 Long.class, projectId, body.name(), body.color());
+        activity.append(projectId, userId, "TAG_CREATE", Map.of("tag_id", id));
         return get(projectId, id, userId);
     }
 
@@ -54,6 +56,7 @@ class TagService {
     public View update(long projectId, long tagId, long userId, Patch body) {
         get(projectId, tagId, userId);
         jdbc.update("UPDATE tag SET name=coalesce(?,name),color=coalesce(?,color) WHERE id=?", body.name(), body.color(), tagId);
+        activity.append(projectId, userId, "TAG_UPDATE", Map.of("tag_id", tagId));
         return get(projectId, tagId, userId);
     }
 
@@ -67,6 +70,7 @@ class TagService {
             throw new ApiException(HttpStatus.CONFLICT, "TAG_IN_USE", "Tag is referenced by votes or decision history");
         }
         jdbc.update("DELETE FROM tag WHERE id=?", tagId);
+        activity.append(projectId, userId, "TAG_DELETE", Map.of("tag_id", tagId));
     }
 
     @Transactional
@@ -80,6 +84,8 @@ class TagService {
             if (attach) jdbc.update("INSERT INTO tag_node(tag_id,node_id) VALUES (?,?) ON CONFLICT DO NOTHING", tagId, id);
             else jdbc.update("DELETE FROM tag_node WHERE tag_id=? AND node_id=?", tagId, id);
         }
+        activity.append(projectId, userId, attach ? "TAG_APPLY" : "TAG_REMOVE",
+                Map.of("tag_id", tagId, "node_id", nodeId, "subtree_size", ids.size()));
         return Map.of("tag_id", tagId, "node_id", nodeId, "status", attach ? "attached" : "detached");
     }
 }
