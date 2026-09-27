@@ -46,7 +46,12 @@ with psycopg.connect(os.environ.get("POSTGRES_URL", "postgresql://brainnet_ci:br
             """
         )
         cursor.execute("INSERT INTO tag_node (tag_id, node_id) VALUES (101, 11), (101, 12), (101, 13)")
-        cursor.execute("SELECT setval(pg_get_serial_sequence('node', 'id'), 13)")
+        # Explicit IDs do not advance PostgreSQL sequences. Keep every seeded
+        # table ready for subsequent API inserts, including user registration.
+        cursor.execute("SELECT setval(pg_get_serial_sequence('app_user', 'id'), (SELECT max(id) FROM app_user))")
+        cursor.execute("SELECT setval(pg_get_serial_sequence('project', 'id'), (SELECT max(id) FROM project))")
+        cursor.execute("SELECT setval(pg_get_serial_sequence('node', 'id'), (SELECT max(id) FROM node))")
+        cursor.execute("SELECT setval(pg_get_serial_sequence('tag', 'id'), (SELECT max(id) FROM tag))")
         if "--browser" in sys.argv:
             cursor.execute("""UPDATE node SET
                 pos_x = CASE id WHEN 11 THEN 400 WHEN 12 THEN 140 ELSE 700 END,

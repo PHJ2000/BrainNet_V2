@@ -38,7 +38,7 @@ class VerticalService {
 
     record CreateResult(int status, String body) {}
 
-    private static OffsetDateTime timestamp(ResultSet rs, String column) throws SQLException {
+    static OffsetDateTime timestamp(ResultSet rs, String column) throws SQLException {
         Timestamp value = rs.getTimestamp(column);
         return value == null ? null : value.toInstant().atOffset(ZoneOffset.UTC);
     }
@@ -70,7 +70,7 @@ class VerticalService {
                 node.created_at(), node.updated_at(), tags, node.version());
     }
 
-    private void requireMember(long projectId, long userId) {
+    void requireMember(long projectId, long userId) {
         Integer member = jdbc.queryForObject(
                 "SELECT count(*) FROM project_user_role WHERE project_id=? AND user_id=?",
                 Integer.class, projectId, userId);
@@ -107,6 +107,78 @@ class VerticalService {
             throw new ApiException(HttpStatus.NOT_FOUND, "NODE_NOT_FOUND", "Node not found");
         }
         return withTags(nodes.getFirst());
+    }
+
+    List<NodeView> listNodes(long projectId, long userId, String tagIds) {
+        requireMember(projectId, userId);
+        List<Object> args = new ArrayList<>();
+        args.add(projectId);
+        String filter = "";
+        if (tagIds != null && !tagIds.isEmpty()) {
+            try {
+                for (String id : tagIds.split(",", -1)) args.add(Long.parseLong(id.trim()));
+            } catch (NumberFormatException ex) {
+                throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY, "VALIDATION_ERROR", "Invalid tag_ids");
+            }
+            filter = " AND EXISTS (SELECT 1 FROM tag_node tn WHERE tn.node_id=n.id AND tn.tag_id IN ("
+                    + String.join(",", java.util.Collections.nCopies(args.size() - 1, "?")) + "))";
+        }
+        List<NodeView> nodes = jdbc.query("SELECT n.* FROM node n WHERE n.project_id=?" + filter + " ORDER BY n.id",
+                this::nodeWithoutTags, args.toArray());
+        Map<Long, List<Long>> tags = new java.util.HashMap<>();
+        jdbc.query("SELECT tn.node_id,tn.tag_id FROM tag_node tn JOIN node n ON n.id=tn.node_id "
+                + "WHERE n.project_id=? ORDER BY tn.tag_id", rs -> {
+            tags.computeIfAbsent(rs.getLong("node_id"), ignored -> new ArrayList<>()).add(rs.getLong("tag_id"));
+        }, projectId);
+        return nodes.stream().map(n -> new NodeView(n.id(), n.project_id(), n.author_id(), n.content(),
+                n.state(), n.depth(), n.order_index(), n.pos_x(), n.pos_y(), n.parent_id(), n.created_at(),
+                n.updated_at(), tags.getOrDefault(n.id(), List.of()), n.version())).toList();
+    }
+
+    // Lock each generation before discovering the next. Child creation takes KEY SHARE on its parent;
+    // a recursive CTE alone would miss children committed while waiting for a parent's lock.
+    List<Long> lockSubtree(long projectId, long nodeId) {
+        List<Long> root = jdbc.query("SELECT id FROM node WHERE project_id=? AND id=? FOR UPDATE",
+                (rs, row) -> rs.getLong(1), projectId, nodeId);
+        if (root.isEmpty()) throw new ApiException(HttpStatus.NOT_FOUND, "NODE_NOT_FOUND", "Node not found");
+        List<Long> ids = new ArrayList<>(root);
+        var seen = new java.util.HashSet<>(root);
+        for (int i = 0; i < ids.size(); i++) {
+            for (Long child : jdbc.query("SELECT id FROM node WHERE project_id=? AND parent_id=? ORDER BY id FOR UPDATE",
+                    (rs, row) -> rs.getLong(1), projectId, ids.get(i))) {
+                if (seen.add(child)) ids.add(child);
+            }
+        }
+        return ids;
+    }
+
+    @Transactional
+    public void deleteNode(long projectId, long nodeId, long userId) {
+        requireMember(projectId, userId);
+        List<Long> ids = lockSubtree(projectId, nodeId);
+        String placeholders = String.join(",", java.util.Collections.nCopies(ids.size(), "?"));
+        jdbc.update("DELETE FROM tag_node WHERE node_id IN (" + placeholders + ")", ids.toArray());
+        jdbc.update("DELETE FROM node WHERE id IN (" + placeholders + ")", ids.toArray());
+        outbox.append(projectId, nodeId, "node.deleted", Map.of());
+    }
+
+    @Transactional
+    public NodeView changeState(long projectId, long nodeId, long userId, boolean activate) {
+        requireMember(projectId, userId);
+        List<Long> ids = lockSubtree(projectId, nodeId);
+        if (activate && !"GHOST".equals(getNode(projectId, nodeId, userId).state())) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "NODE_STATE_CONFLICT", "Node is not in GHOST state");
+        }
+        String placeholders = String.join(",", java.util.Collections.nCopies(ids.size(), "?"));
+        try {
+            jdbc.update("UPDATE node SET state='" + (activate ? "ACTIVE" : "GHOST")
+                    + "',version=version+1,updated_at=now() WHERE state='" + (activate ? "GHOST" : "ACTIVE")
+                    + "' AND id IN (" + placeholders + ")", ids.toArray());
+        } catch (DuplicateKeyException ex) {
+            throw new ApiException(HttpStatus.CONFLICT, "ROOT_NODE_CONFLICT", "Root node already exists for this project");
+        }
+        outbox.append(projectId, nodeId, "node.updated", Map.of());
+        return getNode(projectId, nodeId, userId);
     }
 
     CreateResult createNodes(long projectId, NodeCreate body, long userId, String idempotencyKey) {

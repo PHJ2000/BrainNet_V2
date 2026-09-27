@@ -16,8 +16,8 @@ final class ApiModels {
             OffsetDateTime updated_at,
             boolean is_deleted,
             Long member_count,
-            long node_count,
-            long tag_count) {}
+            Long node_count,
+            Long tag_count) {}
 
     record NodeView(
             long id,

@@ -17,8 +17,9 @@ class NodeOutboxService {
     void append(long projectId, long nodeId, String type, Map<String, Object> extra) {
         String eventId=UUID.randomUUID().toString();
         var payload=new LinkedHashMap<String,Object>(extra);
-        payload.put("event_id",eventId); payload.put("project_id",projectId); payload.put("node_id",nodeId);
+        boolean nodeEvent = type.startsWith("node.");
+        payload.put("event_id",eventId); payload.put("project_id",projectId); payload.put("node_id",nodeEvent ? nodeId : null);
         jdbc.update("INSERT INTO outbox_event(event_id,aggregate_type,aggregate_id,event_type,payload,occurred_at) "
-                + "VALUES (?,'node',?,?,?::jsonb,now())",eventId,nodeId,type,mapper.writeValueAsString(payload));
+                + "VALUES (?,?,?,?,?::jsonb,now())",eventId,nodeEvent ? "node" : "project",nodeId,type,mapper.writeValueAsString(payload));
     }
 }
