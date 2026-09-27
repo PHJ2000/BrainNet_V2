@@ -25,6 +25,11 @@ try {
     Run-Tool -Arguments @('python', 'experiments/runtime-nodes/routing_probe.py', 'canary')
     & (Join-Path $PSScriptRoot 'set-canary.ps1')
     Run-Tool -Arguments @('python', 'experiments/runtime-nodes/routing_probe.py', 'rollback')
+    & (Join-Path $PSScriptRoot 'set-canary.ps1') -AllRest
+    Run-Tool -Arguments @('python', 'spring/vertical-slice/rest_probe.py')
+    & (Join-Path $PSScriptRoot 'set-canary.ps1')
+    docker compose -f $compose exec -T -e REST_EXPECTED_OWNER=fastapi tools python spring/vertical-slice/rest_probe.py
+    if ($LASTEXITCODE -ne 0) { throw 'REST rollback contract failed' }
     docker compose -f $compose exec -T prometheus promtool check rules /etc/prometheus/alerts.yml
     if ($LASTEXITCODE -ne 0) { throw 'Monitoring rule validation failed' }
     Seed -Browser

@@ -43,6 +43,11 @@ class ApiExceptionHandler {
         if (ex.status == HttpStatus.UNPROCESSABLE_ENTITY && "VALIDATION_ERROR".equals(ex.code)) {
             return validationResponse("Request validation failed", request, ex.errors);
         }
+        if ("NODE_CREATION_BUSY".equals(ex.code)) {
+            return ResponseEntity.status(ex.status).header("Retry-After", "1")
+                    .header("X-Trace-Id", trace(request))
+                    .body(new ApiModels.ErrorView(ex.code, ex.getMessage(), trace(request)));
+        }
         return response(ex.status, ex.code, ex.getMessage(), trace(request));
     }
 
@@ -72,12 +77,28 @@ class ApiExceptionHandler {
                         defaultValidationErrors()));
     }
 
+    @ExceptionHandler({org.springframework.web.method.annotation.MethodArgumentTypeMismatchException.class,
+            org.springframework.web.bind.MissingServletRequestParameterException.class})
+    ResponseEntity<?> invalidParameter(Exception ex, HttpServletRequest request) {
+        return validationResponse("Request validation failed", request, null);
+    }
+
     @ExceptionHandler(DataAccessException.class)
     ResponseEntity<ApiModels.ErrorView> database(DataAccessException ex, HttpServletRequest request) {
         String traceId = trace(request);
         logger.error("request_error status=500 code=DB_ERROR trace_id={} exception_type={}",
                 traceId, ex.getClass().getSimpleName());
         return response(HttpStatus.INTERNAL_SERVER_ERROR, "DB_ERROR", "database operation failed", traceId);
+    }
+
+    @ExceptionHandler({org.springframework.web.HttpMediaTypeNotSupportedException.class,
+            org.springframework.web.HttpRequestMethodNotSupportedException.class,
+            org.springframework.web.servlet.resource.NoResourceFoundException.class})
+    ResponseEntity<?> httpError(Exception ex, HttpServletRequest request) {
+        var error = (org.springframework.web.ErrorResponse) ex;
+        HttpStatus status = HttpStatus.valueOf(error.getStatusCode().value());
+        return response(status, status == HttpStatus.NOT_FOUND ? "NOT_FOUND" : "HTTP_ERROR",
+                status.getReasonPhrase(), trace(request));
     }
 
     @ExceptionHandler(Exception.class)

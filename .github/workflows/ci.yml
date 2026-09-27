@@ -53,8 +53,9 @@ jobs:
         run: |
           alembic -c alembic.ini upgrade head
           alembic -c alembic.ini check
-          alembic -c alembic.ini upgrade head --sql > "$RUNNER_TEMP/alembic-upgrade.sql"
+          alembic -c alembic.ini upgrade head --sql | sed -E 's/[[:space:]]+$//' | perl -0pe 's/\n+\z/\n/' > "$RUNNER_TEMP/alembic-upgrade.sql"
           test -s "$RUNNER_TEMP/alembic-upgrade.sql"
+          diff -u ../spring/vertical-slice/src/test/resources/alembic-head.sql "$RUNNER_TEMP/alembic-upgrade.sql"
           grep -qi "outbox_event" "$RUNNER_TEMP/alembic-upgrade.sql"
       - name: Run real PostgreSQL concurrency regressions
         env:

@@ -28,16 +28,16 @@ AI로 아이디어를 확장하고 마인드맵으로 정리하는 웹 애플리
 브라우저: Next.js + React + Cytoscape.js
     │ REST / WebSocket
     ▼
-FastAPI ── AI 요청 ── OpenAI API
-    │
-    ▼
-PostgreSQL 15
+nginx ── REST ── Java 25 / Spring ── OpenAI API
+    └── WebSocket ── FastAPI
+                       │
+                 PostgreSQL 15 (공유 DB / outbox)
 ```
 
 - **프론트엔드:** Next.js, React, TypeScript, Tailwind CSS, Cytoscape.js, TanStack Query.
-- **백엔드:** Python, FastAPI, SQLAlchemy, Alembic, JWT 인증.
+- **백엔드:** Java 25, Spring MVC, JDBC, JWT 인증. FastAPI는 WebSocket·outbox 전달 및 기존 초대·참여 예시 API를 담당합니다.
 - **데이터베이스:** PostgreSQL 15. 백엔드 시작 시 DB 준비를 기다리고 `alembic upgrade head`를 실행합니다.
-- **Spring:** `spring/vertical-slice`에 Java 25 기반의 일부 API 구현이 있습니다. 런타임 비교와 점진적 전환 검증용이며, 평소 로컬 앱은 FastAPI를 사용합니다.
+- **Spring:** `spring/vertical-slice`가 인증·사용자·프로젝트·노드·태그·투표·히스토리 REST API를 담당합니다. 로컬 앱과 개발 Compose의 기본 REST 경로는 Spring입니다. Alembic은 FastAPI 시작 단계에서 실행하며 Spring은 완료 후 시작합니다.
 
 기존 소개 다이어그램과 ERD는 다음과 같습니다. 이후 추가된 요청·이벤트 계약은 [별도 문서](docs/migration/node-request-and-event-contract.md)를 기준으로 확인합니다.
 
@@ -140,7 +140,7 @@ docker compose up --build -d
 
 # 상태 및 로그 확인
 docker compose ps
-docker compose logs --tail=100 backend frontend
+docker compose logs --tail=100 spring backend proxy frontend
 
 # 중지 / 재시작
 docker compose stop
@@ -189,7 +189,7 @@ NEXT_PUBLIC_API_BASE_URL=http://localhost:18000 npm run build
 
 ## API 및 개발 문서
 
-전체 요청·응답 스키마는 실행 중인 백엔드의 `/docs`에서 확인합니다. 보호된 API에는 `Authorization: Bearer <token>`이 필요합니다. 회원가입·로그인은 토큰 없이 호출하며, 로그인은 JSON이 아닌 `application/x-www-form-urlencoded` 형식의 `username`(이메일)과 `password`를 받습니다.
+`/docs`와 `/openapi.json`은 호환 계약을 참고하기 위한 FastAPI 문서입니다. 실제 REST 요청은 기본적으로 Spring에서 처리합니다. Java 구현 범위와 차이는 [REST 전환 문서](docs/migration/rest-migration.md)를 참고합니다. 보호된 API에는 `Authorization: Bearer <token>`이 필요합니다. 회원가입·로그인은 토큰 없이 호출하며, 로그인은 JSON이 아닌 `application/x-www-form-urlencoded` 형식의 `username`(이메일)과 `password`를 받습니다.
 
 | 영역 | 주요 경로 |
 | --- | --- |
@@ -206,6 +206,8 @@ NEXT_PUBLIC_API_BASE_URL=http://localhost:18000 npm run build
 노드 생성 재시도에는 같은 `Idempotency-Key`를 사용하고, 수정에는 `expected_version`을 전달합니다. 상세 동작과 오류 응답은 [노드 요청·이벤트 계약](docs/migration/node-request-and-event-contract.md)을 참고합니다.
 
 ## 검증 상태
+
+이번 REST 전환의 구현 범위, 검증 방법과 롤백은 [REST 전환 문서](docs/migration/rest-migration.md)에 정리했습니다. WebSocket·Alembic과 예시 초대·참여 API는 Python에 남아 있습니다.
 
 저장소의 [2026-09-12 후속 수정 보고서](docs/PERFORMANCE_FIX_2026-09-12.md)에는 다음 결과가 기록되어 있습니다. 이는 해당 시점의 검증 기록이며, 새 환경에서의 실행 성공을 보장하는 결과는 아닙니다.
 
@@ -232,7 +234,7 @@ npm test
 ```text
 backend/                 FastAPI 앱, Alembic 마이그레이션, Python 테스트
 frontend/                Next.js 화면, 그래프, 프론트 단위·E2E 테스트
-spring/vertical-slice/   Java 25 / Spring 일부 API 및 비교 검증
+spring/vertical-slice/   Java 25 / Spring REST API 및 계약 검증
 deploy/                  로컬 앱·검증 Compose, 실행 스크립트, 라우팅·모니터링
 docs/                    설계 결정, 요청·이벤트 계약, 리팩터링·성능 보고서
 experiments/             provider·런타임 비교, 부하·연속 검증 및 결과

@@ -1,31 +1,26 @@
-# BrainNet Spring vertical slice
+# BrainNet Spring REST backend
 
-This module is the ADR-002 first production-shaped slice. It is an independent
-Spring Boot 4.1 / Java 25 service, but it is not a proxy cutover: FastAPI keeps
-ownership of every route until the shadow, canary, soak, and rollback gates are
-completed.
+Java 25 / Spring Boot 4.1 service implementing the shared Alembic schema and
+HS256 JWT contract. The module keeps its original `vertical-slice` path.
+Local and development Compose route REST to Spring by default. This does not
+claim that production provider/canary/soak gates have been completed.
 
 Implemented routes:
 
-- `GET /health`
-- `GET /projects/{project_id}`
-- `GET /projects/{project_id}/nodes/{node_id}`
-- `POST /projects/{project_id}/nodes` for regular and `ai_prompt` node creation
-- `PATCH /projects/{project_id}/nodes/{node_id}` with `expected_version`
+- Health, registration, form login, current user and tag contribution summaries
+- Project list/create/detail/update/delete and owner summary
+- Node list (optional tag filter), regular/AI create, get, versioned patch,
+  subtree delete, activate and deactivate
+- Tag CRUD and subtree attach/detach
+- Vote cast/confirm and history list/detail
 
-The service reads the Alembic public schema, validates the same HS256 JWT
-(`sub` is a positive numeric user id), checks project membership, and uses an
-atomic PostgreSQL conditional update for optimistic concurrency. Node creation
-uses the Alembic-head `idempotency_request` and `outbox_event` tables in the
-same database transaction; AI provider calls happen before that transaction
-and a successful AI node is stored as `GHOST`. It does not run migrations or
-initialize tables. Start it only against a database already at Alembic head.
-The project WebSocket route (`/projects/{project_id}/ws`) remains owned by
-FastAPI; this service does not attempt a WebSocket cutover.
+Node and vote mutations commit their outbox events in the same transaction.
+FastAPI continues delivering those events to WebSocket clients. Alembic, the
+WebSocket endpoint, event diagnostics and the unfinished invite/join examples
+remain Python-owned. This service never initializes or migrates the schema.
 
-This module is not itself a production proxy cutover. Before routing the live
-POST path here, run the staging provider contract, shadow/canary, soak,
-resource/JFR, and rollback gates in `docs/migration/adr-rollout-runbook.txt`.
+See [REST migration](../../docs/migration/rest-migration.md) for ownership,
+compatibility differences, local rollback and remaining production gates.
 
 Required configuration:
 
@@ -55,3 +50,15 @@ Build the runtime image from the repository root:
 ```bash
 docker build --file spring/vertical-slice/Dockerfile --tag brainnet-spring-vertical-slice .
 ```
+
+The REST integration tests use `src/test/resources/alembic-head.sql`, generated
+from Alembic head. CI compares it with a fresh export. After a schema change:
+
+```bash
+cd backend
+PYTHONPATH=. alembic upgrade head --sql | sed -E 's/[[:space:]]+$//' | perl -0pe 's/\n+\z/\n/' > ../spring/vertical-slice/src/test/resources/alembic-head.sql
+```
+
+`rest_probe.py` verifies cross-runtime bcrypt/JWT compatibility, shared reads,
+proxy ownership and WebSocket delivery after cutover and rollback. Run it only
+against a disposable database with the environment in the migration document.

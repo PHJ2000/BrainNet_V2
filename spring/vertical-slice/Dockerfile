@@ -6,6 +6,7 @@ COPY spring/vertical-slice/src spring/vertical-slice/src
 RUN mvn -B -f spring/vertical-slice/pom.xml package -DskipTests
 
 FROM eclipse-temurin:25-jre
+RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY --from=build /workspace/spring/vertical-slice/target/brainnet-spring-vertical-slice-0.1.0-SNAPSHOT.jar /app/app.jar
 EXPOSE 8080
