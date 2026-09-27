@@ -47,6 +47,8 @@ with psycopg.connect(os.environ.get("POSTGRES_URL", "postgresql://brainnet_ci:br
         )
         cursor.execute("INSERT INTO tag_node (tag_id, node_id) VALUES (101, 11), (101, 12), (101, 13)")
         cursor.execute("SELECT setval(pg_get_serial_sequence('node', 'id'), 13)")
+        cursor.execute("SELECT setval(pg_get_serial_sequence('project', 'id'), 3)")
+        cursor.execute("SELECT setval(pg_get_serial_sequence('tag', 'id'), 101)")
         if "--browser" in sys.argv:
             cursor.execute("""UPDATE node SET
                 pos_x = CASE id WHEN 11 THEN 400 WHEN 12 THEN 140 ELSE 700 END,
