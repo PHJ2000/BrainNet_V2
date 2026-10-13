@@ -16,8 +16,6 @@ RUN chmod +x /app/startup.sh
 # 전체 백엔드 앱 복사
 COPY backend/app /app/app
 
-# alembic 폴더 및 설정 파일 복사
-COPY backend/alembic /app/alembic
-COPY backend/alembic.ini /app/alembic.ini
+# Schema migrations run exclusively in Spring/Flyway.
 
 CMD ["/app/startup.sh"]

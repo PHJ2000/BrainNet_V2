@@ -18,7 +18,7 @@ from app.utils.ws_manager import WS_CONNECTIONS, broadcast
 
 logger = logging.getLogger(__name__)
 CHANNEL = "brainnet_node_created"
-EVENT_TYPES = ("node.created", "node.updated", "node.deleted", "vote:cast", "vote:confirmed", "membership.changed", "project.deleted")
+EVENT_TYPES = ("node.created", "node.updated", "node.deleted", "vote:cast", "vote:confirmed", "membership.changed", "project.deleted", "workspace.updated", "tags.updated")
 
 
 async def publish_batch(connection: asyncpg.Connection) -> int:
@@ -51,13 +51,8 @@ async def prune_retained(connection, retention_days=7):
                          ORDER BY id LIMIT 1000 FOR UPDATE SKIP LOCKED)
             DELETE FROM outbox_event USING old WHERE outbox_event.id=old.id RETURNING outbox_event.id
         """, retention_days)
-        claims = await connection.fetch("""
-            WITH old AS (SELECT id FROM idempotency_request WHERE expires_at < now()-interval '1 day'
-                         ORDER BY id LIMIT 1000 FOR UPDATE SKIP LOCKED)
-            DELETE FROM idempotency_request USING old WHERE idempotency_request.id=old.id
-            RETURNING idempotency_request.id
-        """)
-        return len(events), len(claims)
+        return len(events), 0  # REST idempotency retention belongs to Spring.
+
 
 
 class NodeEventBridge:

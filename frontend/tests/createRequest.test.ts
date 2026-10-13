@@ -1,9 +1,17 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { AxiosError, AxiosHeaders } from "axios";
+import { AxiosError, AxiosHeaders, CanceledError } from "axios";
 import { createRequest, isProviderFailure } from "../src/features/nodes/createRequest";
 
 const noWait = async () => {};
+
+test("cancelled navigation requests are never retried", async () => {
+  let calls = 0;
+  await assert.rejects(createRequest(async () => {
+    calls++; throw new CanceledError("unmounted");
+  }, "cancelled", noWait));
+  assert.equal(calls, 1);
+});
 
 test("lost response retries the same operation key", async () => {
   const keys: string[] = [];

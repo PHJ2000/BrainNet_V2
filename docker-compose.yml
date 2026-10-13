@@ -24,16 +24,12 @@ services:
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set}
       JWT_ALGORITHM: ${JWT_ALGORITHM:-HS256}
       ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-30}
-      REQUIRE_NODE_VERSION: ${REQUIRE_NODE_VERSION:-true}
       SQLALCHEMY_ECHO: ${SQLALCHEMY_ECHO:-false}
       NODE_EVENTS_ENABLED: ${NODE_EVENTS_ENABLED:-true}
       OUTBOX_RETENTION_DAYS: ${OUTBOX_RETENTION_DAYS:-7}
-      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
-      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-3.5-turbo}
-      OPENAI_TIMEOUT_SECONDS: ${OPENAI_TIMEOUT_SECONDS:-30}
 
     depends_on:
-      db: {condition: service_healthy}
+      spring: {condition: service_healthy}
     healthcheck:
       test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=3)"]
       interval: 3s
@@ -56,7 +52,7 @@ services:
       OPENAI_MODEL: ${OPENAI_MODEL:-gpt-3.5-turbo}
       OPENAI_TIMEOUT_SECONDS: ${OPENAI_TIMEOUT_SECONDS:-30}
     depends_on:
-      backend: {condition: service_healthy}
+      db: {condition: service_healthy}
       mailpit: {condition: service_started}
     healthcheck:
       test: [CMD, curl, -fsS, http://localhost:8080/health]
@@ -65,8 +61,6 @@ services:
       retries: 30
   proxy:
     image: nginx:1.28-alpine
-    environment:
-      BRAINNET_REST_UPSTREAM: ${BRAINNET_REST_UPSTREAM:-spring}
     volumes: ["./deploy/routing/rest-proxy.conf.template:/etc/nginx/templates/default.conf.template:ro"]
     ports: ["8000:8000"]
     depends_on:

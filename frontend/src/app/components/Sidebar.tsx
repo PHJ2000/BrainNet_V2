@@ -3,64 +3,39 @@
 
 import { useProjects } from "@/features/projects/useProjects";
 import Link from "next/link";
-import { Plus, Search, X } from "lucide-react";
-import { useRef, useState } from "react";
+import { Plus } from "lucide-react";
+import { useState } from "react";
 import type { Project } from "@/types/api";
 import ProjectFormModal from "./ProjectFormModal";
+import JoinProjectDialog from "@/features/projects/JoinProjectDialog";
 
 export default function Sidebar() {
-  const { data: projects = [], isLoading, isError } = useProjects();
+  const { data: projects = [], isLoading, error, refetch } = useProjects();
   const [modalOpen, setModalOpen] = useState(false);
-  const [search, setSearch] = useState("");
-  const searchInput = useRef<HTMLInputElement>(null);
-  const query = search.trim().toLowerCase();
-  const filteredProjects = projects.filter((project: Project) =>
-    project.name.toLowerCase().includes(query)
-  );
+  const [joinOpen, setJoinOpen] = useState(false);
 
   return (
     <div className="flex flex-col h-full p-4">
-      <h2 className="text-lg font-bold mb-4">내 프로젝트</h2>
-
-      <div className="relative mb-4">
-        <label htmlFor="project-search" className="sr-only">프로젝트 이름 검색</label>
-        <Search aria-hidden="true" size={16} className="absolute left-3 top-3 text-gray-400" />
-        <input
-          ref={searchInput}
-          id="project-search"
-          type="text"
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-          placeholder="프로젝트 이름 검색"
-          className="w-full rounded-lg border border-gray-200 bg-white py-2 pl-9 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-        />
-        {search && (
-          <button
-            type="button"
-            aria-label="프로젝트 검색 초기화"
-            onClick={() => {
-              setSearch("");
-              searchInput.current?.focus();
-            }}
-            className="absolute right-1 top-1 rounded-md p-2 text-gray-500 hover:bg-gray-100 focus-visible:outline-2 focus-visible:outline-blue-400"
-          >
-            <X aria-hidden="true" size={16} />
-          </button>
-        )}
-      </div>
+      <Link
+        href="/dashboard"
+        className="mb-4 block text-lg font-semibold hover:text-indigo-700"
+      >
+        내 프로젝트
+      </Link>
 
       <div className="flex-1 space-y-2 overflow-y-auto">
         {/* 프로젝트 목록 */}
         {isLoading ? (
           <div className="text-sm text-gray-400">불러오는 중...</div>
-        ) : isError ? (
-          <div role="alert" className="text-sm text-red-600">프로젝트를 불러오지 못했어요.</div>
-        ) : filteredProjects.length === 0 ? (
-          <div role="status" className="text-sm text-gray-500">
-            {query ? "검색 결과가 없어요." : "아직 프로젝트가 없어요."}
-          </div>
+        ) : error ? (
+          <button
+            onClick={() => void refetch()}
+            className="text-sm text-red-700"
+          >
+            목록을 불러오지 못했습니다. 다시 시도
+          </button>
         ) : (
-          filteredProjects.map((p: Project) => (
+          projects.map((p: Project) => (
             <Link
               key={p.id}
               href={`/dashboard/projects/${p.id}`}
@@ -74,15 +49,31 @@ export default function Sidebar() {
         {/* + 버튼도 같은 목록 안에 배치 */}
         <button
           onClick={() => setModalOpen(true)}
-          className="flex items-center justify-center w-full text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-purple-500 py-2 mt-4 rounded-xl shadow hover:from-blue-700 hover:to-purple-700 transition-all"
+          className="flex items-center justify-center w-full text-sm font-medium text-white bg-indigo-700 py-2 mt-4 rounded-md hover:bg-indigo-800"
         >
-          <Plus size={18} className="mr-2" />
-          새 프로젝트
+          <Plus size={18} className="mr-2" />새 프로젝트
+        </button>
+        <button
+          onClick={() => setJoinOpen(true)}
+          className="mt-2 w-full rounded-md border border-slate-300 py-2 text-sm text-slate-700 hover:bg-slate-50"
+        >
+          초대 코드로 참여
         </button>
       </div>
 
+      <button
+        onClick={() => {
+          localStorage.removeItem("token");
+          window.location.replace("/login");
+        }}
+        className="mt-4 border-t border-slate-200 pt-3 text-left text-sm text-slate-500 hover:text-slate-900"
+      >
+        로그아웃
+      </button>
+
       {/* 모달 */}
       {modalOpen && <ProjectFormModal onClose={() => setModalOpen(false)} />}
+      {joinOpen && <JoinProjectDialog onClose={() => setJoinOpen(false)} />}
     </div>
   );
 }

@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -14,12 +15,20 @@ import java.util.List;
 class CorsConfiguration {
     @Bean
     FilterRegistrationBean<CorsFilter> corsFilter(
-            @Value("${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://127.0.0.1:3000}") String origins) {
+            @Value("${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://127.0.0.1:3000}")
+                    String origins) {
         var config = new org.springframework.web.cors.CorsConfiguration();
         config.setAllowedOrigins(Arrays.stream(origins.split(",")).map(String::trim).toList());
         config.setAllowedMethods(List.of("GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Idempotency-Key", "X-Trace-Id"));
-        config.setExposedHeaders(List.of("X-Trace-Id"));
+        config.setAllowedHeaders(
+                List.of(
+                        "Authorization",
+                        "Content-Type",
+                        "Idempotency-Key",
+                        "X-Trace-Id",
+                        "If-None-Match"));
+        config.setExposedHeaders(
+                List.of("X-Trace-Id", "ETag", "Content-Disposition", "Retry-After"));
         config.setAllowCredentials(true);
         var source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);

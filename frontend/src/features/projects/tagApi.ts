@@ -15,8 +15,13 @@ export interface TagPayload {
   color?: string;
 }
 
-export const listTags = (pid: string | number): Promise<TagResponse[]> =>
-  apiClient.get<TagResponse[]>(`/projects/${pid}/tags`).then((response) => response.data);
+export const listTags = (
+  pid: string | number,
+  signal?: AbortSignal,
+): Promise<TagResponse[]> =>
+  apiClient
+    .get<TagResponse[]>(`/projects/${pid}/tags`, { signal })
+    .then((response) => response.data);
 export const createTag = (
   pid: string | number,
   body: TagPayload,
@@ -32,6 +37,21 @@ export const updateTag = (
   apiClient
     .patch<TagResponse>(`/projects/${pid}/tags/${tid}`, body)
     .then((response) => response.data);
-export const deleteTag  = (pid: string | number, tid: string | number) => apiClient.delete(`/projects/${pid}/tags/${tid}`);
-export const attachTag  = (pid: string | number, tid: string | number, nid: string | number) => apiClient.post(`/projects/${pid}/tags/${tid}/nodes/${nid}`).then(r=>r.data);
-export const detachTag  = (pid: string | number, tid: string | number, nid: string | number) => apiClient.delete(`/projects/${pid}/tags/${tid}/nodes/${nid}`).then(r=>r.data);
+export const deleteTag = (pid: string | number, tid: string | number) =>
+  apiClient.delete(`/projects/${pid}/tags/${tid}`);
+export const attachTag = (
+  pid: string | number,
+  tid: string | number,
+  nid: string | number,
+) =>
+  apiClient
+    .post(`/projects/${pid}/tags/${tid}/nodes/${nid}`)
+    .then((r) => r.data);
+export const detachTag = (
+  pid: string | number,
+  tid: string | number,
+  nid: string | number,
+) =>
+  apiClient
+    .delete(`/projects/${pid}/tags/${tid}/nodes/${nid}`)
+    .then((r) => r.data);

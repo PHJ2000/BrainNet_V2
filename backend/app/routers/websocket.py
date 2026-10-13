@@ -53,7 +53,7 @@ async def project_ws(
             try:
                 await asyncio.wait_for(websocket.receive_text(), timeout=15)
             except TimeoutError:
-                pass
+                await asyncio.wait_for(websocket.send_json({"type": "ping"}), timeout=2)
             if not await revalidate(project_id, websocket):
                 return
     except WebSocketDisconnect:

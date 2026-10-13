@@ -7,6 +7,7 @@ import enum
 class RoleType(enum.Enum):
     OWNER = "OWNER"
     EDITOR = "EDITOR"
+    VIEWER = "VIEWER"
 
 class ProjectUserRole(Base):
     __tablename__ = "project_user_role"

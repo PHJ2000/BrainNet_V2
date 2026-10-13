@@ -1,0 +1,98 @@
+[
+  {
+    "kind": "task",
+    "body": {
+      "title": "기존 😀 과제",
+      "body": "",
+      "status": "TODO",
+      "priority": "MEDIUM",
+      "assignee_id": null,
+      "due_date": null,
+      "node_id": null,
+      "checklist": [],
+      "repeat_every_days": null,
+      "id": "11111111-1111-4111-8111-111111111111"
+    },
+    "hash": "d103e61f207fc1595d0c87553c2ab018ded5c204970ad3da3716c82c07216407"
+  },
+  {
+    "kind": "task_execution",
+    "body": {
+      "title": "반복",
+      "body": "",
+      "status": "TODO",
+      "priority": "MEDIUM",
+      "assignee_id": null,
+      "due_date": "2026-10-13",
+      "node_id": null,
+      "checklist": [
+        {
+          "id": "22222222-2222-4222-8222-222222222222",
+          "text": "확인 😀",
+          "done": false
+        }
+      ],
+      "repeat_every_days": 7,
+      "id": "11111111-1111-4111-8111-111111111111"
+    },
+    "hash": "e2675105a7f151e42701cdf5b9795a38add5003ce4c31edbf4b8657020240323"
+  },
+  {
+    "kind": "discussion",
+    "body": {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "body": "기존 😀 토론",
+      "node_id": null
+    },
+    "hash": "f889ede0abc2ae6c8bcbdd7c404eb171dfa0e360895dd06e0dad65a6371617c8"
+  },
+  {
+    "kind": "reply",
+    "body": {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "body": "기존 답글",
+      "mentions": []
+    },
+    "hash": "9f3729df4734eda298b9d19bf10a1686aef289510378de077377bb4e7580edd9"
+  },
+  {
+    "kind": "proposal",
+    "body": {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "mode": "SUMMARY",
+      "instruction": "",
+      "node_ids": [
+        900
+      ]
+    },
+    "hash": "017833e1938deea311582ecd0612ac39c453743d670fc1d8aa1a9af356119fb9"
+  },
+  {
+    "kind": "asset",
+    "body": {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "kind": "SEARCH",
+      "name": "기존 검색",
+      "project_id": null,
+      "q": "😀",
+      "bookmarked": false
+    },
+    "hash": "0d1499a7c9abbb3a77a16bcfd37cefd8eec0786c414880feeeec83ea210e609e"
+  },
+  {
+    "kind": "task_escape",
+    "body": {
+      "title": "제어문자\u000b와 리터럴 \\u000B",
+      "body": "",
+      "status": "TODO",
+      "priority": "MEDIUM",
+      "assignee_id": null,
+      "due_date": null,
+      "node_id": null,
+      "checklist": [],
+      "repeat_every_days": null,
+      "id": "33333333-3333-4333-8333-333333333333"
+    },
+    "hash": "86144451b6338b0cc11885ebaeaa7b1b6e7714cc4737dcedde824640c6907cb6"
+  }
+]

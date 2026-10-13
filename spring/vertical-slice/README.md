@@ -1,3 +1,5 @@
+> 현재 실행·마이그레이션 기준은 [Spring 작업 공간 통합](../../docs/migration/spring-workspace.md)입니다. 아래 내용은 이전 단계의 기록이며 Python REST 롤백·Alembic 시작 절차는 현재 구성에 적용하지 않습니다.
+
 # BrainNet Spring REST backend
 
 Java 25 / Spring Boot 4.1 service implementing the shared Alembic schema and

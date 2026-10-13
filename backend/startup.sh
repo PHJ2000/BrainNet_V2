@@ -8,8 +8,7 @@ while ! pg_isready --dbname="$DATABASE_READY_URL" >/dev/null 2>&1; do
   sleep 1
 done
 
-echo "Running alembic upgrade head..."
-alembic upgrade head
+# Database migrations are owned by Spring/Flyway.
 
 
 echo "Starting server..."
