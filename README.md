@@ -8,52 +8,32 @@ AI로 아이디어를 확장하고 마인드맵으로 정리하는 웹 애플리
 
 ## 현재 구현 범위
 
-| 기능 | 현재 동작 |
-| --- | --- |
-| 계정·프로젝트 | 회원가입, JWT 로그인, 프로젝트 생성·목록·이름 검색·상세 화면 |
-| 마인드맵 | 노드 내용 수정, 드래그 이동, 확대·축소, 전체 보기, 변경사항 DB 저장 |
-| AI 확장 | 루트에서 AI 추천 2개 + 직접 입력용 1개, 하위 확장에서 AI 추천 1개 + 직접 입력용 1개 생성 |
-| 태그 | 노드 우클릭으로 태그 생성·부착·제거, `TAG` 버튼으로 강조 표시 |
-| 이미지 내보내기 | `SAVE` 버튼으로 `graph.png` 다운로드 |
-| 실시간 갱신 | WebSocket 이벤트를 받으면 노드를 다시 조회하고, 재연결·주기적 조회로 상태 복구 |
-| 요청 안정성 | 생성 재시도의 중복 방지, 버전 기반 수정 충돌 감지, 일반·AI 생성의 별도 동시 실행 제한 |
-| 백엔드 관리 API | 노드 내용 이력·복원, 활동 기록, 하위 트리 지표, 멤버 목록·강퇴·탈퇴·소유권 이전 |
-
-개인 브레인스토밍 화면을 중심으로 구현되어 있습니다. 백엔드에는 소유자 초대·메일 발송·일회성 토큰 참여와 태그 요약 생성·투표·확정 API가 있습니다. 초대·참여·요약·투표 UI는 아직 없습니다. 로컬 Compose의 초대 메일은 외부로 발송하지 않고 [Mailpit 로컬 메일함](http://localhost:18025)에 저장합니다. API 사용법은 [백엔드 협업 흐름](docs/backend-collaboration.md)을 참고합니다.
-
-히스토리·투표 조회 및 처리 API도 있지만, 현재 웹 화면에는 노드 이력·복원·활동·지표·멤버 관리·투표 UI가 없습니다. 노드 내용 복원은 새 버전으로 내용을 되돌리는 API이며, 마인드맵 전체나 삭제된 노드의 복원은 아닙니다. 사용법과 범위는 [백엔드 관리 API](docs/backend-operations.md)를 참고합니다.
+마인드맵 편집·검색·접기·변경 기록 복구에 더해 실행 보드, 체크리스트·반복 과제·선행 조건, 토론·답글·알림, 지식 검색·북마크, AI 제안 검토·채택, 개인 초안·템플릿, JSON/Markdown 백업과 휴지통을 제공한다. 멤버 초대·역할 변경·참여 화면도 포함한다.
 
 ## 구성
 
 ```text
-브라우저: Next.js + React + Cytoscape.js
-    │ REST / WebSocket
-    ▼
-nginx ── REST ── Java 25 / Spring ── OpenAI API
-    └── WebSocket ── FastAPI
-                       │
-                 PostgreSQL 15 (공유 DB / outbox)
+Next.js / React / Cytoscape
+       │
+       nginx ── 모든 업무 API ── Spring / Java 25 ── AI provider
+         └──── WebSocket ────── Python relay
+                                    │
+                     PostgreSQL / transactional outbox
 ```
 
-- **프론트엔드:** Next.js, React, TypeScript, Tailwind CSS, Cytoscape.js, TanStack Query.
-- **백엔드:** Java 25, Spring MVC, JDBC, JWT 인증. 초대·참여·태그 요약도 Spring이 담당하며, FastAPI는 WebSocket·outbox 전달을 담당합니다. 기존 Python 초대·참여 경로는 `410`으로 차단됩니다.
-- **데이터베이스:** PostgreSQL 15. 백엔드 시작 시 DB 준비를 기다리고 `alembic upgrade head`를 실행합니다.
-- **Spring:** `spring/vertical-slice`가 인증·사용자·프로젝트·노드·태그·투표·히스토리 REST API를 담당합니다. 로컬 앱과 개발 Compose의 기본 REST 경로는 Spring입니다. Alembic은 FastAPI 시작 단계에서 실행하며 Spring은 완료 후 시작합니다.
+**WebSocket 전달 외의 백엔드 기능과 DB 마이그레이션은 Spring이 담당한다.** Python에는 업무 HTTP API를 등록하지 않는다. 기존 main과 Workspace 브랜치의 DB는 Spring/Flyway가 데이터를 유지하며 확장한다. 기존 데이터가 있으면 시작 전에 DB 백업을 보관한다.
 
-기존 소개 다이어그램과 ERD는 다음과 같습니다. 이후 추가된 요청·이벤트 계약은 [별도 문서](docs/migration/node-request-and-event-contract.md)를 기준으로 확인합니다.
-
-![프로젝트 소개 다이어그램](images/diagram.png)
-![ERD](images/ERD.png)
+구현 경계, 이전 방법, 복구 범위와 검증 절차는 [Spring 작업 공간 통합](docs/migration/spring-workspace.md)을 참고한다.
 
 ## 실행 방식 선택
 
 Docker와 Docker Compose v2 이상이 필요합니다. 두 앱 구성 모두 프론트 포트 `3000`을 사용하므로 동시에 실행하지 않습니다.
 
-| 구성 | 용도 | 앱 / API 문서 | AI 설정 |
+| 구성 | 용도 | 앱 / API | AI 설정 |
 | --- | --- | --- | --- |
-| `deploy/local-app.compose.yml` | 평소 로컬 사용, production 프론트 빌드, 전용 DB 영속 볼륨 | `3000` / `18000/docs` | 빈 키로 고정 |
-| 루트 `docker-compose.yml` | 개발 서버, 소스 변경 반영, 실제 AI 연결 | `3000` / `8000/docs` | `.env`의 키 사용 |
-| `deploy/local-validation.compose.yml` | Spring 전환·롤백, E2E, 부하 검증 | `18080` / 별도 검증 구성 | 로컬 모의 provider |
+| `deploy/local-app.compose.yml` | 평소 로컬 사용, production 프론트 빌드, 전용 DB 영속 볼륨 | `3000` / `18000` | 빈 키로 고정 |
+| 루트 `docker-compose.yml` | 개발 서버, 소스 변경 반영, 실제 AI 연결 | `3000` / `8000` | `.env`의 키 사용 |
+| `deploy/spring-workspace.compose.yml` | Spring 작업 공간·브라우저·실시간 검증 | `18180` / 같은 주소 | 로컬 모의 provider |
 
 처음 내려받는 경우:
 
@@ -105,7 +85,7 @@ docker compose -p brainnet-local --env-file .env.local \
 다음 실행에서는 `up` 명령의 `--build`를 생략할 수 있습니다.
 
 - 앱: <http://localhost:3000>
-- API 문서: <http://localhost:18000/docs>
+- API: <http://localhost:18000>
 - DB 데이터: `brainnet-local_local-db` 볼륨에 보존됩니다.
 - `.env.local`은 DB 비밀번호와 JWT 비밀값을 담고 있으므로 볼륨과 함께 보관합니다. Git에는 포함되지 않습니다.
 
@@ -149,7 +129,7 @@ docker compose start
 ```
 
 - 앱: <http://localhost:3000>
-- API 문서: <http://localhost:8000/docs>
+- API: <http://localhost:8000>
 - DB: `localhost:5432`
 
 루트 Compose의 프론트는 `npm run dev`로 실행되며 소스 디렉터리를 연결합니다. 이 구성은 고정된 개발용 DB 계정과 호스트 공개 포트를 사용하고, DB의 명시적 이름 있는 볼륨을 정의하지 않습니다. 지속적인 로컬 데이터 보관에는 앞의 로컬 앱 구성을 사용합니다. `down -v`는 볼륨까지 제거하므로 데이터 보존용 중지 명령으로 사용하지 않습니다.
@@ -190,14 +170,14 @@ NEXT_PUBLIC_API_BASE_URL=http://localhost:18000 npm run build
 
 ## API 및 개발 문서
 
-`/docs`와 `/openapi.json`은 호환 계약을 참고하기 위한 FastAPI 문서입니다. 실제 REST 요청은 기본적으로 Spring에서 처리합니다. Java 구현 범위와 차이는 [REST 전환 문서](docs/migration/rest-migration.md)를 참고합니다. 보호된 API에는 `Authorization: Bearer <token>`이 필요합니다. 회원가입·로그인은 토큰 없이 호출하며, 로그인은 JSON이 아닌 `application/x-www-form-urlencoded` 형식의 `username`(이메일)과 `password`를 받습니다.
+모든 REST API는 Spring이 처리한다. `/docs`와 `/openapi.json`은 더 이상 FastAPI 문서로 연결하지 않는다. 보호된 API에는 `Authorization: Bearer <token>`이 필요하다. 로그인은 `application/x-www-form-urlencoded` 형식의 `username`(이메일)과 `password`를 받는다.
 
 | 영역 | 주요 경로 |
 | --- | --- |
 | 인증 | `POST /auth/register`, `POST /auth/login` |
 | 사용자 | `GET /users/me`, `GET /users/me/tag-summaries` |
 | 프로젝트 | `/projects`, `/projects/{project_id}` |
-| 초대·참여 | `POST /projects/{project_id}/invite?email=...`, `POST /projects/join?token=...` |
+| 초대·참여 | `POST /projects/{project_id}/invite?email=...`, `POST /projects/join` (JSON token) |
 | 노드 | `/projects/{project_id}/nodes`, `/projects/{project_id}/nodes/{node_id}` |
 | 노드 활성화 | `POST /projects/{project_id}/nodes/{node_id}/activate`, `/deactivate` |
 | 태그 | `/projects/{project_id}/tags` |
@@ -211,34 +191,16 @@ NEXT_PUBLIC_API_BASE_URL=http://localhost:18000 npm run build
 
 노드 생성 재시도에는 같은 `Idempotency-Key`를 사용하고, 수정에는 `expected_version`을 전달합니다. 상세 동작과 오류 응답은 [노드 요청·이벤트 계약](docs/migration/node-request-and-event-contract.md)을 참고합니다.
 
-## 검증 상태
+## 검증
 
-이번 REST 전환의 구현 범위, 검증 방법과 롤백은 [REST 전환 문서](docs/migration/rest-migration.md)에 정리했습니다. WebSocket·outbox 전달·Alembic은 Python에 남아 있습니다. 새 협업 API의 계약은 [백엔드 협업 흐름](docs/backend-collaboration.md)에 정리했습니다.
+[Spring 작업 공간 검증 절차](docs/migration/spring-workspace.md)와 [CI](.github/workflows/ci.yml)를 기준으로 실행한다. Spring 통합 검사는 실제 PostgreSQL에서 권한·동시 수정·요청 재시도·백업·기존 DB 이전을 검사한다. 브라우저 검사는 전용 계정을 만들고 실제 Spring API에 연결한다. AI는 로컬 모의 provider로 검증하며 실제 외부 API의 품질·요금·장시간 성능 검증을 대신하지 않는다.
 
-저장소의 [2026-09-12 후속 수정 보고서](docs/PERFORMANCE_FIX_2026-09-12.md)에는 다음 결과가 기록되어 있습니다. 이는 해당 시점의 검증 기록이며, 새 환경에서의 실행 성공을 보장하는 결과는 아닙니다.
-
-- Python 57개, 프론트 단위 8개, Spring 19개, Chromium E2E 1개: 총 85개 테스트 통과.
-- 프론트 build/lint, DB 마이그레이션, 런타임 간 API 계약, 이벤트 복구, 전환·롤백 검증 통과.
-- 후속 1시간 연속 검증에서 논리 작업 18,000개, WebSocket 100개, 오류·접속자별 이벤트 누락 0건.
-- AI 부하 검증은 로컬 모의 provider를 사용했으며, 실제 OpenAI 호출의 품질·요금·rate limit 검증은 포함하지 않음.
-
-프론트의 기본 검증 명령:
-
-```bash
-cd frontend
-npm run build
-npm run lint
-npm test
-```
-
-백엔드·Spring·브라우저 통합 검증은 별도 DB와 환경변수가 필요합니다. [CI 설정](.github/workflows/ci.yml), [Docker 검증 절차](deploy/README.md), [부하 측정 안내](experiments/runtime-nodes/README.md)를 참고합니다. 검증 스크립트 일부는 테스트 데이터를 초기화하므로 평소 쓰는 DB에 연결하지 않습니다.
-
-전환 시 서비스 롤백은 v1 계약을 지원하는 FastAPI로 라우팅을 되돌리고 확장된 DB 스키마를 유지하는 방식입니다. 데이터가 있는 환경에서 Alembic downgrade를 실행하면 version·idempotency·outbox 데이터가 삭제되므로 사용하지 않습니다.
+과거 `docs/PERFORMANCE_*`, `experiments/*`, canary·FastAPI 롤백 문서는 당시 실험 기록이다. 현재 실행 경로는 Spring으로 고정되어 있고 과거 롤백 설정을 적용하지 않는다.
 
 ## 디렉터리
 
 ```text
-backend/                 FastAPI 앱, Alembic 마이그레이션, Python 테스트
+backend/                 WebSocket relay, 과거 Python 업무·Alembic 소스, relay 테스트
 frontend/                Next.js 화면, 그래프, 프론트 단위·E2E 테스트
 spring/vertical-slice/   Java 25 / Spring REST API 및 계약 검증
 deploy/                  로컬 앱·검증 Compose, 실행 스크립트, 라우팅·모니터링

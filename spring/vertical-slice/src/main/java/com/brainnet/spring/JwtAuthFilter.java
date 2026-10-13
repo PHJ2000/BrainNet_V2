@@ -1,21 +1,25 @@
 package com.brainnet.spring;
 
-import tools.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.SignedJWT;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Date;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import tools.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
 
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE + 20)
@@ -35,8 +39,12 @@ class JwtAuthFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
-        return path.equals("/health") || (request.getMethod().equals("POST")
-                && (path.equals("/auth/register") || path.equals("/auth/login")));
+        return path.equals("/health")
+                || path.equals("/health/ai")
+                || path.equals("/health/events")
+                || path.equals("/metrics")
+                || (request.getMethod().equals("POST")
+                        && (path.equals("/auth/register") || path.equals("/auth/login")));
     }
 
     @Override
@@ -56,14 +64,17 @@ class JwtAuthFilter extends OncePerRequestFilter {
             }
             Date expiration = jwt.getJWTClaimsSet().getExpirationTime();
             String subject = jwt.getJWTClaimsSet().getSubject();
-            if (expiration == null || expiration.before(new Date())
-                    || subject == null || !subject.matches("[1-9][0-9]*")) {
+            if (expiration == null
+                    || expiration.before(new Date())
+                    || subject == null
+                    || !subject.matches("[1-9][0-9]*")) {
                 throw new IllegalArgumentException("invalid claims");
             }
             request.setAttribute(USER_ID, Long.parseLong(subject));
         } catch (Exception ex) {
             response.setHeader("WWW-Authenticate", "Bearer");
-            String message = header == null ? "Not authenticated" : "Could not validate credentials";
+            String message =
+                    header == null ? "Not authenticated" : "Could not validate credentials";
             ApiErrorWriter.write(mapper, response, 401, "UNAUTHORIZED", message, traceId);
             return;
         }

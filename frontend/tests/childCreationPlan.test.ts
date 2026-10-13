@@ -7,6 +7,24 @@ const payloads = [0, 1, 2].map((order) => ({
   content: "?", parent_id: 11, pos_x: order, pos_y: 0, depth: 1, order, state: "GHOST",
 }));
 
+test("navigation during provider failure does not create a fallback node", async () => {
+  const plan = childCreationPlan("idea", 2, payloads);
+  let current = true;
+  let regularCalls = 0;
+  const config = { headers: new AxiosHeaders() };
+  const complete = await runChildCreationPlan(plan, {
+    ai: async () => {
+      current = false;
+      throw new AxiosError("provider failed", undefined, config, undefined, {
+        status: 503, statusText: "error", headers: {}, config, data: { code: "AI_PROVIDER_UNAVAILABLE" },
+      });
+    },
+    regular: async () => { regularCalls++; },
+  }, () => current);
+  assert.equal(complete, false);
+  assert.equal(regularCalls, 0);
+});
+
 test("partial success and lost response resume the original slots and keys", async () => {
   const plan = childCreationPlan("idea", 2, payloads);
   const attempts: string[] = [];

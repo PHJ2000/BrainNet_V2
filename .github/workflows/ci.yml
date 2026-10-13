@@ -1,323 +1,86 @@
 name: CI
-
-on:
-  push:
-  pull_request:
-
+on: [push, pull_request]
 permissions:
   contents: read
-
 jobs:
-  backend:
-    name: Backend contract and migration
+  spring:
+    name: Spring business contracts and legacy database adoption
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_DB: brainnet_test
-          POSTGRES_USER: brainnet_test
-          POSTGRES_PASSWORD: brainnet_test
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U brainnet_test -d brainnet_test"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
-    env:
-      DATABASE_URL: postgresql+asyncpg://brainnet_test:brainnet_test@localhost:5432/brainnet_test
-      POSTGRES_URL: postgresql://brainnet_test:brainnet_test@localhost:5432/brainnet_test
-      JWT_SECRET: brainnet-ci-test-secret-not-for-production
-      JWT_ALGORITHM: HS256
-      ACCESS_TOKEN_EXPIRE_MINUTES: "30"
-      REQUIRE_NODE_VERSION: "true"
-      PYTHONPATH: backend
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-          cache: pip
-          cache-dependency-path: requirements.txt
-      - name: Install backend dependencies
-        run: python -m pip install --upgrade pip && python -m pip install -r requirements.txt
-      - name: Compile backend Python
-        run: python -m compileall -q backend/app backend/tests
-      - name: Run backend contract tests
-        run: python -m pytest -q backend/tests
-      - name: Check Alembic metadata and render offline upgrade SQL
-        working-directory: backend
-        env:
-          PYTHONPATH: .
-        run: |
-          alembic -c alembic.ini upgrade head
-          alembic -c alembic.ini check
-          alembic -c alembic.ini upgrade head --sql | sed -E 's/[[:space:]]+$//' | perl -0pe 's/\n+\z/\n/' > "$RUNNER_TEMP/alembic-upgrade.sql"
-          test -s "$RUNNER_TEMP/alembic-upgrade.sql"
-          diff -u ../spring/vertical-slice/src/test/resources/alembic-head.sql "$RUNNER_TEMP/alembic-upgrade.sql"
-          grep -qi "outbox_event" "$RUNNER_TEMP/alembic-upgrade.sql"
-      - name: Run real PostgreSQL concurrency regressions
-        env:
-          RUN_POSTGRES_CONCURRENCY_TESTS: "1"
-        run: python -m pytest -q backend/tests/test_postgres_node_concurrency.py backend/tests/test_postgres_node_idempotency.py backend/tests/test_postgres_node_events.py backend/tests/test_postgres_event_operations.py
-      - name: Verify empty-DB schema round-trip for expand migration
-        working-directory: backend
-        env:
-          PYTHONPATH: .
-        run: |
-          python - <<'PY'
-          import os
-          import psycopg
-
-          with psycopg.connect(os.environ["POSTGRES_URL"], autocommit=True) as connection:
-              with connection.cursor() as cursor:
-                  cursor.execute("DROP SCHEMA public CASCADE")
-                  cursor.execute("CREATE SCHEMA public")
-          PY
-          alembic -c alembic.ini upgrade head
-          alembic -c alembic.ini downgrade 4c389bbebfad
-          alembic -c alembic.ini upgrade head
-          python - <<'PY'
-          import os
-          import psycopg
-
-          with psycopg.connect(os.environ["POSTGRES_URL"]) as connection:
-              with connection.cursor() as cursor:
-                  cursor.execute("SELECT version_num FROM alembic_version")
-                  assert cursor.fetchone()[0] == "c2f4a6b8d010"
-                  cursor.execute("SELECT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = %s AND column_name = %s)", ("node", "version"))
-                  assert cursor.fetchone()[0] is True
-                  cursor.execute("SELECT to_regclass(%s), to_regclass(%s)", ("public.idempotency_request", "public.outbox_event"))
-                  assert cursor.fetchone() == ("idempotency_request", "outbox_event")
-                  cursor.execute("SELECT EXISTS (SELECT 1 FROM pg_indexes WHERE schemaname = 'public' AND tablename = 'node' AND indexname = 'uq_node_active_root_per_project')")
-                  assert cursor.fetchone()[0] is True
-          PY
-      - name: Validate Docker Compose configuration
-        run: docker compose config --quiet
-      - name: Build production backend image
-        run: docker build --tag brainnet-backend-ci --file backend/Dockerfile .
-      - name: Smoke production startup, migration, and health endpoint
-        run: |
-          container_name="brainnet-backend-ci"
-          trap 'exit_code=$?; if [ "$exit_code" -ne 0 ]; then docker logs "$container_name" || true; fi; docker rm --force "$container_name" >/dev/null 2>&1 || true; docker image rm brainnet-backend-ci >/dev/null 2>&1 || true; exit "$exit_code"' EXIT
-
-          docker run --detach --name "$container_name" --network host \
-            -e DATABASE_URL \
-            -e JWT_SECRET \
-            -e JWT_ALGORITHM \
-            -e ACCESS_TOKEN_EXPIRE_MINUTES \
-            -e REQUIRE_NODE_VERSION \
-            brainnet-backend-ci
-
-          for _ in $(seq 1 30); do
-            if curl --fail --silent --show-error http://127.0.0.1:8000/health \
-              | grep -q '"status":"ok"'; then
-              exit 0
-            fi
-            sleep 1
-          done
-
-          echo "Backend health check did not become ready" >&2
-          exit 1
-
-  frontend:
-    name: Frontend build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: npm
-          cache-dependency-path: frontend/package-lock.json
-      - name: Install frontend dependencies
-        working-directory: frontend
-        run: npm ci
-      - name: Build frontend
-        working-directory: frontend
-        run: npm run build
-      - name: Lint frontend
-        working-directory: frontend
-        run: npm run lint
-      - name: Test node creation retries
-        working-directory: frontend
-        run: npm test
-
-  spring-vertical-slice:
-    name: Spring vertical slice
-    runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_DB: brainnet_ci
-          POSTGRES_USER: brainnet_ci
-          POSTGRES_PASSWORD: brainnet_ci
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U brainnet_ci -d brainnet_ci"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: "25"
+          java-version: '25'
           cache: maven
           cache-dependency-path: spring/vertical-slice/pom.xml
-      - name: Run Spring integration and concurrency tests
-        run: mvn -B -f spring/vertical-slice/pom.xml test
-      - name: Build Spring runtime image
-        run: docker build --file spring/vertical-slice/Dockerfile --tag brainnet-spring-vertical-slice-ci .
-      - name: Build FastAPI runtime image for differential contract
-        run: docker build --file backend/Dockerfile --tag brainnet-backend-spring-contract-ci .
-      - name: Smoke Spring health endpoint
-        env:
-          DATABASE_URL: postgresql+asyncpg://brainnet_ci:brainnet_ci@127.0.0.1:5432/brainnet_ci
-          JWT_SECRET: brainnet-ci-spring-secret-not-for-production
-          JWT_ALGORITHM: HS256
-          ACCESS_TOKEN_EXPIRE_MINUTES: "30"
-          REQUIRE_NODE_VERSION: "true"
-          SPRING_DATASOURCE_URL: jdbc:postgresql://127.0.0.1:5432/brainnet_ci
-          SPRING_DATASOURCE_USERNAME: brainnet_ci
-          SPRING_DATASOURCE_PASSWORD: brainnet_ci
-        run: |
-          spring_container="brainnet-spring-vertical-slice-ci"
-          backend_container="brainnet-backend-spring-contract-ci"
-          secondary_container="brainnet-backend-events-secondary-ci"
-          trap 'exit_code=$?; if [ "$exit_code" -ne 0 ]; then docker logs "$spring_container" || true; docker logs "$backend_container" || true; docker logs "$secondary_container" || true; fi; docker rm --force "$spring_container" "$backend_container" "$secondary_container" >/dev/null 2>&1 || true; docker image rm brainnet-spring-vertical-slice-ci brainnet-backend-spring-contract-ci >/dev/null 2>&1 || true; exit "$exit_code"' EXIT
-
-          docker run --detach --network host --name "$spring_container" \
-            -e JWT_SECRET \
-            -e SPRING_DATASOURCE_URL \
-            -e SPRING_DATASOURCE_USERNAME \
-            -e SPRING_DATASOURCE_PASSWORD \
-            brainnet-spring-vertical-slice-ci
-
-          spring_ready=false
-          for _ in $(seq 1 30); do
-            if curl --fail --silent --show-error http://127.0.0.1:8080/health \
-              | grep -q '"status":"ok"'; then
-              spring_ready=true
-              break
-            fi
-            sleep 1
-          done
-
-          if [ "$spring_ready" != true ]; then
-            echo "Spring health check did not become ready" >&2
-            exit 1
-          fi
-
-          docker run --detach --network host --name "$backend_container" \
-            -e DATABASE_URL \
-            -e JWT_SECRET \
-            -e JWT_ALGORITHM \
-            -e ACCESS_TOKEN_EXPIRE_MINUTES \
-            -e REQUIRE_NODE_VERSION \
-            brainnet-backend-spring-contract-ci
-
-          for _ in $(seq 1 60); do
-            if curl --fail --silent --show-error http://127.0.0.1:8000/health \
-              | grep -q '"status":"ok"'; then
-              break
-            fi
-            sleep 1
-          done
-          curl --fail --silent --show-error http://127.0.0.1:8000/health \
-            | grep -q '"status":"ok"' || { echo "FastAPI health check did not become ready" >&2; exit 1; }
-
-          docker cp spring/vertical-slice/contract_seed.py "$backend_container:/tmp/contract_seed.py"
-          jwt_token="$(docker exec --workdir /app --env PYTHONPATH=/app "$backend_container" python /tmp/contract_seed.py)"
-          JWT_TOKEN="$jwt_token" FASTAPI_BASE_URL=http://127.0.0.1:8000 SPRING_BASE_URL=http://127.0.0.1:8080 \
-            python3 spring/vertical-slice/contract_probe.py
-          docker exec -i --workdir /app --env PYTHONPATH=/app "$backend_container" python - <<'PY'
-          import os
-          import psycopg
-
-          with psycopg.connect("postgresql://brainnet_ci:brainnet_ci@127.0.0.1:5432/brainnet_ci") as connection:
-              with connection.cursor() as cursor:
-                  cursor.execute("SELECT count(*) FROM node WHERE content='contract-created'")
-                  if cursor.fetchone()[0] != 1:
-                      raise SystemExit("expected exactly one idempotent node")
-                  cursor.execute("SELECT count(*) FROM outbox_event WHERE event_type='node.created'")
-                  if cursor.fetchone()[0] != 4:
-                      raise SystemExit("expected four node.created outbox events across creation probes")
-                  cursor.execute("SELECT response_status FROM idempotency_request WHERE idempotency_key='contract-node-idempotency'")
-                  row = cursor.fetchone()
-                  if row is None or row[0] != 201:
-                      raise SystemExit(f"unexpected idempotency response row: {row}")
-                  cursor.execute("SELECT count(*) FROM node WHERE content='mixed-writer'")
-                  if cursor.fetchone()[0] != 1:
-                      raise SystemExit("mixed-runtime concurrent retry created duplicate nodes")
-          print("Node create DB proof passed: four outbox events, one mixed-writer node, cached 201 response")
-          PY
-          docker logs "$spring_container" > "$RUNNER_TEMP/spring-runtime.log" 2>&1
-          grep -q "request_error status=404 code=NODE_NOT_FOUND trace_id=contract-missing-node" "$RUNNER_TEMP/spring-runtime.log"
-          grep -q "request_complete trace_id=contract-missing-node" "$RUNNER_TEMP/spring-runtime.log"
-          grep -q "request_error status=409 code=NODE_VERSION_CONFLICT trace_id=contract-version-conflict" "$RUNNER_TEMP/spring-runtime.log"
-          grep -q "request_complete trace_id=contract-version-conflict" "$RUNNER_TEMP/spring-runtime.log"
-
-          docker run --detach --network host --name "$secondary_container" \
-            -e DATABASE_URL -e JWT_SECRET -e JWT_ALGORITHM -e ACCESS_TOKEN_EXPIRE_MINUTES \
-            brainnet-backend-spring-contract-ci \
-            python -m uvicorn app.main:app --host 0.0.0.0 --port 8001
-          docker cp spring/vertical-slice/event_probe.py "$backend_container:/tmp/event_probe.py"
-          docker exec --workdir /app --env PYTHONPATH=/app \
-            --env JWT_TOKEN="$jwt_token" \
-            --env POSTGRES_URL=postgresql://brainnet_ci:brainnet_ci@127.0.0.1:5432/brainnet_ci \
-            --env FASTAPI_BASE_URL=http://127.0.0.1:8000 \
-            --env FASTAPI_SECONDARY_URL=http://127.0.0.1:8001 \
-            --env SPRING_BASE_URL=http://127.0.0.1:8080 \
-            "$backend_container" python /tmp/event_probe.py
-
-  local-rollout:
-    name: Browser, provider faults, and rollout
+      - run: mvn -B -f spring/vertical-slice/pom.xml test
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: spring-test-results
+          path: spring/vertical-slice/target/surefire-reports
+  frontend:
+    name: Frontend build and unit tests
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: frontend
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: '20'
           cache: npm
           cache-dependency-path: frontend/package-lock.json
-      - name: Install browser test dependencies
-        working-directory: frontend
-        run: |
-          npm ci
-          npx playwright install --with-deps chromium
-      - name: Build and start disposable validation stack
-        run: |
-          docker compose -f deploy/local-validation.compose.yml build
-          docker compose -f deploy/local-validation.compose.yml up -d
-          for _ in $(seq 1 180); do
-            if curl --fail --silent http://localhost:18080/login >/dev/null \
-              && curl --fail --silent http://localhost:18080/health/events | grep -q '"ready":true'; then
-              exit 0
-            fi
-            sleep 2
-          done
-          echo 'Validation stack did not become ready' >&2
-          exit 1
-      - name: Verify provider faults, two-instance events, cutover, rollback, and browser retries
-        shell: pwsh
-        run: ./deploy/verify-local.ps1
-      - name: Save browser and rollout evidence
-        if: always()
-        uses: actions/upload-artifact@v4
+      - run: npm ci
+      - run: npm run lint && npm test && npm run build
+  relay:
+    name: WebSocket relay boundary and authorization
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql+asyncpg://unused:unused@localhost/unused
+      JWT_SECRET: brainnet-ci-websocket-test-secret-not-for-production
+      PYTHONPATH: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
-          name: local-rollout-evidence
+          python-version: '3.12'
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: python -m compileall -q backend/app
+      - run: python -m pytest -q backend/tests/test_websocket_contract.py backend/tests/test_relay_boundary.py
+  browser:
+    name: Spring-only workspace browser and WebSocket integration
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci --prefix frontend
+      - run: cd frontend && npx playwright install --with-deps chromium
+      - run: docker compose -f deploy/spring-workspace.compose.yml up --build -d --wait --wait-timeout 240
+      - name: Browser journeys against Spring
+        working-directory: frontend
+        env:
+          PLAYWRIGHT_BASE_URL: http://localhost:18180
+        run: npx playwright test --reporter=line
+      - name: Real relay delivery, revocation, and process boundary
+        run: docker compose -f deploy/spring-workspace.compose.yml exec -T backend python /workspace/deploy/verify-spring-relay.py
+      - name: Save diagnostics
+        if: failure()
+        run: docker compose -f deploy/spring-workspace.compose.yml logs --no-color > /tmp/workspace-stack.log
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: workspace-browser-results
           path: |
-            frontend/test-results/
-            experiments/runtime-nodes/results/final-2026-09-12/browser-verified.png
-            experiments/runtime-nodes/results/final-2026-09-12/routing-state.json
-      - name: Stop disposable validation stack
+            frontend/test-results
+            /tmp/workspace-stack.log
+      - name: Stop isolated stack
         if: always()
-        run: |
-          docker compose -f deploy/local-validation.compose.yml logs --no-color --tail 80
-          docker compose -f deploy/local-validation.compose.yml down --volumes
+        run: docker compose -f deploy/spring-workspace.compose.yml down -v

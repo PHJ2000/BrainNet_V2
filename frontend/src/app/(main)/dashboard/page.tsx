@@ -3,29 +3,84 @@
 
 import { useState } from "react";
 import ProjectFormModal from "../../components/ProjectFormModal";
-
+import BackupImport from "@/features/projects/BackupImport";
+import ProjectList from "@/features/projects/ProjectList";
+import KnowledgeLibrary from "@/features/workspace/KnowledgeLibrary";
+import ProjectTrash from "@/features/workspace/ProjectTrash";
+import { AssetList } from "@/features/workspace/PersonalAssets";
+import { Inbox } from "@/features/workspace/Collaboration";
+import { MyWork } from "@/features/workspace/Execution";
 
 export default function DashboardPage() {
   const [modalOpen, setModalOpen] = useState(false);
+  const [view, setView] = useState("projects");
   return (
-    <div className="h-full flex flex-col items-center justify-center py-28">
-      {/* 아이콘(원하면 삭제해도 됨) */}
-      <div className="mb-4">
-        <span className="text-5xl">💡</span>
+    <div className="h-full overflow-auto p-8">
+      <div className="mx-auto max-w-4xl space-y-6">
+        <header className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-800">내 프로젝트</h1>
+            <p className="mt-1 text-sm text-slate-600">
+              작업할 프로젝트를 찾고 아이디어를 이어가세요.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setModalOpen(true)}
+            className="px-6 py-2 rounded-md bg-indigo-700 text-white font-medium hover:bg-indigo-800"
+          >
+            + 새 프로젝트 만들기
+          </button>
+        </header>
+        <nav
+          aria-label="대시보드 보기"
+          className="flex flex-wrap gap-3 border-b border-slate-200"
+        >
+          <button
+            className="px-2 py-3 text-sm"
+            aria-current={view === "projects" ? "page" : undefined}
+            onClick={() => setView("projects")}
+          >
+            프로젝트
+          </button>
+          <button
+            className="px-2 py-3 text-sm"
+            aria-current={view === "knowledge" ? "page" : undefined}
+            onClick={() => setView("knowledge")}
+          >
+            전체 지식 검색
+          </button>
+          <button
+            className="px-2 py-3 text-sm"
+            aria-current={view === "inbox" ? "page" : undefined}
+            onClick={() => setView("inbox")}
+          >
+            알림함
+          </button>
+          <button
+            className="px-2 py-3 text-sm"
+            aria-current={view === "work" ? "page" : undefined}
+            onClick={() => setView("work")}
+          >
+            내 작업함
+          </button>
+        </nav>
+        {view === "projects" ? (
+          <ProjectList />
+        ) : view === "inbox" ? (
+          <Inbox />
+        ) : view === "work" ? (
+          <MyWork />
+        ) : (
+          <KnowledgeLibrary />
+        )}
+        {modalOpen && <ProjectFormModal onClose={() => setModalOpen(false)} />}
+        <div className="mt-4">
+          <BackupImport />
+        </div>
+        <AssetList kind="TEMPLATE" />
+        <ProjectTrash />
       </div>
-      <h2 className="text-2xl font-bold mb-2 text-gray-700">환영합니다!</h2>
-      <p className="text-gray-500 mb-7 text-lg text-center">
-        아직 프로젝트가 없어요.<br/>
-        새로운 프로젝트를 만들어 <span className="text-blue-500 font-semibold">아이디어</span>를 시작해보세요.
-      </p>
-      <button
-        type="button"
-        onClick={() => setModalOpen(true)}
-        className="px-6 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold shadow hover:brightness-110 transition"
-      >
-        + 새 프로젝트 만들기
-      </button>
-      {modalOpen && <ProjectFormModal onClose={() => setModalOpen(false)} />}
     </div>
   );
 }
